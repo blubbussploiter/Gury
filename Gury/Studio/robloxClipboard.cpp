@@ -6,42 +6,42 @@
 
 RBX::StudioClipboard* clipboard = new RBX::StudioClipboard();
 
-void RBX::StudioClipboard::copy(Instance* what)
+void RBX::StudioClipboard::copy(Instance* instance)
 {
-    content->push_back(what->clone());
+    content->push_back(instance->clone());
 }
 
-void RBX::StudioClipboard::copyMultiple(Instances* which)
+void RBX::StudioClipboard::copyMultiple(Instances* instances)
 {
     content->clear();
-    for (size_t i = 0; i < which->size(); i++)
+    for (size_t i = 0; i < instances->size(); i++)
     {
-        Instance* what = which->at(i);
-        if (what)
+        Instance* instance = instances->at(i);
+        if (instance)
         {
-            copy(what);
+            copy(instance);
         }
     }
 }
 
-void RBX::StudioClipboard::cut(Instance* what)
+void RBX::StudioClipboard::cut(Instance* instance)
 {
     GlobalSounds::pageTurn->play();
-    content->push_back(what);
+    content->push_back(instance);
 
     /* set parent to nil (for cutting) */
-    what->setParent(0);
+    instance->setParent(0);
 }
 
-void RBX::StudioClipboard::cutMultiple(Instances* which)
+void RBX::StudioClipboard::cutMultiple(Instances* instances)
 {
     content->clear();
-    for (size_t i = 0; i < which->size(); i++)
+    for (size_t i = 0; i < instances->size(); i++)
     {
-        Instance* what = which->at(i);
-        if (what)
+        Instance* instance = instances->at(i);
+        if (instance)
         {
-            cut(what);
+            cut(instance);
         }
     }
 }
