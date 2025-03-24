@@ -11,5 +11,5 @@ Gury3d is a 2006 roblox studio / client recreation, including lua, graphics and 
 
 # Screenshots
 
-![King arthurs castle screenshot]([https://github.com/blubbussploiter/Gury/blob/master/King%20arthurs.png](https://github.com/blubbussploiter/Gury/blob/master/King%20arthurs.png))
-![Haunted hill screenshot]([https://github.com/blubbussploiter/Gury/blob/master/King%20arthurs.png](https://github.com/blubbussploiter/Gury/blob/master/Haunted%20mansion.png))
+![King Arthur's Castle screenshot](https://github.com/blubbussploiter/Gury/blob/master/King%20arthurs.png)  
+![Haunted Hill screenshot](https://github.com/blubbussploiter/Gury/blob/master/Haunted%20mansion.png)
