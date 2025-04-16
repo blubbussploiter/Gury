@@ -10,10 +10,24 @@
 #include "../Gury/Game/Network/replicator.h"
 
 #include "../Gury/Game/World/workspace.h"
+#include "../Gury/Game/Services/selection.h"
 
 #include "players.h"
 
 using namespace RBX::Network;
+
+/* from https://robloxopolis.com/what-colors-does-the-roblox-player-list-use/ */
+
+static Color3 playerList_Colors[] = {
+	Color3(0.67f, 0.13f, 0.13f), /* Red */
+	Color3(0.16f, 0.29f, 0.84f), /* Blue */
+	Color3(0.11f, 0.41f, 0.07f), /* Green */
+	Color3(0.50f, 0.14f, 0.75f), /* Purple */
+	Color3(1, 0.57f, 0.20f), /* Orange */
+	Color3(1, 0.93f, 0.20f), /* Yellow */
+	Color3(1, 0.80f, 0.95f), /* Pink */
+	Color3(0.91f, 0.87f, 0.73f) /* Tan */
+};
 
 RTTR_REGISTRATION
 {
@@ -25,7 +39,6 @@ RTTR_REGISTRATION
 		.method("createLocalPlayer", &RBX::Network::Players::createLocalPlayer);
 }
 
-
 Player* Players::createLocalPlayer(int userId)
 {
 	Player* player;
@@ -36,17 +49,35 @@ Player* Players::createLocalPlayer(int userId)
 	}
 
 	player = new Player();
+	addPlayer(player);
 
-	if (userId == 0)
-		userId++;
+	if (userId == 0) {
+		userId = 1;
+	}
 
 	player->userId = userId;
 	player->setName("Player");
 
 	localPlayer = player;
-	addPlayer(player);
+	SelectionService::get()->selectionAllowed = false;
 
 	return localPlayer;
+}
+
+void RBX::Network::Players::onPlayerNameChanged(Instance* plr, std::string propertyChanged)
+{
+	if (propertyChanged == "Name") {
+
+		Player* player = toInstance<Player>(plr);
+		Gui::GuiLabel* lbl = player->getGuiName();
+
+		if (lbl && lbl->title != player->getName())
+		{
+			lbl->title = player->getName();
+			lbl->textColor = Players::get()->getPlayerColor(player);
+		}
+
+	}
 }
 
 void RBX::Network::Players::setPlayerList(RBX::Gui::GuiList* _playerList)
@@ -56,45 +87,48 @@ void RBX::Network::Players::setPlayerList(RBX::Gui::GuiList* _playerList)
 
 void Players::destroyPlayer(Player* plr)
 {
-	players.erase(std::remove(players.begin(), players.end(), plr));
-	delete& plr;
+	plr->remove();
 }
 
 void Players::addPlayer(Player* player)
 {
-	RBX::Gui::GuiLabel* lbl;
+	RBX::Gui::GuiLabel* guiName;
 
-	lbl = new RBX::Gui::GuiLabel();
+	guiName = new RBX::Gui::GuiLabel();
 
-	lbl->textColor = Color3::wheelRandom();
-	lbl->title = player->getName();
-	lbl->sz = 10;
+	guiName->textColor = getPlayerColor(player);
+	guiName->title = player->getName();
+	guiName->sz = 10;
 
-	players.push_back(player);
+	player->setParent(this);
+	player->setGuiName(guiName);
+	player->onChanged.connect(onPlayerNameChanged);
 
 	playerList->visible = true;
-	playerList->addChild(lbl);
+	playerList->addChild(guiName);
 }
 
-void Players::updatePlayerList()
+Color3 RBX::Network::Players::getPlayerColor(Player* player)
 {
-	for (unsigned int i = 0; i < players.size(); i++)
-	{
-		Player* p = players.at(i);
-		RBX::Gui::GuiLabel* lbl = p->getGuiName();
+	return playerList_Colors[rand() % sizeof(playerList_Colors) / sizeof(Color3)];
+}
 
-		if (lbl && lbl->title != p->getName())
-		{
-			lbl->title = p->getName();
-		}
+void RBX::Network::Players::doOnChildAdded(Instance* child)
+{
+	Player* player = toInstance<Player>(child);
+	if (player)
+	{
+		Players::get()->onPlayerAdded(player);
 	}
 }
 
-void RBX::Network::Players::onStep()
+void RBX::Network::Players::doOnChildRemoved(Instance* child)
 {
-	if (localPlayer)
+	Player* player = toInstance<Player>(child);
+	if (player)
 	{
-		localPlayer->backpack->updateGui();
+		player->onRemove();
+		Players::get()->onPlayerRemoving(player);
 	}
 }
 

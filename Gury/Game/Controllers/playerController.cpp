@@ -16,19 +16,22 @@ void RBX::Network::PlayerController::doMove()
 	if (character)
 	{
 		humanoid = character->findFirstChildOfClass<Humanoid>("Humanoid");
-
-		if (!moving())
+		if (humanoid)
 		{
-			humanoid->setWalkDirection(Vector3::zero());
-			return;
+
+			if (!getMoving())
+			{
+				humanoid->setWalkDirection(Vector3::zero());
+				return;
+			}
+
+			CoordinateFrame cameraCoord = Camera::get()->cframe;
+			Vector3 movementHorizontal, movementVertical;
+
+			movementHorizontal = cameraCoord.rightVector() * horizontal;
+			movementVertical = cameraCoord.lookVector() * vertical;
+
+			humanoid->setWalkDirection(normalize(movementHorizontal + movementVertical));
 		}
-			
-		CoordinateFrame cameraCoord = Camera::get()->cframe;
-		Vector3 movementHorizontal, movementVertical;
-		
-		movementHorizontal = cameraCoord.rightVector() * horizontal;
-		movementVertical = cameraCoord.lookVector() * vertical;
-		
-		humanoid->setWalkDirection(normalize(movementHorizontal + movementVertical));
 	}
 }

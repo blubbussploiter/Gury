@@ -13,7 +13,7 @@ TextureRef cursor_far;
 TextureRef cursor_close;
 TextureRef cursor_clicker;
 
-float szx = 150, szy = 150;
+float szx = 125, szy = 125;
 
 RBX::Mouse* mouse;
 HCURSOR oldCursor;
@@ -42,24 +42,7 @@ RBX::ModelInstance* RBX::Mouse::getModelTarget()
 	return (RBX::ModelInstance*)(RBX::World::getModelFromG3DRay<Instance>(ray, hitWorld));
 }
 
-bool RBX::Mouse::inGuryWindow()
-{
-	RBX::Experimental::Application* app;
-	app = RBXManager::get()->getApplication();
-
-	if (app)
-	{
-		RECT rect;
-		GetClientRect(app->viewHwnd, &rect);
-
-		return (x >= rect.left && y >= rect.top &&
-			x < rect.right && y < rect.bottom) && (GetFocus() == app->viewHwnd);
-	}
-
-	return nullptr;
-}
-
-void RBX::Mouse::update(UserInput* ui)
+void RBX::Mouse::doUserInput(UserInput* ui)
 {
 	if (!ui->keyDown(SDL_RIGHT_MOUSE_KEY))
 	{
@@ -68,14 +51,14 @@ void RBX::Mouse::update(UserInput* ui)
 		cx = x - szx / 2;
 		cy = y - szy / 2;
 	}
-
-	updateCursorInfo();
 }
 
-void RBX::Mouse::updateCursorInfo()
+void RBX::Mouse::updateCursorInfo(bool overGui)
 {
 	if (cursor_clicker.isNull() || cursor_close.isNull()) return;
-	if (SelectionService::get()->getPossibleSelectedItem() != 0)
+	if (overGui && 
+		SelectionService::get()->selectionAllowed &&
+		SelectionService::get()->getPossibleSelectedItem() != 0)
 	{
 		currentglId = cursor_clicker->getOpenGLID();
 	}
@@ -95,7 +78,8 @@ void RBX::Mouse::render(RenderDevice* rd)
 		currentglId = cursor_close->getOpenGLID();
 	}
 
-	if (inGuryWindow())
+	RBX::Experimental::Application* application = RBXManager::get()->getApplication();
+	if (application && application->inGuryWindow())
 	{
 
 		rd->push2D();

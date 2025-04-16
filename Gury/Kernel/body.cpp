@@ -63,6 +63,16 @@ void RBX::Body::modifyPosition(Vector3 position)
 	modifyPosition(CoordinateFrame(position));
 }
 
+void RBX::Body::modifyRotation(Matrix3 rotation)
+{
+	if (body)
+	{
+		float dRotation[12] = toDMatrix3(rotation);
+
+		dBodySetRotation(body, dRotation);
+	}
+}
+
 void RBX::Body::modifyPosition(CoordinateFrame position)
 {
 	Vector3 translation = position.translation;

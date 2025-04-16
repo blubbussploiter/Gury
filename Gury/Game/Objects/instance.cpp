@@ -23,7 +23,10 @@ RTTR_REGISTRATION
 		 .property("archivable", &RBX::Instance::getArchivable, &RBX::Instance::setArchivable)(rttr::metadata("Type", RBX::Behavior))
 		 .property("Parent", &RBX::Instance::getParent,
 			 &RBX::Instance::setParent)(rttr::metadata("Serializable", false))
+		.property_readonly("Changed", &RBX::Instance::desc_onChanged) /* Signal? */
+		.property_readonly("ChildAdded", &RBX::Instance::desc_onChildAdded)
 		.method("remove", &RBX::Instance::remove)
+		.method("clone", &RBX::Instance::clone)
 		.method("children", &RBX::Instance::getChildren)
 		.method("findFirstChild", &RBX::Instance::findFirstChild);
 }
@@ -114,26 +117,30 @@ void RBX::Instance::setParent(Instance* instance)
 		throw std::runtime_error(RBX::Format("Attempt to set %s as its own parent", getName().c_str()));
 	}
 
-	if (oldParent)
-	{
-		if (std::find(parent->getChildren()->begin(), parent->getChildren()->end(), this) != parent->getChildren()->end())
+	if (oldParent != instance) {
+
+		if (oldParent)
 		{
-			parent->signalOnDescendentRemoved(instance, this);
-			parent->getChildren()->erase(std::remove(parent->getChildren()->begin(), parent->getChildren()->end(), this));
-			oldParent->onChildRemoved(this);
+			if (std::find(parent->getChildren()->begin(), parent->getChildren()->end(), this) != parent->getChildren()->end())
+			{
+				parent->signalOnDescendentRemoved(instance, this);
+				parent->getChildren()->erase(std::remove(parent->getChildren()->begin(), parent->getChildren()->end(), this));
+				oldParent->onChildRemoved(this);
+			}
 		}
+		parent = instance;
+
+		if (parent)
+		{
+			parent->children->push_back(this);
+			parent->onChildAdded(this);
+
+			if (!parent->contains(oldParent))
+				parent->signalOnDescendentAdded(parent, this);
+		}
+
 	}
-	parent = instance;
-
-	if (parent)
-	{
-		parent->children->push_back(this);
-		parent->onChildAdded(this);
-
-		if (!parent->contains(oldParent))
-			parent->signalOnDescendentAdded(parent, this);
-	}
-
+	
 	onChanged(this, "Parent");
 }
 

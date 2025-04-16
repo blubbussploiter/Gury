@@ -130,7 +130,7 @@
     <ClCompile Include="Application\gurycursor.cpp" />
     <ClCompile Include="Application\iobfix.cpp" />
     <ClCompile Include="Application\md5.cpp" />
-    <ClCompile Include="Application\poll.cpp" />
+    <ClCompile Include="Application\inputPolling.cpp" />
     <ClCompile Include="Game\classes.cpp" />
     <ClCompile Include="Game\Controllers\playerController.cpp" />
     <ClCompile Include="Game\Controllers\rightkeyboard.cpp" />
@@ -145,12 +145,15 @@
     <ClCompile Include="Game\Gui\GuiList.cpp" />
     <ClCompile Include="Game\Gui\GuiMessage.cpp" />
     <ClCompile Include="Game\Gui\GuiRoot.cpp" />
-    <ClCompile Include="Game\Gui\MenuBar.cpp" />
+    <ClCompile Include="Game\Gui\TopMenuBar.cpp" />
     <ClCompile Include="Game\log.cpp" />
     <ClCompile Include="Game\Lua\cframemt.cpp" />
-    <ClCompile Include="Game\Lua\instancemt.cpp" />
+    <ClCompile Include="Game\Lua\instanceBridge.cpp" />
     <ClCompile Include="Game\Lua\luargs.cpp" />
-    <ClCompile Include="Game\Lua\valuebridge.cpp" />
+    <ClCompile Include="Game\Lua\signalBridge.cpp" />
+    <ClCompile Include="Game\Lua\signaldescriptor.cpp" />
+    <ClCompile Include="Game\Lua\signalInstance.cpp" />
+    <ClCompile Include="Game\Lua\variantBridge.cpp" />
     <ClCompile Include="Game\Lua\vector3mt.cpp" />
     <ClCompile Include="Game\Network\guid.cpp" />
     <ClCompile Include="Game\Network\idserializer.cpp" />
@@ -169,6 +172,7 @@
     <ClCompile Include="Game\Objects\controller.cpp" />
     <ClCompile Include="Game\Objects\decal.cpp" />
     <ClCompile Include="Game\Objects\fileMesh.cpp" />
+    <ClCompile Include="Game\Objects\headmesh.cpp" />
     <ClCompile Include="Game\Objects\Humanoid\humanoid.cpp" />
     <ClCompile Include="Game\Objects\Humanoid\humanoidPhysicsStuff.cpp" />
     <ClCompile Include="Game\Objects\instance.cpp" />
@@ -183,6 +187,8 @@
     <ClCompile Include="Game\Objects\PVInstance\pvinstanceAppearanceWrite.cpp" />
     <ClCompile Include="Game\Objects\specialMesh.cpp" />
     <ClCompile Include="Game\Objects\wedgemesh.cpp" />
+    <ClCompile Include="Game\Objects\World\hint.cpp" />
+    <ClCompile Include="Game\Objects\World\message.cpp" />
     <ClCompile Include="Game\Rendering\brickcolor.cpp" />
     <ClCompile Include="Game\Rendering\brickmap.cpp" />
     <ClCompile Include="Game\Rendering\diagnosticsWorldDrawer.cpp" />
@@ -206,9 +212,10 @@
     <ClCompile Include="Game\Services\content.cpp" />
     <ClCompile Include="Game\Services\contentprovider.cpp" />
     <ClCompile Include="Game\Services\crashreporter.cpp" />
+    <ClCompile Include="Game\Services\Hopper.cpp" />
     <ClCompile Include="Game\Services\scriptcontext.cpp" />
     <ClCompile Include="Game\Services\selectionservice.cpp" />
-    <ClCompile Include="Game\Services\sounds.cpp" />
+    <ClCompile Include="Game\Services\soundservice.cpp" />
     <ClCompile Include="Game\Services\stdout.cpp" />
     <ClCompile Include="Game\World\camera.cpp" />
     <ClCompile Include="Game\World\cameraUtilities.cpp" />
@@ -228,23 +235,31 @@
     <ClCompile Include="Kernel\kernel.cpp" />
     <ClCompile Include="Kernel\primitive.cpp" />
     <ClCompile Include="Main\main.cpp" />
-    <ClCompile Include="Studio\ChildFrm.cpp" />
-    <ClCompile Include="Studio\DragTool.cpp" />
-    <ClCompile Include="Studio\ExplorerView.cpp" />
-    <ClCompile Include="Studio\ExplorerViewTree.cpp" />
-    <ClCompile Include="Studio\InsertDialog.cpp" />
-    <ClCompile Include="Studio\MainFrm.cpp" />
-    <ClCompile Include="Studio\MoveTool.cpp" />
-    <ClCompile Include="Studio\OutputWnd.cpp" />
+    <ClCompile Include="Studio\App\GuryChildFrame.cpp" />
+    <ClCompile Include="Studio\Documents\htmlDocument.cpp" />
+    <ClCompile Include="Studio\Documents\htmlView.cpp" />
+    <ClCompile Include="STUDIO\DOCUMENTS\scriptEditDoc.cpp" />
+    <ClCompile Include="Studio\Documents\scriptEditorView.cpp" />
+    <ClCompile Include="Studio\Windows\GuryGameFrame.cpp" />
+    <ClCompile Include="Studio\Gury Interaction\Studio Tools\DragTool.cpp" />
+    <ClCompile Include="Studio\Windows\CRBXHtmlView.cpp" />
+    <ClCompile Include="Studio\Windows\ExplorerView.cpp" />
+    <ClCompile Include="Studio\Windows\ExplorerViewTree.cpp" />
+    <ClCompile Include="Studio\Windows\Dialogs\InsertDialog.cpp" />
+    <ClCompile Include="Studio\Windows\MainFrm.cpp" />
+    <ClCompile Include="Studio\Gury Interaction\Studio Tools\MoveTool.cpp" />
+    <ClCompile Include="Studio\Windows\OutputWnd.cpp" />
     <ClCompile Include="Studio\pch.cpp" />
-    <ClCompile Include="Studio\PropertiesWnd.cpp" />
-    <ClCompile Include="Studio\robloxClipboard.cpp" />
-    <ClCompile Include="Studio\robloxProperty.cpp" />
-    <ClCompile Include="Studio\StudioTool.cpp" />
-    <ClCompile Include="Studio\supergurymfc.cpp" />
-    <ClCompile Include="Studio\supergurymfcDoc.cpp" />
-    <ClCompile Include="Studio\supergurymfcView.cpp" />
-    <ClCompile Include="Studio\toolbarTools.cpp" />
+    <ClCompile Include="Studio\Windows\PropertiesWnd.cpp" />
+    <ClCompile Include="Studio\Gury Interaction\robloxClipboard.cpp" />
+    <ClCompile Include="Studio\Gury Interaction\robloxProperty.cpp" />
+    <ClCompile Include="Studio\Gury Interaction\StudioNavigator.cpp" />
+    <ClCompile Include="Studio\Gury Interaction\Studio Tools\StudioTool.cpp" />
+    <ClCompile Include="Studio\App\supergurymfc.cpp" />
+    <ClCompile Include="Studio\App\GuryDoc.cpp" />
+    <ClCompile Include="Studio\App\GuryView.cpp" />
+    <ClCompile Include="Studio\Gury Interaction\toolbarTools.cpp" />
+    <ClCompile Include="Studio\Windows\StartPage.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\application.h" />
@@ -252,6 +267,11 @@
     <ClInclude Include="Application\gurycursor.h" />
     <ClInclude Include="Application\md5.h" />
     <ClInclude Include="Game\globalSounds.h" />
+    <ClInclude Include="Game\Lua\signaldescriptor.h" />
+    <ClInclude Include="Game\Lua\signalInstance.h" />
+    <ClInclude Include="Game\Objects\World\hint.h" />
+    <ClInclude Include="Game\Objects\World\message.h" />
+    <ClInclude Include="Game\Services\Hopper.h" />
     <ClInclude Include="Main\framework.h" />
     <ClInclude Include="Game\classes.h" />
     <ClInclude Include="Game\Controllers\rightkeyboard.h" />
@@ -344,9 +364,14 @@
     <ClInclude Include="Kernel\kernel.h" />
     <ClInclude Include="Kernel\primitive.h" />
     <ClInclude Include="Main\resource.h" />
+    <ClInclude Include="Studio\App\GuryChildFrame.h" />
     <ClInclude Include="Studio\ChildFrm.h" />
     <ClInclude Include="Studio\CInsertObjectDlg.h" />
     <ClInclude Include="Studio\ClassView.h" />
+    <ClInclude Include="Studio\Documents\htmlDocument.h" />
+    <ClInclude Include="Studio\Documents\htmlView.h" />
+    <ClInclude Include="Studio\Documents\scriptEditorDocument.h" />
+    <ClInclude Include="Studio\Documents\scriptEditorView.h" />
     <ClInclude Include="Studio\DragTool.h" />
     <ClInclude Include="Studio\FileView.h" />
     <ClInclude Include="Studio\MainFrm.h" />
@@ -361,6 +386,8 @@
     <ClInclude Include="Studio\supergurymfcView.h" />
     <ClInclude Include="Studio\ViewTree.h" />
     <ClInclude Include="Main\targetver.h" />
+    <ClInclude Include="Studio\Windows\rbxhtml.h" />
+    <ClInclude Include="Studio\Windows\startPage.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Main\supergurymfc.aps" />
@@ -402,7 +429,7 @@
     <ProjectGuid>{CF8EA185-0F2A-474A-A66B-8E3825E2F907}</ProjectGuid>
     <Keyword>MFCProj</Keyword>
     <RootNamespace>supergurymfc</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.22000.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -521,10 +548,14 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_WINDOW;_CRT_SECURE_NO_WARNINGS;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOW;_CRT_SECURE_NO_WARNINGS;NOMINMAX%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>..\include;..\include\include;..\include\fmod\inc;..\include\fmod\studio;..\include\ode;..\include\png;..\include\rttr;..\include\lua;..\include\ode;..\include\ode\OPCODE;</AdditionalIncludeDirectories>
       <CallingConvention>Cdecl</CallingConvention>
+      <ShowIncludes>false</ShowIncludes>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
+      <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -536,7 +567,8 @@
       <StackReserveSize>8388608</StackReserveSize>
       <StackCommitSize>
       </StackCommitSize>
-      <HeapReserveSize>8388608</HeapReserveSize>
+      <HeapReserveSize>
+      </HeapReserveSize>
       <HeapCommitSize>
       </HeapCommitSize>
     </Link>

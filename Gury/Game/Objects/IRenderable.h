@@ -45,12 +45,14 @@ namespace RBX
 			virtual void writeBrickFace(NormalId face, int unit, bool repeat = false) {};
 
 			virtual void editBrickFace(NormalId face, int unit, bool repeat = false) {};
-			virtual void plainRender(RenderDevice* renderDevice) {} /* for other world rendered things */
+
+			virtual void render2D(RenderDevice* renderDevice) {} /* for rendering 2dly */
+			virtual void renderAdornee(RenderDevice* renderDevice) {} /* for other world rendered things */
 
 			/* levels */
 
-			void addVIndicesToProxy(Render::Mesh* proxy, Table<NormalId, Face> vIndices);
-			void removeVIndicesFromProxy(Render::Mesh* proxy, Table<NormalId, Face> vIndices);
+			void addVertexIndicesToProxy(Render::Mesh* proxy, Table<NormalId, Face> vIndices);
+			void removeVertexIndicesFromProxy(Render::Mesh* proxy, Table<NormalId, Face> vIndices);
 
 			void addToProxy(Render::Mesh* proxy);
 			void removeFromProxy(Render::Mesh* proxy);

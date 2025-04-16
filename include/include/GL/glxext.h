@@ -36,7 +36,11 @@ extern "C" {
 
 #if defined(_WIN32) && !defined(APIENTRY) && !defined(__CYGWIN__)
 	#define WIN32_LEAN_AND_MEAN 1
-	#include <windows.h>
+    #ifndef BUILDWXP
+    #include <windows.h>
+    #else
+    #include <afxwin.h>
+    #endif
 #else
 	#ifndef _WIN32
 		#include "GL/glx.h"

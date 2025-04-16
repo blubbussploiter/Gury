@@ -9,7 +9,9 @@
 
 #include "../Gury/Application/appmanager.h"
 #include "../Gury/Game/Serializer/serializer.h"
+
 #include "../Gury/Game/Services/stdout.h"
+#include "../Gury/Game/Services/Hopper.h"
 
 #include "../Gury/Game/World/runservice.h"
 #include "../Gury/Kernel/jointsservice.h"
@@ -86,7 +88,7 @@ void RBX::Datamodel::fillExplorerWindow()
     addToExplorerWindow(players);
     addToExplorerWindow(lighting);
     addToExplorerWindow(soundService);
-    addToExplorerWindow(jointService);
+    addToExplorerWindow(hopper);
 }
 
 void RBX::Datamodel::emptyExplorerWindow()
@@ -104,9 +106,22 @@ void RBX::Datamodel::removeFromExplorerWindow(RBX::Instance* i)
     CMainFrame::mainFrame->m_wndClassView.RemoveInstance(i);
 }
 
+void RBX::Datamodel::render(RenderDevice* renderDevice)
+{
+    if (!gameHint->text.empty()) {
+        gameHint->render(renderDevice);
+    }
+
+    if (!gameMessage->text.empty()) {
+        gameMessage->render(renderDevice);
+    }
+}
+
 void RBX::Datamodel::open()
 {
     guiRoot = new Gui::GuiRoot();
+    players = new RBX::Network::Players();
+    hopper = new Hopper();
     workspace = new Workspace();
     runService = new RunService();
     renderScene = new Render::RenderScene();
@@ -116,7 +131,6 @@ void RBX::Datamodel::open()
     thumbnailGenerator = new ThumbnailGenerator();
     scriptContext = new ScriptContext();
     soundService = new SoundService();
-    players = new RBX::Network::Players();   
     jointService = new JointsService();
     selectionService = new SelectionService();
     runService->scriptContext = scriptContext;

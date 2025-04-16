@@ -7,7 +7,7 @@
 #include "../Gury/Game/Services/stdout.h"
 #include "../Gury/Game/Network/Player/players.h"
 
-static RBX::Sound* switch3 = RBX::Sound::fromFile(GetFileInPath("/content/sounds/SWITCH3.wav"));
+static RBX::Sound* switch3 = RBX::Sound::fromFile("rbxasset://sounds\\SWITCH3.wav");
 
 void RBX::Camera::lookAt(const Vector3& position)
 {

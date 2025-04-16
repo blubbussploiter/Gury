@@ -175,10 +175,10 @@ public:
     inline static Rect2D xyxy(float x0, float y0, float x1, float y1) {
         Rect2D r;
         
-        r.min.x = G3D::min(x0, x1);
-        r.min.y = G3D::min(y0, y1);
-        r.max.x = G3D::max(x0, x1);
-        r.max.y = G3D::max(y0, y1);
+        r.min.x = std::min(x0, x1);
+        r.min.y = std::min(y0, y1);
+        r.max.x = std::max(x0, x1);
+        r.max.y = std::max(y0, y1);
 
         return r;
     }

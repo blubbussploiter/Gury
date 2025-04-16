@@ -12,7 +12,7 @@
 
 #include "humanoid.h"
 
-RBX::Sound* uuhhh = RBX::Sound::fromFile(GetFileInPath("/content/sounds/uuhhh.wav"));
+RBX::Sound* uuhhh = RBX::Sound::fromFile("rbxasset://sounds\\uuhhh.wav");
  
 RTTR_REGISTRATION
 {
@@ -282,7 +282,7 @@ void RBX::Humanoid::updateHumanoidState()
 
 }
 
-void RBX::Humanoid::plainRender(RenderDevice* renderDevice)
+void RBX::Humanoid::renderAdornee(RenderDevice* renderDevice)
 {
     renderMultiplayer(renderDevice);
 }

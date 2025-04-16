@@ -17,7 +17,7 @@
 POINT oldMouse;
 POINT mouse;
 
-RBX::Sound* RBX::Camera::switch3 = RBX::Sound::fromFile(GetFileInPath("/content/sounds/SWITCH3.wav"));
+RBX::Sound* RBX::Camera::switch3 = RBX::Sound::fromFile("rbxasset://sounds\\SWITCH3.wav");
 
 RTTR_REGISTRATION
 {
@@ -160,7 +160,7 @@ void RBX::Camera::update(bool rightMouseDown)
 
 void RBX::Camera::doMove()
 {
-    if (!moving())
+    if (!getMoving())
         return;
 
     Vector3 horizontalVector = vertical *cframe.lookVector();

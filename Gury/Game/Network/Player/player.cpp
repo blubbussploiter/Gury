@@ -64,15 +64,16 @@ void Player::loadCharacter()
 
 	if (!IsA<RBX::PartInstance>(head) || !IsA<RBX::PartInstance>(humanoidRootPart)) return;
 
-	Extents ce;
-	Vector3 pos;
+	Extents levelExtents;
+	Vector3 levelExtentsCentre;
 
 	Workspace* workspace;
+
 	workspace = Workspace::get();
+	levelExtents = workspace->getModelWorldExtents();
 
-	pos = Camera::get()->camera->getCoordinateFrame().translation;
-
-	character->translate(pos);
+	levelExtentsCentre = Camera::get()->camera->getCoordinateFrame().translation;
+	character->translate(levelExtentsCentre);
 
 	controller = new PlayerController();
 	controller->init(this);
@@ -99,15 +100,48 @@ void Player::disposeActiveBin()
 	activeBin = 0;
 }
 
+void RBX::Network::Player::onRemove()
+{
+	Players* players = Players::get();
+	Camera* camera = Camera::get();
+
+	if (players->getNumPlayers() == 0) {
+		players->playerList->visible = false;
+	}
+
+	if (guiName) {
+		guiName->remove();
+	}
+
+	if (character) {
+
+		character->remove();
+
+		camera->disable(false);
+		camera->cameraSubject = 0;
+		camera->cameraType = Fixed;
+	}
+}
+
 void Player::setAsController()
 {
 	if (character)
 	{
 		RBX::ControllerService::get()->addController(controller);
-		RBX::Camera::get()->disable(1);
+		RBX::Camera::get()->disable(true);
 	}
 }
 
-void RBX::Network::Player::render(RenderDevice* rd)
+void RBX::Network::Player::onPlayerMessageAdded(Instance* playerMsg)
 {
+	if (IsA<Render::IRenderable>(playerMsg)) {
+		Scene::get()->onWorkspaceDescendentAdded(toInstance<Render::IRenderable>(playerMsg));
+	}
+}
+
+void RBX::Network::Player::onPlayerMessageRemoved(Instance* playerMsg)
+{
+	if (IsA<Render::IRenderable>(playerMsg)) {
+		Scene::get()->onWorkspaceDescendentRemoved(toInstance<Render::IRenderable>(playerMsg));
+	}
 }

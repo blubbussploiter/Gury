@@ -14,20 +14,27 @@
 
 #include "scriptcontext.h"
 
-int instanceNew(lua_State* L)
+RBX_LUA_REGISTER_NAME(RBX::Instance, "Instance");
+RBX_LUA_REGISTER_NAME(RBX::SignalInstance, "Signal");
+
+int RBX::ScriptContext::instanceNew(lua_State* L)
 {
+	int nargs = lua_gettop(L);
 	const char* instance = luaL_checkstring(L, 1);
-	if (!instance) return 0;
 
-	RBX::Instance* newInstance = RBX::fromName(instance);
-
-	if (!lua_isnil(L, 2))
+	if (instance)
 	{
-		newInstance->setParent(RBX::Lua::SharedPtrBridge<RBX::Instance>::getPtr(L, 2));
+		RBX::Instance* newInstance = RBX::fromName(instance);
+
+		if (nargs == 2)
+		{
+			newInstance->setParent(RBX::Lua::SharedPtrBridge<RBX::Instance>::getPtr(L, 2));
+		}
+
+		RBX::Lua::SharedPtrBridge<RBX::Instance>::pushObject(L, newInstance);
+		return 1;
 	}
 
-	RBX::Lua::SharedPtrBridge<RBX::Instance>::push(L, newInstance);
-	return 1;
 }
 
 void RBX::ScriptContext::openState()
@@ -46,12 +53,13 @@ void RBX::ScriptContext::openState()
 
 		RBX_LUA_REGISTER(globalState, G3D::Vector3);
 		RBX_LUA_REGISTER(globalState, G3D::CoordinateFrame);
+		RBX_PTR_LUA_REGISTER(globalState, RBX::SignalInstance);
 		RBX_PTR_LUA_REGISTER(globalState, RBX::Instance);
 
-		RBX::Lua::SharedPtrBridge<RBX::Instance>::push(globalState, Datamodel::get());
+		RBX::Lua::SharedPtrBridge<RBX::Instance>::pushObject(globalState, Datamodel::get());
 		lua_setglobal(globalState, "game");
 
-		RBX::Lua::SharedPtrBridge<RBX::Instance>::push(globalState, Workspace::get());
+		RBX::Lua::SharedPtrBridge<RBX::Instance>::pushObject(globalState, Workspace::get());
 		lua_setglobal(globalState, "workspace");
 
 		lua_register(globalState, "wait", &ScriptContext::wait);
@@ -166,7 +174,7 @@ void RBX::ScriptContext::runScript(RBX::BaseScript* script)
 			throw std::exception("ScriptContext::runScript: Unable to create a new thread");
 		}
 
-		RBX::Lua::SharedPtrBridge<RBX::Instance>::push(thread, script);
+		RBX::Lua::SharedPtrBridge<RBX::Instance>::pushObject(thread, script);
 		lua_setglobal(thread, "script");
 
 		source = script->getSource();
@@ -177,7 +185,7 @@ void RBX::ScriptContext::runScript(RBX::BaseScript* script)
 
 			if (luaL_loadbuffer(thread, raw.c_str(), raw.size(), script->getName().c_str()))
 			{
-				RBX::StandardOut::print(RBX::MESSAGE_ERROR, lua_tolstring(thread, -1, 0));
+				doError(lua_tolstring(thread, -1, 0));
 				lua_pop(thread, 1);
 				return;
 			}
@@ -194,7 +202,15 @@ void RBX::ScriptContext::runScript(RBX::BaseScript* script)
 void RBX::ScriptContext::close()
 {
 	scripts.clear();
-	lua_close(globalState);
+	if (globalState)
+	{
+		lua_close(globalState);
+	}
+}
+
+void RBX::ScriptContext::doError(std::string error)
+{
+	RBX::StandardOut::print(RBX::MESSAGE_ERROR, error.c_str());
 }
 
 void RBX::ScriptContext::runScripts()
@@ -204,8 +220,10 @@ void RBX::ScriptContext::runScripts()
 		for (unsigned int i = 0; i < scripts.size(); i++)
 		{
 			RBX::BaseScript* script = scripts.at(i);
-			if (!script) continue;
-			runScript(script);
+			if (script)
+			{
+				runScript(script);
+			}
 		}
 	}
 	catch (std::exception err)
@@ -229,11 +247,11 @@ int RBX::ScriptContext::print(lua_State* L)
 			return luaL_error(L, LUA_QL("tostring") " must return a string to "
 				LUA_QL("print"));
 		if (i > 1)
-			RBX::Log::writeEntry("\t", 1);
+			RBX::Log::writeEntry("&nbsp;", 1); /* html formatted \t */
 		RBX::Log::writeEntry(s, 1);
 		lua_pop(L, 1);  /* pop result */
 	}
-	RBX::Log::writeEntry("\n", 1);
+	RBX::Log::writeEntry("<br>", 1);
 	return 0;
 }
 

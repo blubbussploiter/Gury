@@ -13,6 +13,8 @@
 #define IDS_TOOLBAR_STANDARD            124
 #define IDS_TOOLBAR_CUSTOMIZE           125
 #define ID_VIEW_CUSTOMIZE               126
+#define IDR_STARTPAGE                   126
+#define IDR_HTMLVIEW                    126
 #define ID_TOOLBAR_MOUSE                127
 #define IDR_MAINFRAME                   128
 #define IDR_MAINFRAME_256               129
@@ -87,6 +89,7 @@
 #define IDS_EXPLORER                    305
 #define IDS_EDIT_MENU                   306
 #define IDS_GAME_VIEW                   307
+#define IDR_SCRIPTEDITOR                308
 #define IDB_BITMAP1                     316
 #define IDR_TOOLBAR1                    317
 #define IDR_TOOLBAR2                    319

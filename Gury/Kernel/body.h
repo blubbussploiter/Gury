@@ -69,6 +69,8 @@ namespace RBX
 
 		void modifyPosition(Vector3 position);
 
+		void modifyRotation(Matrix3 rotation);
+
 		void modifyPosition(CoordinateFrame position);
 
 		void modifyPV(PV pv);

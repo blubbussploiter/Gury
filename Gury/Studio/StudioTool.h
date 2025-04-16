@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+#include <functional>
 #include <G3DAll.h>
 
 namespace RBX
@@ -24,6 +25,19 @@ namespace RBX
 
 			virtual void doGraphics(RenderDevice* renderDevice) {}
 
+		};
+
+		class StudioNavigator {
+		private:
+			Table<SDLKey, std::function<void()>> actions;
+		public:
+
+			void bindAction(SDLKey hotKey, std::function<void()> action);
+			void doActions(UserInput* userInput);
+
+			static void removeSelected();
+
+			static StudioNavigator* get();
 		};
 
 		extern StudioTool* current_Tool;

@@ -54,36 +54,37 @@ void RBX::RBXManager::initOneTimeAppliances()
 	/* Menu bar */
 
 	toolboxBtn = new RBX::Gui::GuiButton();
-	toolboxBtn->position = Vector2(0, 0);
+	toolboxBtn->position = Vector2(0, 2);
 	toolboxBtn->size = Vector2(100, 20);
 	toolboxBtn->title = "Toolbox";
 	toolboxBtn->disabled = true;
 
 	editModeBtn = new RBX::Gui::GuiButton();
-	editModeBtn->position = Vector2(100, 0);
+	editModeBtn->position = Vector2(100, 2);
 	editModeBtn->size = Vector2(100, 20);
 	editModeBtn->title = "x Edit Mode";
 	editModeBtn->onClick = RBX::Gui::MenuBar::onEditModeBtnClick;
 
 	helpBtn = new RBX::Gui::GuiButton();
-	helpBtn->position = Vector2(200, 0);
+	helpBtn->position = Vector2(200, 2);
 	helpBtn->size = Vector2(100, 20);
 	helpBtn->title = "Help...";
 
 	fullscreenBtn = new RBX::Gui::GuiButton();
-	fullscreenBtn->position = Vector2(300, 0);
+	fullscreenBtn->position = Vector2(300, 2);
 	fullscreenBtn->size = Vector2(100, 20);
 	fullscreenBtn->title = "Fullscreen";
 	fullscreenBtn->onClick = RBX::Gui::MenuBar::onFullscreenBtnClick;
 
 	exitBtn = new RBX::Gui::GuiButton();
-	exitBtn->position = Vector2(400, 0);
+	exitBtn->position = Vector2(400, 2);
 	exitBtn->size = Vector2(100, 20);
 	exitBtn->title = "   Exit";
 	exitBtn->onClick = RBX::Gui::MenuBar::onExitBtnClick;
 
 	/* Playerlist */
 
+	playerList->name = "ScoreHud"; /* Legacy purposes */
 	playerList = new RBX::Gui::GuiList();
 	playerList->position = Vector2(150, 10);
 	playerList->listTitle = "Player List";

@@ -17,9 +17,11 @@
 #ifndef G3D_COLOR3_H
 #define G3D_COLOR3_H
 
+#include <algorithm>
+#include <string>
+
 #include "G3D/platform.h"
 #include "G3D/g3dmath.h"
-#include <string>
 
 namespace G3D {
 
@@ -124,11 +126,11 @@ public:
 
 
     inline Color3 max(const Color3& other) const {
-        return Color3(G3D::max(r, other.r), G3D::max(g, other.g), G3D::max(b, other.b));
+        return Color3(std::max(r, other.r), std::max(g, other.g), std::max(b, other.b));
     }
 
     inline Color3 min(const Color3& other) const {
-        return Color3(G3D::min(r, other.r), G3D::min(g, other.g), G3D::min(b, other.b));
+        return Color3(std::min(r, other.r), std::min(g, other.g), std::min(b, other.b));
     }
 
 	inline Color3 lerp(const Color3& other, float a) const {

@@ -1484,7 +1484,7 @@ dReal dWorldGetContactSurfaceLayer (dWorldID w)
 #define DO(x)
 
 
-extern "C" void dTestDataStructures()
+ void dTestDataStructures()
 {
   int i;
   DO(printf ("testDynamicsStuff()\n"));

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "content.h"
 #include "../Gury/Game/Gui/GuiRoot.h"
 #include "../Gury/Game/Objects/Bins/hopperbin.h"
 
@@ -7,67 +8,67 @@
 
 #define BACKPACK_ITEM_HOVER_COLOR  Color4(0.7f, 0.7f, 0.7f, 1.f);
 #define BACKPACK_ITEM_CLICKED_COLOR Color3::yellow();
+#define BACKPACK_ITEM_NEUTRAL_COLOR Color4(0.7f, 0.7f, 0.7f, .5f);
 
 namespace RBX
 {
 	class BackpackItem;
 	class HopperBin;
 
-	extern void onClickFn(RBX::Gui::GuiButton* b);
-
-	class Backpack : public RBX::Instance
-	{
-	private:
-		std::map<HopperBin*, BackpackItem*> items;
-	public:
-		void keypress(G3D::UserInput* ui);
-		void updateGui();
-		void removeBackpackItem(HopperBin* b) { items.erase(b); }
-		BackpackItem* getBackpackItem(HopperBin* b) { return items[b]; }
-		BackpackItem* createBackpackItem(HopperBin* item);
-		Backpack()
-		{
-			setName("Backpack");
-			setClassName("Backpack");
-			isParentLocked = 1;
-		}
-		virtual ~Backpack() {}
-		RTTR_ENABLE(RBX::Instance)
-	};
 
 	class BackpackItem : public RBX::Gui::GuiButton
 	{
 	private:
 		HopperBin* item;
 	public:
-		Gui::GuiBox* frame, *f_outline;
+		int backpackIndex;
+
+		Gui::GuiBox* outlineBox;
+		Gui::GuiBox* numberOutlineBox;
+		Gui::GuiBox* disabledBox;
 		Gui::GuiImage* texture;
 		Gui::GuiLabel* number;
 	public:
-		std::string textureId;
+
+		Content textureId;
+
+		void doActivate();
+
 		HopperBin* getItem() { return item; }
 		void getTextureId();
-		void fromitem(HopperBin* bin);
+
+		void fromHopperBin(HopperBin* bin);
+
+		void drawOutline(RenderDevice* rd, Vector2 from, Vector2 to, float thickness, Color3 color);
 		void render(RenderDevice* rd);
+
+		void doUpdateGridPosition(int backpackIndex);
+
+		static void doOnChanged(Instance* hopperBin, std::string propertyName);
+		static void onClickFn(RBX::Gui::GuiButton* b);
 		void handleMouse(G3D::UserInput* ui);
-		BackpackItem()
-		{
-			alignBottom = 1;
-			texture = new RBX::Gui::GuiImage();
-			f_outline = new RBX::Gui::GuiBox();
-			f_outline->size = Vector2(50, 50);
-			f_outline->background = Color4::clear();
-			texture->size = Vector2(45, 45);
-			size = Vector2(65, 65);
-			position = Vector2(0, 65);
-			titleOff = Vector2(0, 20);
-			titleColor = Color3::white();
-			clickedColor = BACKPACK_ITEM_CLICKED_COLOR;
-			hoverColor = BACKPACK_ITEM_HOVER_COLOR;
-			sz = 10;
-			onClick = onClickFn;
-			setName("BackpackItem");
-			setClassName("BackpackItem");
-		}
+		
+		BackpackItem();
 	};
+
+	class Backpack : public RBX::Instance
+	{
+	public:
+
+		static void doOnChildAdded(Instance* child);
+		static void doOnChildRemoved(Instance* child);
+
+		Backpack()
+		{
+			setName("Backpack");
+			setClassName("Backpack");
+
+			onChildAdded.connect(doOnChildAdded);
+			onChildRemoved.connect(doOnChildRemoved);
+		}
+		virtual ~Backpack() {}
+
+		RTTR_ENABLE(RBX::Instance)
+	};
+
 }

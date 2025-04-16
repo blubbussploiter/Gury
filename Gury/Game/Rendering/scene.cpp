@@ -111,17 +111,15 @@ void RBX::Scene::onWorkspaceDescendentAdded(Render::IRenderable* instance)
 	}
 }
 
-void RBX::Scene::onWorkspaceDescendentRemoved(RBX::Render::IRenderable* descendent)
+void RBX::Scene::onWorkspaceDescendentRemoved(RBX::Render::IRenderable* instance)
 {
-	if (std::find(
-		sceneObjects.begin(),
-		sceneObjects.end(),
-		descendent) != sceneObjects.end())
+	if (std::find(sceneObjects.begin(), sceneObjects.end(), instance) != sceneObjects.end())
 	{
 		sceneObjects.erase(std::remove(
 			sceneObjects.begin(),
 			sceneObjects.end(),
-			descendent));
-		descendent->removeFromRenderEnvironment();
+			instance));
+		instance->onRemove();
+		instance->removeFromRenderEnvironment();
 	}
 }

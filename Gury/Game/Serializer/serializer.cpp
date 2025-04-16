@@ -120,8 +120,8 @@ void writeProperty(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* properti
         if (type == rttr::type::get<Color3>())
         {
             Color3 color = variant.get_value<Color3>();
-            Color3uint8 uc = Color3uint8(color);
-            value = XML_(std::to_string(uc.asUInt32()));
+            Color4uint8 uc = Color4uint8(color);
+            value = XML_(RBX::Format("%u", uc.asUInt32()));
         }
 
         if (type == rttr::type::get<RBX::ProtectedString>())
@@ -142,10 +142,16 @@ void writeProperty(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* properti
                 if (content.isBinary)
                 {
                     /* Write base64 */
+
+                    std::string encoded = base64_encode(content.content, content.contentLength);
+                    propertyNode->append_node(doc.allocate_node(rapidxml::node_element, "binary", XML_(encoded)));
+
                 }
                 else if (content.isStored)
                 {
                     /* Write url or whatever */
+
+                    propertyNode->append_node(doc.allocate_node(rapidxml::node_element, "url", XML_(content.contentUrl)));
                 }
             }
         }

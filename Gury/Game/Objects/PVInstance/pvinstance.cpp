@@ -42,7 +42,8 @@ RTTR_REGISTRATION
          .property("RightSurface", &RBX::PVInstance::getRightSurface, &RBX::PVInstance::setRightSurface)(rttr::metadata("Type", RBX::Surface))
          .property("LeftSurface", &RBX::PVInstance::getLeftSurface, &RBX::PVInstance::setLeftSurface)(rttr::metadata("Type", RBX::Surface))
          .property("rawFormFactor", &RBX::PVInstance::getFormFactor, &RBX::PVInstance::setFormFactor)(rttr::metadata("Serializable", false))
-         .property("formFactor", &RBX::PVInstance::getFormFactor, &RBX::PVInstance::setFormFactor)
+         .property("formFactor", &RBX::PVInstance::getFormFactor, &RBX::PVInstance::setFormFactor)(rttr::metadata("Serializable", false))
+         .property("FormFactor", &RBX::PVInstance::getFormFactor, &RBX::PVInstance::setFormFactor)
          //.property("FormFactor", &RBX::PVInstance::getFormFactor, &RBX::PVInstance::setFormFactor)
          .property("Transparency", &RBX::PVInstance::getFauxTransparency, &RBX::PVInstance::setTransparency)(rttr::metadata("Type", RBX::Appearance));
 }
@@ -74,13 +75,7 @@ void RBX::PVInstance::write()
         case Ball:
         { 
             sphereRadius = size.y;
-            //writeBallFace(Right);
             writeBall();
-            //writeBallFace(Back);
-            //writeBallFace(Bottom);
-           // writeBallFace(Front);
-            //d->setShininess(80.f);
-            //RBX::Primitives::drawBall(d, this);
             break;
         }
         case Cylinder:
@@ -119,31 +114,41 @@ void RBX::PVInstance::edit()
     }
 }
 
-void RBX::PVInstance::doonChildAdded(Instance* child)
+void RBX::PVInstance::onMeshAdded(Instance* child)
 {
-    if (IsA<Render::SpecialMesh>(child))
+    if (child && IsA<Render::SpecialMesh>(child))
     {
         Render::SpecialMesh* mesh = toInstance<Render::SpecialMesh>(child);
         Render::IRenderable* parent = toInstance<Render::IRenderable>(child->parent);
 
         if (parent)
         {
+            RBX::StandardOut::print(RBX::MESSAGE_INFO,
+                "Write new %s to %s", child->name.c_str(), parent->name.c_str());
             parent->removeFromRenderEnvironment();
-            mesh->write();
+            parent->specialShape = mesh;
+            mesh->removeFromRenderEnvironment();
+            parent->write();
         }
     }
 }
 
-void RBX::PVInstance::doonChildRemoved(Instance* child)
+void RBX::PVInstance::onMeshRemoved(Instance* child)
 {
-    if (IsA<Render::SpecialMesh>(child))
+    if (child && IsA<Render::SpecialMesh>(child))
     {
+        RBX::StandardOut::print(RBX::MESSAGE_INFO,
+            "Remove old %s", child->name.c_str());
         Render::SpecialMesh* mesh = toInstance<Render::SpecialMesh>(child);
         Render::IRenderable* parent = toInstance<Render::IRenderable>(child->parent);
 
         if (parent)
         {
+            RBX::StandardOut::print(RBX::MESSAGE_INFO,
+                "Remove %s from %s", child->name.c_str(), parent->name.c_str());
             mesh->removeFromRenderEnvironment();
+            parent->specialShape = 0;
+            parent->removeFromRenderEnvironment();
             parent->write();
         }
     }
@@ -290,7 +295,7 @@ RBX::PVInstance::PVInstance()
     setClassName("PVInstance");
     setName("PVInstance");
 
-    setFormFactor(FormFactor::Symmetric);
+    formFactor = FormFactor::Symmetric;
 
     elasticity = 0.5f;
     friction = 0.1f;
@@ -304,8 +309,8 @@ RBX::PVInstance::PVInstance()
     primitive = new Primitive(new Body());
     primitive->onPVChanged.connect(onPrimitivePVChanged);
 
-    onChildAdded.connect(doonChildAdded);
-    onChildRemoved.connect(doonChildRemoved);
+   // onChildAdded.connect(onMeshAdded);
+    onChildRemoved.connect(onMeshRemoved);
 
     Gurnel::get()->addPrimitive(primitive);
 

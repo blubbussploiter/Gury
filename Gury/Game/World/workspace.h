@@ -27,8 +27,13 @@ namespace RBX
 
 		void wakeUpModels();
 
+		void playAllSounds();
+
 		static void workspaceDescendentAdded(RBX::Instance* descendent);
 		static void workspaceDescendentRemoved(RBX::Instance* descendent);
+
+		static void getPVInstances(RBX::Instances* instances, RBX::Instances* pvs);
+		static void getAllInstancesOfClass(RBX::Instances* instances, std::string className);
 
 		void createCurrentCamera();
 		Camera* getCurrentCamera();
@@ -57,5 +62,5 @@ namespace RBX
 
 		RTTR_ENABLE(ModelInstance)
 	};
-	void getPVInstances(RBX::Instances* instances, RBX::Instances* pvs);
+
 }

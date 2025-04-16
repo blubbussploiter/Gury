@@ -1,6 +1,8 @@
-#include "backpack.h"
 
 #include "../Gury/Game/Gui/GuiRoot.h"
+
+#include "backpack.h"
+#include "Hopper.h"
 
 RTTR_REGISTRATION
 {
@@ -8,42 +10,23 @@ RTTR_REGISTRATION
 		.constructor<>();
 }
 
-void RBX::Backpack::keypress(G3D::UserInput* ui)
+void RBX::Backpack::doOnChildAdded(Instance* child)
 {
+	RBX::HopperBin* bin = toInstance<RBX::HopperBin>(child);
 
-}
-
-void RBX::Backpack::updateGui()
-{
-	for (unsigned int i = 0; i < getChildren()->size(); i++)
+	if (bin)
 	{
-		RBX::HopperBin* bin = dynamic_cast<RBX::HopperBin*>(getChildren()->at(i));
-		if (bin)
-		{
-			if (!items[bin])
-			{
-				items[bin] = createBackpackItem(bin);
-				RBX::Gui::get()->add(items[bin]);
-			}
-			else
-			{
-				//rd->push2D();
-				if (items[bin]->number)
-				{
-					items[bin]->number->title = std::to_string(i + 1);
-				}
-				items[bin]->position.x = (i * 65);
-				//items[bin]->handleMouse(ui);
-				//items[bin]->render(rd);
-				//rd->popState();
-			}
-		}
+		Hopper::get()->createFor(bin);
 	}
 }
 
-RBX::BackpackItem* RBX::Backpack::createBackpackItem(HopperBin* item)
+void RBX::Backpack::doOnChildRemoved(Instance* child)
 {
-	RBX::BackpackItem* n = new RBX::BackpackItem();
-	n->fromitem(item);
-	return n;
+	RBX::HopperBin* bin = toInstance<RBX::HopperBin>(child);
+
+	if (bin)
+	{
+		Hopper::get()->removeFor(bin);
+		Hopper::get()->updateBackpackItemGrid();
+	}
 }

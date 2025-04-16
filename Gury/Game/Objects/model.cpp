@@ -64,6 +64,24 @@ void RBX::ModelInstance::makeController()
 	//RBX::ControllerService::get()->addController(controller);
 }
 
+bool RBX::ModelInstance::isLocked()
+{
+	size_t locked = 0;
+	Instances* pvInstances = new Instances();
+
+	Workspace::getPVInstances(children, pvInstances);
+
+	for (size_t i = 0; i < pvInstances->size(); i++) {
+		PVInstance* child = toInstance<PVInstance>(pvInstances->at(i));
+		if (child && child->locked)
+		{
+			locked++;
+		}
+	}
+
+	return (locked >= pvInstances->size());
+}
+
 void RBX::ModelInstance::drawControllerFlag(RenderDevice* rd, Color3 color)
 {
 	RBX::PVInstance* primaryPart = getPrimaryPart();
@@ -143,9 +161,9 @@ void RBX::ModelInstance::updatePrimaryPart(Instance* child)
 void RBX::ModelInstance::translateInstances(Instances instances, PVInstance* rootPart, CoordinateFrame cframe)
 {
 	CoordinateFrame frame = rootPart->getCFrame();
-	RBX::Instances* children = new Instances();
+	Instances* children = new Instances();
 
-	RBX::getPVInstances(&instances, children);
+	Workspace::getPVInstances(&instances, children);
 
 	for (unsigned int i = 0; i < children->size(); i++)
 	{
@@ -167,7 +185,7 @@ CoordinateFrame RBX::ModelInstance::getPVInstancesCentre(Instances instances)
 	Vector3 min, max;
 	Instances* pvInstances = new Instances();
 
-	getPVInstances(&instances, pvInstances);
+	Workspace::getPVInstances(&instances, pvInstances);
 
 	for (unsigned int i = 0; i < pvInstances->size(); i++)
 	{
@@ -207,7 +225,7 @@ RBX::Extents RBX::ModelInstance::getInstancesExtents(Instances instances)
 	Vector3 min, max;
 	Instances* pvs = new Instances();
 
-	getPVInstances(&instances, pvs);
+	Workspace::getPVInstances(&instances, pvs);
 
 	for (unsigned int i = 0; i < pvs->size(); i++)
 	{
@@ -250,16 +268,16 @@ RBX::Extents RBX::ModelInstance::getInstancesExtents(Instances instances)
 
 RBX::PVInstance* RBX::ModelInstance::getRootPart(Instances i)
 {
-	RBX::PVInstance* result = 0;
-	RBX::Instances* children = new Instances();
+	PVInstance* result = 0;
+	Instances* children = new Instances();
 
 	float lastArea = -1;
-	RBX::getPVInstances(&i, children);
+	Workspace::getPVInstances(&i, children);
 
 	for (unsigned int i = 0; i < children->size(); i++)
 	{
-		RBX::PVInstance* pv = (RBX::PVInstance*)(children->at(i));
-		RBX::Extents extents = pv->getWorldExtents();
+		PVInstance* pv = (PVInstance*)(children->at(i));
+		Extents extents = pv->getWorldExtents();
 		float area = extents.area();
 		if (area > lastArea)
 		{
@@ -304,7 +322,7 @@ void RBX::ModelInstance::buildJoints()
 void RBX::ModelInstance::breakJoints()
 {
 	Instances* instances = new Instances();
-	getPVInstances(getChildren(), instances);
+	Workspace::getPVInstances(getChildren(), instances);
 
 	for (unsigned int i = 0; i < instances->size(); i++)
 	{

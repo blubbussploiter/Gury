@@ -71,5 +71,7 @@ void RBX::Gui::GuiButton::handleMouse(G3D::UserInput* ui)
 		clicked = true;
 	}
 	else
+	{
 		clicked = false;
+	}
 }

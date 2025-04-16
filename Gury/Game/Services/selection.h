@@ -24,6 +24,13 @@ namespace RBX
 
 		bool isSelected(Instance* i);
 
+		Instance* getOneSelected() {
+			if (selection.size() > 0) {
+				return selection.at(0);
+			}
+			return 0;
+		}
+
 		Instance* getPossibleSelectedItem();
 
 		Instances selectionAsInstances();
@@ -53,10 +60,7 @@ namespace RBX
 			}
 		}
 
-		void deselectAll()
-		{
-			selection.clear();
-		}
+		void deselectAll();
 
 		void selectInstance(RBX::Instance* instance, bool selectInExplorer=1);
 

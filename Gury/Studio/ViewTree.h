@@ -24,6 +24,8 @@ public:
 	void ExpandAndFocusOnItem(RBX::Instance* i, HTREEITEM item);
 	void SelectInstance(RBX::Instance* instance);
 
+	void TryDoubleClick(HTREEITEM item);
+
 // Overrides
 protected:
 	virtual BOOL OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult);

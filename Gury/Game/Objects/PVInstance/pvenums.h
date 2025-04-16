@@ -84,6 +84,7 @@ namespace RBX
 				rttr::value("SteppingMotor", SteppingMotor)
 			);
 
+
 		rttr::registration::enumeration<Shape>("Shape")
 			(
 				rttr::value("Ball", Ball),

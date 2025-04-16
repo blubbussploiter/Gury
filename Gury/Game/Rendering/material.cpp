@@ -64,6 +64,7 @@ bool RBX::Render::Material::veryOpaque(int level)
 void RBX::Render::Material::Level::configureRenderDevice(RenderDevice* renderDevice)
 {
 	renderDevice->setShininess(mShiny);
+	renderDevice->setSpecularCoefficient(mSpecular);
 }
 
 void RBX::Render::Material::Level::baseTexture(RenderDevice* renderDevice)

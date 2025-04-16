@@ -5,9 +5,13 @@
 
 using namespace RBX;
 
-Vector3 RBX::PVInstance::getQuadFaceNormal(RBX::NormalId face, Vector3 v0, Vector3 v1, Vector3 v2, Vector3 v3)
+Vector3 RBX::PVInstance::getQuadFaceNormal(RBX::NormalId face, Vector3 v0, Vector3 v1, Vector3 v2, Vector3 v3, Vector3 v4, Vector3 v5)
 {
-    return normalize((v0 - v2).cross(v1 - v3).direction()) * random(0.2f, 1);
+    Vector3 v0v1 = v1 - v0;
+    Vector3 v0v2 = v2 - v0;
+    Vector3 v3v4 = v4 - v3;
+    Vector3 v3v5 = v5 - v3;
+    return (v0v1.cross(v0v2) + v3v4.cross(v3v5));
 }
 
 Array<Vector3> PVInstance::getBrickFaceVertices(NormalId face)
@@ -15,72 +19,72 @@ Array<Vector3> PVInstance::getBrickFaceVertices(NormalId face)
     Array<Vector3> vertices;
     switch (face)
     {
-    case NormalId::Top:
-    {
-        vertices.append(Vector3(size.x, size.y, -size.z)); /* vertex 0 */
-        vertices.append(Vector3(-size.x, size.y, -size.z)); /* vertex 1 */
-        vertices.append(Vector3(-size.x, size.y, size.z));/* vertex 2 */
+        case NormalId::Top:
+        {
+            vertices.append(Vector3(size.x, size.y, -size.z)); /* vertex 0 */
+            vertices.append(Vector3(-size.x, size.y, -size.z)); /* vertex 1 */
+            vertices.append(Vector3(-size.x, size.y, size.z));/* vertex 2 */
 
-        vertices.append(Vector3(size.x, size.y, -size.z)); /* vertex 0 */
-        vertices.append(Vector3(-size.x, size.y, size.z));/* vertex 2 */
-        vertices.append(Vector3(size.x, size.y, size.z));/* vertex 3 */
-        break;
-    }
-    case NormalId::Bottom:
-    {
-        vertices.append(Vector3(size.x, -size.y, size.z));/* vertex 0 */
-        vertices.append(Vector3(-size.x, -size.y, size.z)); /* vertex 1 */
-        vertices.append(Vector3(-size.x, -size.y, -size.z)); /* vertex 2 */ 
+            vertices.append(Vector3(size.x, size.y, -size.z)); /* vertex 0 */
+            vertices.append(Vector3(-size.x, size.y, size.z));/* vertex 2 */
+            vertices.append(Vector3(size.x, size.y, size.z));/* vertex 3 */
+            break;
+        }
+        case NormalId::Bottom:
+        {
+            vertices.append(Vector3(size.x, -size.y, size.z));/* vertex 0 */
+            vertices.append(Vector3(-size.x, -size.y, size.z)); /* vertex 1 */
+            vertices.append(Vector3(-size.x, -size.y, -size.z)); /* vertex 2 */ 
 
-        vertices.append(Vector3(size.x, -size.y, size.z));/* vertex 0 */
-        vertices.append(Vector3(-size.x, -size.y, -size.z)); /* vertex 2 */
-        vertices.append(Vector3(size.x, -size.y, -size.z));/* vertex 3 */
-        break;
-    }
-    case NormalId::Front:
-    {
-        vertices.append(Vector3(size.x, -size.y, -size.z));/* vertex 0 */
-        vertices.append(Vector3(-size.x, -size.y, -size.z));/* vertex 1 */
-        vertices.append(Vector3(-size.x, size.y, -size.z));/* vertex 2 */
+            vertices.append(Vector3(size.x, -size.y, size.z));/* vertex 0 */
+            vertices.append(Vector3(-size.x, -size.y, -size.z)); /* vertex 2 */
+            vertices.append(Vector3(size.x, -size.y, -size.z));/* vertex 3 */
+            break;
+        }
+        case NormalId::Front:
+        {
+            vertices.append(Vector3(size.x, -size.y, -size.z));/* vertex 0 */
+            vertices.append(Vector3(-size.x, -size.y, -size.z));/* vertex 1 */
+            vertices.append(Vector3(-size.x, size.y, -size.z));/* vertex 2 */
 
-        vertices.append(Vector3(size.x, -size.y, -size.z));/* vertex 0 */
-        vertices.append(Vector3(-size.x, size.y, -size.z));/* vertex 2 */
-        vertices.append(Vector3(size.x, size.y, -size.z));/* vertex 3 */
-        break;
-    }
-    case NormalId::Back:
-    {
-        vertices.append(Vector3(size.x, size.y, size.z));/* vertex 0 */
-        vertices.append(Vector3(-size.x, size.y, size.z)); /* vertex 1 */
-        vertices.append(Vector3(-size.x, -size.y, size.z));/* vertex 2 */
+            vertices.append(Vector3(size.x, -size.y, -size.z));/* vertex 0 */
+            vertices.append(Vector3(-size.x, size.y, -size.z));/* vertex 2 */
+            vertices.append(Vector3(size.x, size.y, -size.z));/* vertex 3 */
+            break;
+        }
+        case NormalId::Back:
+        {
+            vertices.append(Vector3(size.x, size.y, size.z));/* vertex 0 */
+            vertices.append(Vector3(-size.x, size.y, size.z)); /* vertex 1 */
+            vertices.append(Vector3(-size.x, -size.y, size.z));/* vertex 2 */
 
-        vertices.append(Vector3(size.x, size.y, size.z));/* vertex 0 */
-        vertices.append(Vector3(-size.x, -size.y, size.z));/* vertex 2 */
-        vertices.append(Vector3(size.x, -size.y, size.z));/* vertex 3 */
-        break;
-    }
-    case NormalId::Left:
-    {
-        vertices.append(Vector3(-size.x, size.y, size.z));/* vertex 0 */
-        vertices.append(Vector3(-size.x, size.y, -size.z));/* vertex 1 */
-        vertices.append(Vector3(-size.x, -size.y, -size.z));/* vertex 2 */
+            vertices.append(Vector3(size.x, size.y, size.z));/* vertex 0 */
+            vertices.append(Vector3(-size.x, -size.y, size.z));/* vertex 2 */
+            vertices.append(Vector3(size.x, -size.y, size.z));/* vertex 3 */
+            break;
+        }
+        case NormalId::Left:
+        {
+            vertices.append(Vector3(-size.x, size.y, size.z));/* vertex 0 */
+            vertices.append(Vector3(-size.x, size.y, -size.z));/* vertex 1 */
+            vertices.append(Vector3(-size.x, -size.y, -size.z));/* vertex 2 */
 
-        vertices.append(Vector3(-size.x, size.y, size.z));/* vertex 0 */
-        vertices.append(Vector3(-size.x, -size.y, -size.z));/* vertex 2 */
-        vertices.append(Vector3(-size.x, -size.y, size.z));/* vertex 3 */
-        break;
-    }
-    case NormalId::Right:
-    {
-        vertices.append(Vector3(size.x, size.y, -size.z));/* vertex 0 */
-        vertices.append(Vector3(size.x, size.y, size.z));/* vertex 1 */
-        vertices.append(Vector3(size.x, -size.y, size.z));/* vertex 2 */
+            vertices.append(Vector3(-size.x, size.y, size.z));/* vertex 0 */
+            vertices.append(Vector3(-size.x, -size.y, -size.z));/* vertex 2 */
+            vertices.append(Vector3(-size.x, -size.y, size.z));/* vertex 3 */
+            break;
+        }
+        case NormalId::Right:
+        {
+            vertices.append(Vector3(size.x, size.y, -size.z));/* vertex 0 */
+            vertices.append(Vector3(size.x, size.y, size.z));/* vertex 1 */
+            vertices.append(Vector3(size.x, -size.y, size.z));/* vertex 2 */
 
-        vertices.append(Vector3(size.x, size.y, -size.z));/* vertex 0 */
-        vertices.append(Vector3(size.x, -size.y, size.z));/* vertex 2 */
-        vertices.append(Vector3(size.x, -size.y, -size.z));/* vertex 3 */
-        break;
-    }
+            vertices.append(Vector3(size.x, size.y, -size.z));/* vertex 0 */
+            vertices.append(Vector3(size.x, -size.y, size.z));/* vertex 2 */
+            vertices.append(Vector3(size.x, -size.y, -size.z));/* vertex 3 */
+            break;
+        }
     }
     for (int i = 0; i < vertices.size(); i++)
     {

@@ -28,6 +28,8 @@ namespace RBX
 		void createController(); /* recursive */
 		void makeController(); /* non recursive */
 
+		bool isLocked();
+
 		void setController(ControllerTypes c) 
 		{
 			controllerType = c;
@@ -88,6 +90,8 @@ namespace RBX
 		}
 
 		virtual ~ModelInstance() { breakJoints(); }
+
+		RBX_CLONE_DEF(ModelInstance)
 		RTTR_ENABLE(Instance)
 	};
 

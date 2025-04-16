@@ -3,6 +3,8 @@
 #include "fmod.hpp"
 
 #include "../Gury/Game/Objects/instance.h"
+#include "../Gury/Game/Services/content.h"
+#include "../Gury/Game/Services/stdout.h"
 
 #include <vector>
 #include <string>
@@ -25,11 +27,24 @@ namespace RBX
 		float startPosition, length;
 		float volume;
 
-		std::string soundPath;
+		Content soundId;
 
 		void playOnce();
 		void play();
 		void stop();
+
+		void updateSound();
+
+		void setSoundId(Content content) {
+			soundId = content;
+			if (soundId.resolve()) {
+				updateSound();
+			}
+		}
+
+		Content getSoundId() {
+			return soundId;
+		}
 
 		bool isPlaying()
 		{ 
@@ -67,12 +82,24 @@ namespace RBX
 		static RBX::Sound* fromFile(std::string file, bool isLooped = 0)
 		{
 			RBX::Sound* s = new RBX::Sound();
-			s->soundPath = file;
+			s->setSoundId(Content::fromStoredContent(file));
+			s->name = file;
 			s->isLooping = isLooped;
-			s->volume = 1.0f;
 			return s;
 		}
-		virtual ~Sound() { sound->release(); }
+
+		Sound()
+		{
+			className = "Sound";
+			name = "Sound";
+			volume = 1.0f;
+		}
+
+		virtual ~Sound() { 
+			sound->release();
+		}
+
+		RTTR_ENABLE(Instance);
 	};
 
 }

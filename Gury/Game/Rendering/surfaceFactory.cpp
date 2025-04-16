@@ -115,7 +115,7 @@ Vector2 SurfaceFactory::getFacePositionRelative(NormalId face, Vector3 brickSize
 	return Vector2();
 }
 
-Vector2 RBX::SurfaceFactory::getTextureDimensions(Shape shape, Vector3 brickSize)
+Vector2 RBX::SurfaceFactory::getTextureDimensions(RBX::Shape shape, Vector3 brickSize)
 {
 	int width = 0, height = 0;
 
@@ -128,7 +128,7 @@ Vector2 RBX::SurfaceFactory::getTextureDimensions(Shape shape, Vector3 brickSize
 		int m0 = getFaceBounds(Back, brickSize).x;
 		int m1 = getFaceBounds(Bottom, brickSize).x;
 
-		width = max(m0, m1);
+		width = std::max(m0, m1);
 
 		/* calculate size for height */
 
@@ -147,13 +147,13 @@ void SurfaceFactory::pasteFaceOnBrickTexture(GImage& bimage, GImage surfaceImage
 	GImage::pasteSubImage(bimage, surfaceImage, positionRel.x, positionRel.y, 0, 0, surfaceImage.width, surfaceImage.height);
 }
 
-void SurfaceFactory::allocateBrickTexture(Shape shape, Vector3 brickSize, GImage& bimage)
+void SurfaceFactory::allocateBrickTexture(RBX::Shape shape, Vector3 brickSize, GImage& bimage)
 {
 	Vector2 dim = getTextureDimensions(shape, brickSize);
 	bimage = GImage(dim.x, dim.y, 4);
 }
 
-int SurfaceFactory::generateBrickTexture(PVInstance* pv, Shape shape, Vector3 brickSize, Color4 brickColor, SurfaceType front, SurfaceType back, SurfaceType left, SurfaceType right, SurfaceType top, SurfaceType bottom)
+int SurfaceFactory::generateBrickTexture(PVInstance* pv, RBX::Shape shape, Vector3 brickSize, Color4 brickColor, SurfaceType front, SurfaceType back, SurfaceType left, SurfaceType right, SurfaceType top, SurfaceType bottom)
 {
 	GImage brickTexture;
 
@@ -167,7 +167,7 @@ int SurfaceFactory::generateBrickTexture(PVInstance* pv, Shape shape, Vector3 br
 	return -1;
 }
 
-void RBX::SurfaceFactory::editBrickTexture(PVInstance* pv, int textureIndex, Shape shape, Vector3 brickSize, Color4 brickColor, SurfaceType front, SurfaceType back, SurfaceType left, SurfaceType right, SurfaceType top, SurfaceType bottom)
+void RBX::SurfaceFactory::editBrickTexture(PVInstance* pv, int textureIndex, RBX::Shape shape, Vector3 brickSize, Color4 brickColor, SurfaceType front, SurfaceType back, SurfaceType left, SurfaceType right, SurfaceType top, SurfaceType bottom)
 {
 	auto reserve = Render::TextureReserve::get();
 
@@ -256,7 +256,7 @@ void SurfaceFactory::pasteSurface(NormalId face, SurfaceType surface, Color4 col
 
 }
 
-void RBX::SurfaceFactory::pasteSurfaces(GImage& brickTexture, Shape shape, Vector3 brickSize, Color4 brickColor, SurfaceType front, SurfaceType back, SurfaceType left, SurfaceType right, SurfaceType top, SurfaceType bottom)
+void RBX::SurfaceFactory::pasteSurfaces(GImage& brickTexture, RBX::Shape shape, Vector3 brickSize, Color4 brickColor, SurfaceType front, SurfaceType back, SurfaceType left, SurfaceType right, SurfaceType top, SurfaceType bottom)
 {
 	switch (shape)
 	{

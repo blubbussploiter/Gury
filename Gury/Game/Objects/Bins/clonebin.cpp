@@ -5,7 +5,7 @@
 
 #include "clonebin.h"
 
-RBX::Sound* ping = RBX::Sound::fromFile(GetFileInPath("/content/sounds/electronicpingshort.wav"));
+RBX::Sound* ping = RBX::Sound::fromFile("rbxasset://sounds\\electronicpingshort.wav");
 TextureRef cloneCursor, cloneOver, cloneDown;
 
 RBX::PVInstance* lastClone, *lastSelection;

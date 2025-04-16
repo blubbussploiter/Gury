@@ -18,8 +18,8 @@ namespace RBX
 
 		SoundService()
 		{
-			setName("SoundService");
-			setClassName("SoundService");
+			name = "SoundService";
+			className = "SoundService";
 		}
 	};
 

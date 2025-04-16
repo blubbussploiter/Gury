@@ -168,10 +168,10 @@ void RBX::Gurnel::collisionCallback(void* data, dGeomID o1, dGeomID o2)
 void RBX::Gurnel::cleanup()
 {
 	RBX::StandardOut::print(RBX::MESSAGE_INFO, "Gurnel::cleanup() closing Gurnel");
+	dCloseODE();
 	dJointGroupDestroy(contacts);
 	dSpaceDestroy(space);
 	dWorldDestroy(world);
-	dCloseODE();
 }
 
 void RBX::Gurnel::diag_renderObjects(RenderDevice* rd)

@@ -51,6 +51,7 @@ namespace RBX
 			void renderScene(RenderDevice* rd);
 
 			void renderNonGeometricInstances(RenderDevice* rd);
+			void render2DInstances(RenderDevice* rd);
 
 			void sendProxyGeometry(RenderDevice* renderDevice, RenderSurface* proxy);
 
@@ -95,10 +96,10 @@ namespace RBX
 
 				Material* factory = MaterialFactory<PartInstance>::factory()->getMaterial();
 				
-				proxy = new Render::RenderSurface(factory->levels[0]);
-				reflectProxy = new Render::RenderSurface(factory->levels[1]);
-				transparentProxy = new Render::RenderSurface(factory->levels[2]);
-				texturedProxy = new Render::RenderSurface(factory->levels[3]);
+				proxy = new Render::RenderSurface(factory->levels[0], 0.02f);
+				reflectProxy = new Render::RenderSurface(factory->levels[1], 0.02f);
+				transparentProxy = new Render::RenderSurface(factory->levels[2], 0.02f);
+				texturedProxy = new Render::RenderSurface(factory->levels[3], 0.02f);
 
 			}
 

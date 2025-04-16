@@ -138,6 +138,7 @@ RBX::Instance* RBX::SelectionService::getPossibleSelectedItem()
 	Instances* instances = Workspace::get()->children;
 
 	float nearest = inf();
+	size_t locked = 0;
 
 	for (unsigned int i = 0; i < instances->size(); i++)
 	{
@@ -153,6 +154,14 @@ RBX::Instance* RBX::SelectionService::getPossibleSelectedItem()
 			{
 				PVInstance* pvInstance = toInstance<PVInstance>(instance);
 				if (pvInstance->getLocked()) {
+					continue;
+				}
+			}
+
+			if (IsA<ModelInstance>(instance)) /* Check if model locked */
+			{
+				ModelInstance* modelInstance = toInstance<ModelInstance>(instance);
+				if (modelInstance->isLocked()) {
 					continue;
 				}
 			}
@@ -173,6 +182,7 @@ RBX::Instance* RBX::SelectionService::getPossibleSelectedItem()
 			}
 		}
 	}
+
 	return selected;
 }
 
@@ -255,6 +265,12 @@ void RBX::SelectionService::selectArray(Instances instances)
 	{
 		selectInstance(instances.at(i));
 	}
+}
+
+void RBX::SelectionService::deselectAll()
+{
+	selection.clear();
+	CMainFrame::mainFrame->m_wndClassView.SelectInstance(0);
 }
 
 void RBX::SelectionService::selectInstance(RBX::Instance* instance, bool selectInExplorer)

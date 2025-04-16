@@ -34,12 +34,16 @@ namespace RBX
 
 		void close();
 
+		void doError(std::string error);
+
 		static ScriptContext* get();
 
 		/* custom funcs */
 
 		static int wait(lua_State* L);
 		static int print(lua_State* L);
+
+		static int instanceNew(lua_State* L);
 
 		ScriptContext()
 		{

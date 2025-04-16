@@ -11,6 +11,8 @@
 #include "OutputWnd.h"
 #include "PropertiesWnd.h"
 
+#include "Windows/startPage.h"
+
 #include "../Main/framework.h"
 
 class CMainFrame : public CMDIFrameWndEx
@@ -28,7 +30,6 @@ public:
 // Overrides
 public:
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
-//	virtual BOOL LoadFrame(UINT nIDResource, DWORD dwDefaultStyle = WS_OVERLAPPEDWINDOW | FWS_ADDTOTITLE, CWnd* pParentWnd = nullptr, CCreateContext* pContext = nullptr);
 
 // Implementation
 public:
@@ -50,6 +51,7 @@ public:  // control bar embedded members
 	ExplorerTreeView        m_wndClassView;
 	COutputWnd        m_wndOutput;
 	CPropertiesWnd    m_wndProperties;
+	CStartPage* m_startPage;
 
 	static CMainFrame* mainFrame;
 
@@ -63,6 +65,7 @@ protected:
 //	afx_msg void OnApplicationLook(UINT id);
 	afx_msg void OnUpdateApplicationLook(CCmdUI* pCmdUI);
 	afx_msg void OnSettingChange(UINT uFlags, LPCTSTR lpszSection);
+	afx_msg void onFullScreen();
 	void OnUpdateFrameTitle(BOOL bAddToTitle);
 	DECLARE_MESSAGE_MAP()
 
@@ -86,6 +89,9 @@ public:
 	afx_msg void OnEditPasteinto();
 	afx_msg void OnDestroy();
 	afx_msg void OnFileSave();
+//	afx_msg void OnWindowPosChanging(WINDOWPOS* lpwndpos);
+//	afx_msg void OnWindowPosChanged(WINDOWPOS* lpwndpos);
+//	virtual BOOL OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext);
 };
 
 

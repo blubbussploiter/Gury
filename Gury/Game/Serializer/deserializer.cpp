@@ -121,7 +121,7 @@ RBX::Content getContent(rapidxml::xml_node<>* node)
 
 	if (urlNode)
 	{
-		return RBX::Content::fromContent(urlNode->value());
+		return RBX::Content::fromStoredContent(urlNode->value());
 	}
 
 	/* other, http stuff idk */
@@ -184,11 +184,9 @@ void setProperty(rapidxml::xml_node<>* node, RBX::Instance* instance, std::strin
 				property.set_value(instance, getContent(node));
 				break;
 			}
-			case 10:
+			case 10: /* ProtectedString not (usually) used, just convert to string */
 			{
-				RBX::ProtectedString string = RBX::ProtectedString();
-				string.source = propertyValue;
-				property.set_value(instance, string);
+				property.set_value(instance, propertyValue);
 				break;
 			}
 			case 11:
@@ -315,7 +313,16 @@ void RBX::Serializer::load(std::string fileName)
 	if (file.size() <= 0)
 		return;
 
-	doc.parse<0>(file.data());
+	try
+	{
+		doc.parse<0>(file.data());
+	}
+	catch(std::exception e)
+	{
+		MessageBox(0, "Failed to open document", "Gury", MB_OK | MB_ICONWARNING);
+		RBX::StandardOut::print(RBX::MESSAGE_ERROR, e.what());
+		return;
+	}
 
 	if (!checkTag())
 		return;

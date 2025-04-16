@@ -74,7 +74,7 @@ END
 // remains consistent on all systems.
 IDR_MAINFRAME           ICON                    "res\\supergurymfc.ico"
 
-IDR_supergurymfcTYPE    ICON                    "res\\supergurymfcDoc.ico"
+IDR_SCRIPTEDITORTYPE    ICON                    "res\\supergurymfcDoc.ico"
 
 IDI_FILE_VIEW           ICON                    "res\\file_view.ico"
 
@@ -395,11 +395,11 @@ BEGIN
     BEGIN
         BLOCK "040904B0"
         BEGIN
-            VALUE "CompanyName", "TODO: <Company name>"
+            VALUE "CompanyName", "Gury incorporated"
             VALUE "FileDescription", "supergurymfc"
             VALUE "FileVersion", "1.0.0.1"
             VALUE "InternalName", "supergurymfc.exe"
-            VALUE "LegalCopyright", "TODO: (c) <Company name>.  All rights reserved."
+            VALUE "LegalCopyright", "Gury incorporated.  All rights reserved."
             VALUE "OriginalFilename", "supergurymfc.exe"
             VALUE "ProductName", "TODO: <Product name>"
             VALUE "ProductVersion", "1.0.0.1"
@@ -462,14 +462,22 @@ END
 
 STRINGTABLE
 BEGIN
-    IDR_MAINFRAME           "supergurymfc"
-    IDR_supergurymfcTYPE    "\nsupergurymfc\nsupergurymfc\n\n\nsupergurymfc.Document\nsupergurymfc.Document"
+    IDR_MAINFRAME           "\nGame\nGame\n\n\nGame.Document\nGame.Document"
     ID_WINDOW_MANAGER       "&Windows..."
 END
 
 STRINGTABLE
 BEGIN
-    AFX_IDS_APP_TITLE       "supergurymfc"
+    IDS_EXPLORER            "Explorer"
+    IDS_EDIT_MENU           "Edit"
+    IDS_GAME_VIEW           "Explorer"
+    IDR_SCRIPTEDITOR        "\nscript\nscript\n\n\nscript.Document\nscript.Document"
+    IDR_HTMLVIEW            "\nhtmlview\nhtmlview\n\n\nhtmlview.Document\nhtmlview.Document"
+END
+
+STRINGTABLE
+BEGIN
+    AFX_IDS_APP_TITLE       "Gury"
     AFX_IDS_IDLEMESSAGE     "Ready"
 END
 
@@ -576,9 +584,8 @@ STRINGTABLE
 BEGIN
     IDS_STATUS_PANE1        "Pane 1"
     IDS_STATUS_PANE2        "Pane 2"
-    IDS_TOOLBAR_STANDARD    "Standard"
+    IDS_TOOLBAR_STANDARD    "Poopin"
     IDS_TOOLBAR_CUSTOMIZE   "Customize..."
-    ID_TOOLBAR_MOUSE        "Mouse"
 END
 
 STRINGTABLE
@@ -588,13 +595,6 @@ BEGIN
     IDS_OUTPUT_WND          "Output"
     IDS_PROPERTIES_WND      "Properties"
     IDS_COMMANDBAR          "Command bar"
-END
-
-STRINGTABLE
-BEGIN
-    IDS_EXPLORER            "Explorer"
-    IDS_EDIT_MENU           "Edit"
-    IDS_GAME_VIEW           "Explorer"
 END
 
 STRINGTABLE

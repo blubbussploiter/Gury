@@ -1,5 +1,6 @@
 #include <iostream>
 #include <sstream>
+#include <vector>
 #include <fstream>
 
 #include "../Gury/Game/strings.h"
@@ -10,28 +11,28 @@
 
 #include "stdout.h"
 
-RBX::Content RBX::Content::fromImageFile(std::string file)
+std::string RBX::Content::resolveUrl()
 {
-	/* jsut read it as binary then encode to base64 */
-	/*
-	
-	G3D::GImage data;
-	G3D::GImage::Format format;
+	if (isStored && !contentUrl.empty())
+	{
+		Url url = Url::Parse(contentUrl);
 
-	G3D::BinaryOutput output;
-	Content content(1, "");
+		if (url.Protocol.empty())
+		{
+			return contentUrl;
+		}
+		else if (url.Protocol == "rbxasset")
+		{
+			std::string file = url.Host;
+			return ConFileInPath(RBX::Format("/content/%s", file.c_str()));
+		}
+		else if (url.Protocol == "rbxassetid")
+		{
+			/* From asset delivery? */
+		}
 
-	format = data.resolveFormat(file);
-
-	data.load(file, format);
-	data.encode(format, output);
-
-	content.content = output.getCArray();
-	content.contentLength = output.length();
-
-	return content;
-	*/
-	return Content::fromContent(file);
+	}
+	return contentUrl;
 }
 
 bool RBX::Content::resolve()
@@ -49,8 +50,34 @@ bool RBX::Content::resolve()
 
 	if (isStored)
 	{
-		/* resolve data stuff .. idk */
-		return true;
+		if (!contentUrl.empty()) {
+
+			std::string fullUrl = resolveUrl();
+			std::ifstream contentStream(fullUrl, std::ios::binary);
+
+			Log::writeEntry(RBX::Format("%s resolving\n", fullUrl.c_str()).c_str());
+
+			if (contentStream.good()) {
+
+				contentStream.seekg(0, std::ios::end);
+				contentLength = contentStream.tellg();
+				contentStream.seekg(0, std::ios::beg);
+
+				content = new G3D::uint8[contentLength];
+
+				if (!contentStream.read((char*)content, contentLength)) {
+					return false;
+				}
+
+				contentStream.close();
+			}
+
+			return true;
+		}
+	}
+
+	if (isOnline) {
+
 	}
 
 	return false;

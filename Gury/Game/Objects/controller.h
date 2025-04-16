@@ -35,11 +35,10 @@ namespace RBX
 		float getSpeed() { return speed; }
 		void setSpeed(float s) { speed = s; }
 
-		bool moving() { return isMoving; }
+		bool getMoving() { return isMoving; }
+		void setMoving(bool m) { isMoving = m; }
 
-		void setmoving(bool m) { isMoving = m; }
-
-		void disable(bool d) { isDisabled = d; }
+		void disable(bool disabled) { isDisabled = disabled; }
 		bool disabled() { return isDisabled; }
 
 		virtual void handleInput(G3D::UserInput* ui);

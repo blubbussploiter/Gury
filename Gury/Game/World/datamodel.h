@@ -16,6 +16,7 @@ namespace RBX
 	class SoundService;
 	class SelectionService;
 	class JointsService;
+	class Hopper;
 
 	namespace Network { class Players; }
 	namespace Lua { class YieldingThreads; }
@@ -29,6 +30,7 @@ namespace RBX
 		Workspace* workspace;
 		RunService* runService;
 		JointsService* jointService;
+		Hopper* hopper;
 		ControllerService* controllerService;
 		ThumbnailGenerator* thumbnailGenerator;
 		ScriptContext* scriptContext;
@@ -40,7 +42,9 @@ namespace RBX
 		RBX::Render::RenderScene* renderScene;
 		RBX::Gurnel* physicsKernel;
 
-		Gui::GuiHint* message;
+		Gui::GuiHint* gameHint;
+		Gui::GuiMessage* gameMessage;
+
 		Gui::GuiRoot* guiRoot;
 
 		RBX::Network::Players* players;
@@ -54,7 +58,9 @@ namespace RBX
 		void loadContent(std::string contentId);
 		void saveContent(std::string contentId);
 
-		void setMessage(std::string msg) { message->text = msg; }
+		void setMessage(std::string msg) { gameMessage->text = msg; }
+		void setHint(std::string msg) { gameHint->text = msg; }
+
 		void setMessageBrickCount() { uiBrickcount = !uiBrickcount; }
 
 		bool messageBrickCount() { return uiBrickcount; }
@@ -64,6 +70,8 @@ namespace RBX
 
 		void addToExplorerWindow(RBX::Instance* i);
 		void removeFromExplorerWindow(RBX::Instance* i);
+
+		void render(RenderDevice* renderDevice);
 
 		void open();
 		void close();
@@ -81,7 +89,9 @@ namespace RBX
 			onDescendentAdded.connect(descendentAdded);
 			onDescendentRemoved.connect(descendentRemoved);
 			
-			message = new Gui::GuiHint();
+			gameMessage = new Gui::GuiMessage();
+			gameHint = new Gui::GuiHint();
+
 			isParentLocked = 1;
 		}
 

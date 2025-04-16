@@ -44,7 +44,7 @@ void RBX::Decal::fromFile(std::string file, Texture::WrapMode wrap, Texture::Int
 {
     wrapMode = wrap;
     interpolateMode = interpolate;
-    tContent = Content::fromImageFile(file);
+    tContent = Content::fromStoredContent(file);
 }
 
 void RBX::Render::rawDecal(RenderDevice* d, RBX::Render::IRenderable* pv, NormalId face, int texture, bool repeat)

@@ -15,6 +15,12 @@ class CsupergurymfcApp : public CWinAppEx
 public:
 	CsupergurymfcApp() noexcept;
 
+public:
+
+	CMultiDocTemplate* pGameDocTemplate;
+	CMultiDocTemplate* pScriptDocTemplate;
+	CMultiDocTemplate* startPage;
+
 // Overrides
 public:
 	virtual BOOL InitInstance();

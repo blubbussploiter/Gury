@@ -1,33 +1,13 @@
 
 #pragma once
 
-#include "pch.h"
-#include "../Main/framework.h"
 
+#include "pch.h"
+
+#include "Windows/rbxhtml.h"
 #include "../Gury/Game/log.h"
 
 #include <string>
-#include <afxhtml.h>
-
-class COutputView : public CHtmlView
-{
-private:
-	// Construction
-public:
-	COutputView() noexcept;
-
-public:
-	virtual ~COutputView();
-
-	void WriteText(std::string preText, std::string text, std::string color);
-	void WriteQuickText(std::string text);
-
-protected:
-
-	void OnInitialUpdate() override;
-
-	DECLARE_MESSAGE_MAP()
-};
 
 class COutputWnd : public CDockablePane
 {
@@ -45,32 +25,12 @@ public:
 		m_wndOutput.WriteQuickText(text);
 	}
 
-	void AddText(RBX::MessageType messageType, std::string preText, std::string Text)
-	{
-		switch (messageType)
-		{
-			case RBX::MESSAGE_INFO:
-			{
-				m_wndOutput.WriteText(preText, Text, "blue");
-				break;
-			}
-			case RBX::MESSAGE_ERROR:
-			{
-				m_wndOutput.WriteText(preText, Text, "red");
-				break;
-			}
-			case RBX::MESSAGE_WARNING:
-			{
-				m_wndOutput.WriteText(preText, Text, "orange");
-				break;
-			}
-		}
-	}
+	void AddText(RBX::MessageType messageType, std::string preText, std::string Text);
 
 // Attributes
 protected:
 
-	COutputView m_wndOutput;
+	CRBXHtmlView m_wndOutput;
 
 protected:
 

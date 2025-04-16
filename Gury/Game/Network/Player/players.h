@@ -24,26 +24,36 @@ namespace RBX
 
 			int maxPlayers;
 
-			std::vector<Player*> players;
-			RBX::Gui::GuiList* playerList;
 		public:
+
+			RBX::Gui::GuiList* playerList;
+
+			boost::signal<void(Player*)> onPlayerAdded;
+			boost::signal<void(Player*)> onPlayerRemoving;
 
 			Player* localPlayer;
 			Player* getLocalPlayer() { return localPlayer; }
 
 			Player* createLocalPlayer(int userId);
 
+			static void onPlayerNameChanged(Instance* player, std::string propertyChanged);
+
 			void setPlayerList(RBX::Gui::GuiList* playerList);
+
 			void destroyPlayer(Player* plr);
-
 			void addPlayer(Player* plr);
-			void updatePlayerList();
 
-			void onStep();
+			Color3 getPlayerColor(Player* player);
 
 			int getNumPlayers()
 			{
-				return players.size();
+				int num = 0;
+				for (size_t i = 0; i < children->size(); i++) {
+					if (IsA<Player>(children->at(i))) {
+						num++;
+					}
+				}
+				return num;
 			}
 
 			void setMaxPlayers(int newMaxPlayers) 
@@ -55,6 +65,8 @@ namespace RBX
 				return maxPlayers; 
 			}
 
+			static void doOnChildAdded(Instance* child);
+			static void doOnChildRemoved(Instance* child);
 
 			/* unlike actual function, no arguments, instead dependant on there being a global Players class */
 
@@ -66,7 +78,12 @@ namespace RBX
 				setClassName("Players");
 				setName("Players");
 
+				onChildAdded.connect(doOnChildAdded);
+				onChildRemoved.connect(doOnChildRemoved);
+
 				isParentLocked = 1;
+
+				maxPlayers = 10;
 				localPlayer = 0;
 			}
 
@@ -121,20 +138,34 @@ namespace RBX
 			void loadCharacter();
 			void disposeActiveBin();
 
+			void onRemove();
+
 			void setAsController();
-			void render(RenderDevice* rd);
+
+			static void onPlayerMessageAdded(Instance* playerMsg);
+			static void onPlayerMessageRemoved(Instance* playerMsg);
 
 			Player()
 			{
 				setClassName("Player");
 				setName("Player");
+
 				setParent(Players::get());
+
 				backpack = new RBX::Backpack();
+
 				backpack->setParent(this);
+				backpack->isParentLocked = true;
+
+				onDescendentAdded.connect(onPlayerMessageAdded);
+				onDescendentRemoved.connect(onPlayerMessageRemoved);
+
 				activeBin = 0;
 				controller = 0;
+
 				character = 0;
 				guiName = 0;
+
 				userId = 0;
 			}
 			~Player()

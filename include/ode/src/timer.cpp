@@ -30,6 +30,10 @@ TODO
 
 */
 
+#ifdef WIN32
+#include <afxwin.h>
+#endif
+
 #include <ode/common.h>
 #include <ode/timer.h>
 
@@ -41,7 +45,6 @@ TODO
 
 #ifdef WIN32
 
-#include "windows.h"
 
 static inline void getClockCount (unsigned long cc[2])
 {

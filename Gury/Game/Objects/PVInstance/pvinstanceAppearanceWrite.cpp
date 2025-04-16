@@ -12,7 +12,7 @@ void RBX::PVInstance::writeBrickFace(NormalId face, int unit, bool repeat)
 
 void RBX::PVInstance::writeBrickFaceGeometry(RBX::NormalId face,Vector2 xy, Vector2 wh, Vector3 v0, Vector3 v1, Vector3 v2, Vector3 v3, Vector3 v4, Vector3 v5, Color4 color, int textureUnit)
 {
-    Vector3 normal = getQuadFaceNormal(face, v0, v1, v2, v3);
+    Vector3 normal = getQuadFaceNormal(face, v0, v1, v2, v3, v4 ,v5);
 
     if (!vertexIndices.containsKey(face))
     {

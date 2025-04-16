@@ -17,10 +17,9 @@ namespace RBX
 
         static float angleFromTwoPoints(Vector3 from, Vector3 to)
         {
-            float x1 = from.x, x2 = to.x, y1 = from.y, y2 = to.y, z1 = from.z, z2 = to.z;
-            float dist = sqrt(pow(x1 - x2, 2) + pow(y1 - y2, 2) + pow(z1 - z2, 2));
-            float dist2 = sqrt(pow(x1 - x2, 2) + pow(z1 - z2, 2));
-            return acos(dist2 / dist) * 180 / 3.1415926;
+            float x1 = from.x, x2 = to.x, z1 = from.z, z2 = to.z;
+            float dist = sqrt(x2 - x1 * x2 - x1 + z2 - z1 * z2 - x1);
+            return dist;
         }
 
         static Vector3 rotationFromTwoPoints(Vector3 from, Vector3 to)
@@ -31,30 +30,33 @@ namespace RBX
         }
 
         /* i ripped all of these from IDA */
-        static double angleToE0(const G3D::Vector3 v)
+        static float angleToE0(const G3D::Vector3 v)
         {
-            double result; // st7
+            float result; // st7
             G3D::Vector3 u; // [esp+0h] [ebp-Ch] BYREF
             float y; // [esp+8h] [ebp-4h]
 
             u.y = v.x;
-            y = v.y;
+            y = v.z;
+
             u.unitize(0.000001f);
             result = acos(u.y);
-            if (y < 0.0)
-                return 6.2831855 - result;
+
+            if (y < 0.0f)
+                return 6.2831855f - result;
+
             return result;
         }
-        static double radWrap(float rad)
+        static float radWrap(float rad)
         {
-            double result; // st7
+            float result; // st7
             float v2; // [esp+Ch] [ebp-4h]
 
             result = rad;
-            if (rad < -3.1415927 || result >= 3.1415927)
+            if (rad < -3.1415927f || result >= 3.1415927f)
             {
-                v2 = floor((result + 3.1415927) * 0.15915495);
-                return rad - (double)(int)v2 * 6.283185;
+                v2 = floor((result + 3.1415927f) * 0.15915495f);
+                return rad - (float)v2 * 6.283185f;
             }
             return result;
         }

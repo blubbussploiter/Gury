@@ -40,7 +40,23 @@ void RBX::Workspace::wakeUpModels()
     }
 }
 
-void RBX::getPVInstances(RBX::Instances* instances, RBX::Instances* pvs)
+void RBX::Workspace::playAllSounds()
+{
+    Instances* sounds = new Instances();
+    getAllInstancesOfClass(sounds, "Sound");
+
+    for (size_t i = 0; i < sounds->size(); i++)
+    {
+        Sound* sound = toInstance<Sound>(sounds->at(i));
+        if (sound)
+        {
+            sound->play();
+        }
+    }
+}
+
+
+void RBX::Workspace::getPVInstances(RBX::Instances* instances, RBX::Instances* pvs)
 {
     for (unsigned int i = 0; i < instances->size(); i++)
     {
@@ -50,6 +66,20 @@ void RBX::getPVInstances(RBX::Instances* instances, RBX::Instances* pvs)
             pvs->push_back(child);
 
         getPVInstances(child->getChildren(), pvs);
+    }
+}
+
+void RBX::Workspace::getAllInstancesOfClass(RBX::Instances* instances, std::string className)
+{
+    Instances* children = Workspace::get()->children;
+    for (unsigned int i = 0; i < children->size(); i++)
+    {
+        RBX::Instance* child = children->at(i);
+
+        if (child->className == className)
+            instances->push_back(child);
+
+        getPVInstances(child->getChildren(), instances);
     }
 }
 

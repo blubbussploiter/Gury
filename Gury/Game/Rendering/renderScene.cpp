@@ -39,7 +39,7 @@ void RBX::Render::RenderScene::presetLighting()
 
 void RBX::Render::RenderScene::turnOnLights(RenderDevice* device)
 {
-	float spotDamper = 0.48f;
+	float spotDamper = 0.35f;
 	float ambientDamper = 0.5f;
 	float damper = 0.6f;
 
@@ -51,20 +51,21 @@ void RBX::Render::RenderScene::turnOnLights(RenderDevice* device)
 	presetLighting();
 
 	/* 2006 ambient color */
-	if (Lighting::get()->usesAmbient)
+	Lighting* RBXlighting = Lighting::get();
+	if (RBXlighting->usesAmbient)
 	{
-		spotDamper = 0.9f;
-		damper = 1.f;
+		spotDamper = 1;
+		damper = 1;
+
+		ambientColor = RBXlighting->getAmbient();
 		effectSettings->_hemisphereLighting = false;
-		ambientColor = Lighting::get()->getAmbient();
 	}
 	else
 	{
 		effectSettings->_hemisphereLighting = true;
 		ambientColor = (lighting->ambientBottom + lighting->ambientTop) * ambientDamper;
 	}
-
-	device->setSpecularCoefficient(Color3::white());
+	
 	device->setColorClearValue(colorClearValue);
 
 	device->setLight(0, GLight::directional(params.lightDirection, params.lightColor * spotDamper));
@@ -100,7 +101,6 @@ void RBX::Render::RenderScene::sendProxyGeometry(RenderDevice* renderDevice, Ren
 {
 	if (proxy)
 	{
-		//renderDevice->setPolygonOffset(proxy->polygonOffset);
 		proxy->material->configureRenderDevice(renderDevice);
 
 		Mesh::sendGeometry(proxy->fullMesh->triangle_level, renderDevice);
@@ -154,7 +154,17 @@ void RBX::Render::RenderScene::renderNonGeometricInstances(RenderDevice* renderD
 	for (unsigned int i = 0; i < sceneObjects.size(); i++)
 	{
 		IRenderable* iRenderable = toInstance<IRenderable>(sceneObjects.at(i));
-		iRenderable->plainRender(renderDevice);
+		iRenderable->renderAdornee(renderDevice);
+	}
+}
+
+void RBX::Render::RenderScene::render2DInstances(RenderDevice* renderDevice)
+{
+	Instances sceneObjects = Scene::get()->sceneObjects;
+	for (unsigned int i = 0; i < sceneObjects.size(); i++)
+	{
+		IRenderable* iRenderable = toInstance<IRenderable>(sceneObjects.at(i));
+		iRenderable->render2D(renderDevice);
 	}
 }
 
@@ -172,7 +182,9 @@ void RBX::Render::RenderScene::oneFrame(RenderDevice* renderDevice, Camera* proj
 
 	renderDevice->setCullFace(RenderDevice::CULL_BACK);
 	renderDevice->setAlphaTest(RenderDevice::ALPHA_GREATER, 0.1);
-	renderDevice->setDepthTest((RenderDevice::DepthTest)(RenderDevice::DEPTH_GEQUAL | RenderDevice::DEPTH_LEQUAL));
+
+	renderDevice->setDepthWrite(true);
+	renderDevice->setDepthTest((RenderDevice::DepthTest)(RenderDevice::DEPTH_LESS));
 
 	renderDevice->setStencilConstant(0);
 	renderDevice->setStencilClearValue(0);
@@ -181,12 +193,12 @@ void RBX::Render::RenderScene::oneFrame(RenderDevice* renderDevice, Camera* proj
 
 	renderDevice->setProjectionAndCameraMatrix(*projection->getCamera());
 
+	renderDevice->pushState();
+	
 	if (!sky.isNull())
 	{
 		sky->render(params);
 	}
-
-	renderDevice->pushState();
 
 	renderScene(renderDevice);
 
@@ -217,8 +229,10 @@ void RBX::Render::RenderScene::oneFrame(RenderDevice* renderDevice, Camera* proj
 
 	renderDevice->push2D();
 
+	render2DInstances(renderDevice);
+
+	datamodel->render(renderDevice);
 	datamodel->guiRoot->render(renderDevice);
-	datamodel->message->render(renderDevice);
 
 	SelectionService::get()->renderDragBox(renderDevice);
 	Diagnostics::get_Renderer()->render2D(renderDevice);

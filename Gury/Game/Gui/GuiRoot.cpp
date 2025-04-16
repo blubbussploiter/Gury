@@ -35,16 +35,24 @@ void RBX::Gui::GuiRoot::render(RenderDevice* d)
 	}
 }
 
-void RBX::Gui::GuiRoot::doButtonLogic(G3D::UserInput* ui, RenderDevice* d)
+bool RBX::Gui::GuiRoot::doButtonLogic(G3D::UserInput* ui, RenderDevice* d)
 {
+	bool hoverAny = true;
+
 	for (unsigned int i = 0; i < children->size(); i++)
 	{
 		GuiObject* object = toInstance<GuiObject>(children->at(i));
 		if (object)
 		{
 			object->handleMouse(ui);
+			if (object->mouseIn(ui->mouseXY()))
+			{
+				hoverAny = false;
+			}
 		}
 	}
+
+	return hoverAny;
 }
 
 bool RBX::Gui::GuiObject::mouseIn(Vector2 mouse)

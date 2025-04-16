@@ -17,15 +17,11 @@ namespace RBX
 
 		public:
 
-			RenderSurface() : RenderSurface(0.0f){
+			RenderSurface() : RenderSurface(1.f){
 			}
 
 			RenderSurface(float polygonOffset) : RenderSurface(new Mesh(), new Material::Level(), polygonOffset){
 			}
-
-			RenderSurface(Material::Level* material) : RenderSurface(new Mesh(), material, 0.0f) {
-			}
-
 			RenderSurface(Material::Level* material, float polygonOffset) : RenderSurface(new Mesh(), material, polygonOffset){
 			}
 

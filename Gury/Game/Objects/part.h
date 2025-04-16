@@ -38,11 +38,11 @@ namespace RBX
 			setName("Part");
 
 			shape = Shape::Block;
-
-			setSize(Vector3(2, 1.2f, 4));
+			size = Vector3(2, 1.2f, 4);
 
 		}
 
+		RBX_CLONE_DEF(PartInstance) 
 		RTTR_ENABLE(RBX::PVInstance)
 	};
 }

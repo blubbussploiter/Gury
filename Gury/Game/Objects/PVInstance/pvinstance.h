@@ -54,7 +54,7 @@ namespace RBX
 
 		PV* startPV;
 
-		Vector3 getQuadFaceNormal(RBX::NormalId face, Vector3 v0, Vector3 v1, Vector3 v2, Vector3 v3);
+		Vector3 getQuadFaceNormal(RBX::NormalId face, Vector3 v0, Vector3 v1, Vector3 v2, Vector3 v3, Vector3 v4, Vector3 v5);
 
 		/* Brick Face */
 
@@ -246,8 +246,8 @@ namespace RBX
 		void edit();
 		void write();
 
-		static void doonChildAdded(Instance* child);
-		static void doonChildRemoved(Instance* child);
+		static void onMeshAdded(Instance* child);
+		static void onMeshRemoved(Instance* child);
 
 		void writeSurfaces();
 		void editSurfaces();
@@ -274,7 +274,7 @@ namespace RBX
 			{
 			case Ball:
 			{
-				float xyz = max(max(size.x, size.y), size.z);
+				float xyz = std::max(std::max(size.x, size.y), size.z);
 				size = Vector3(xyz, xyz, xyz);
 				break;
 			}
@@ -436,7 +436,6 @@ namespace RBX
 
 		PVInstance();
 
-		RBX_CLONE_DEF(PVInstance)
 		RTTR_ENABLE(RBX::Render::IRenderable)
 	};
 

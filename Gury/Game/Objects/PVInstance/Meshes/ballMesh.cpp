@@ -1,8 +1,8 @@
 
 #include "../pvinstance.h"
 
-int sectors = 18;
-int stacks = 18;
+int sectors = 28;
+int stacks = 20;
 
 Array<Vector3> RBX::PVInstance::getBallFaceVertices()
 {

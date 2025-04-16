@@ -4,33 +4,32 @@
 
 #pragma once
 
+#include "supergurymfcDoc.h"
 #include "../Gury/Application/appmanager.h"
 
-class CsupergurymfcView : public CView
+class GuryView : public CView
 {
 protected: // create from serialization only
-	CsupergurymfcView() noexcept;
-	DECLARE_DYNCREATE(CsupergurymfcView)
+	GuryView() noexcept;
+	DECLARE_DYNCREATE(GuryView)
 
 // Attributes
 public:
 
-	RBX::Experimental::Application* application;
-
-	CsupergurymfcDoc* GetDocument() const;
+	GuryDoc* GetDocument() const;
 
 // Operations
 public:
 
 // Overrides
 public:
-	virtual void OnDraw(CDC* pDC);  // overridden to draw this view
+//	virtual void OnDraw(CDC* pDC);  // overridden to draw this view
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 protected:
 
 // Implementation
 public:
-	virtual ~CsupergurymfcView();
+	virtual ~GuryView();
 #ifdef _DEBUG
 	virtual void AssertValid() const;
 	virtual void Dump(CDumpContext& dc) const;
@@ -40,14 +39,26 @@ protected:
 
 // Generated message map functions
 protected:
-	afx_msg void OnFilePrintPreview();
-	afx_msg void OnRButtonUp(UINT nFlags, CPoint point);
-	afx_msg void OnContextMenu(CWnd* pWnd, CPoint point);
 	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg void OnClose();
+	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
+	afx_msg void OnDestroy();
+	afx_msg void OnKillFocus(CWnd* pNewWnd);
+	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
+//	afx_msg void OnMouseHWheel(UINT nFlags, short zDelta, CPoint pt);
+	afx_msg void OnPaint();
+	afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
+	afx_msg void OnSetFocus(CWnd* pOldWnd);
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg void OnWindowPosChanged(WINDOWPOS* lpwndpos);
+	afx_msg void OnWindowPosChanging(WINDOWPOS* lpwndpos);
+	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
+	virtual void OnDraw(CDC* /*pDC*/);
 };
 
 #ifndef _DEBUG  // debug version in supergurymfcView.cpp
-inline CsupergurymfcDoc* CsupergurymfcView::GetDocument() const
-   { return reinterpret_cast<CsupergurymfcDoc*>(m_pDocument); }
+inline GuryDoc* GuryView::GetDocument() const
+   { return reinterpret_cast<GuryDoc*>(m_pDocument); }
 #endif
 

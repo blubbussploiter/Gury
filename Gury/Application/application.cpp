@@ -66,6 +66,18 @@ void RBX::Experimental::Application::resize(int cx, int cy)
 	renderDevice->setViewport(viewportRect);
 }
 
+bool RBX::Experimental::Application::inGuryWindow()
+{
+	float x = Mouse::get()->x;
+	float y = Mouse::get()->y;
+
+	RECT rect;
+	GetClientRect(viewHwnd, &rect);
+
+	return (x >= rect.left && y >= rect.top &&
+		x < rect.right && y < rect.bottom) && (GetFocus() == viewHwnd);
+}
+
 void RBX::Experimental::Application::resizeWithParent(int cx, int cy)
 {
 	RECT r;
@@ -89,7 +101,7 @@ RBX::Experimental::Application::Application(HWND wnd)
 	_settings.window.framed = false;
 	_settings.window.stereo = true;
 	_settings.window.refreshRate = 32;
-	_settings.window.depthBits = 32;
+	_settings.window.depthBits = 0;
 	_settings.dataDir = ConFileInPath("\\content\\");
 
 	window = Win32Window::create(_settings.window, viewHwnd);

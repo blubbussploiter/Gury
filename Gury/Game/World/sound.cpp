@@ -1,9 +1,30 @@
 #include "../Gury/Game/Services/soundservice.h"
 #include "../Gury/Game/World/sounds.h"
 
+RTTR_REGISTRATION
+{
+	rttr::registration::class_<RBX::Sound>("Sound")
+		 .constructor<>()
+		 .property("SoundId", &RBX::Sound::getSoundId, &RBX::Sound::setSoundId)
+		 .method("Play", &RBX::Sound::play)
+		 .method("play", &RBX::Sound::play)
+		 .method("Stop", &RBX::Sound::stop)
+		 .method("stop", &RBX::Sound::stop);
+}
+
 void RBX::Sound::stop()
 {
 	channel->stop();
+}
+
+void RBX::Sound::updateSound()
+{
+	FMOD_CREATESOUNDEXINFO* createSoundInfo = new FMOD_CREATESOUNDEXINFO();
+
+	createSoundInfo->cbsize = sizeof(FMOD_CREATESOUNDEXINFO);
+	createSoundInfo->length = soundId.contentLength;
+
+	SoundService::get()->mpSystem->createSound((const char*)soundId.content, FMOD_OPENMEMORY | FMOD_CREATESAMPLE, createSoundInfo, &sound);
 }
 
 void RBX::Sound::setStartPosition(double value)
@@ -32,13 +53,12 @@ void RBX::Sound::playOnce()
 
 void RBX::Sound::play()
 {
-	if (!sound)
-	{
-		SoundService::get()->mpSystem->createSound(soundPath.c_str(), 0, 0, &sound);
-	}
+	if (sound) {
+		sound->setMode(FMOD_LOOP_OFF);
 
-	sound->setMode(FMOD_LOOP_OFF);
-	SoundService::get()->mpSystem->playSound(sound, 0, 0, &channel);
-	channel->setPosition(startPosition, FMOD_TIMEUNIT_MS);
-	channel->setVolume(volume);
+		SoundService::get()->mpSystem->playSound(sound, 0, 0, &channel);
+
+		channel->setPosition(startPosition, FMOD_TIMEUNIT_MS);
+		channel->setVolume(volume);
+	}
 }

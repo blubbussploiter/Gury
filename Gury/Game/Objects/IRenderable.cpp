@@ -3,7 +3,7 @@
 
 #include "../Gury/Game/Rendering/renderScene.h"
 
-void RBX::Render::IRenderable::addVIndicesToProxy(Render::Mesh* mesh, Table<NormalId, Face> vIndices)
+void RBX::Render::IRenderable::addVertexIndicesToProxy(Render::Mesh* mesh, Table<NormalId, Face> vIndices)
 {
     auto& keys = vIndices.getKeys();
 
@@ -19,13 +19,12 @@ void RBX::Render::IRenderable::addVIndicesToProxy(Render::Mesh* mesh, Table<Norm
         for (int f = 0; f < face.indices.size(); f++)
         {
             uint32 index = face.indices[f];
-
             thisProxy->addIndex(index);
         }
     }
 }
 
-void RBX::Render::IRenderable::removeVIndicesFromProxy(Render::Mesh* mesh, Table<NormalId, Face> vIndices)
+void RBX::Render::IRenderable::removeVertexIndicesFromProxy(Render::Mesh* mesh, Table<NormalId, Face> vIndices)
 {
     auto& keys = vIndices.getKeys();
     for (int i = 0; i < keys.size(); i++)
@@ -45,12 +44,12 @@ void RBX::Render::IRenderable::removeVIndicesFromProxy(Render::Mesh* mesh, Table
 
 void RBX::Render::IRenderable::addToProxy(Render::Mesh* proxy)
 {
-    addVIndicesToProxy(proxy, vertexIndices);
+    addVertexIndicesToProxy(proxy, vertexIndices);
 }
 
 void RBX::Render::IRenderable::removeFromProxy(Render::Mesh* proxy)
 {
-    removeVIndicesFromProxy(proxy, vertexIndices);
+    removeVertexIndicesFromProxy(proxy, vertexIndices);
 }
 
 void RBX::Render::IRenderable::editMeshPosition(CoordinateFrame newPosition)
@@ -119,6 +118,14 @@ void RBX::Render::IRenderable::removeFromRenderEnvironment()
     {
         vertexIndices.remove(Bottom);
     }
+    if (vertexIndices.containsKey(UNDEFINED))
+    {
+        vertexIndices.remove(UNDEFINED);
+    }
+
+    if (specialShape) {
+        specialShape->removeFromRenderEnvironment();
+    }
 
     currentProxy = 0;
 
@@ -174,6 +181,6 @@ void  RBX::Render::IRenderable::editGlobalTexturedProxyLocation()
     Render::RenderSurface* textured = scene->texturedProxy;
     Render::Mesh* level = textured->fullMesh;
 
-    removeVIndicesFromProxy(level, vertexIndices);
-    addVIndicesToProxy(level, vertexIndices);
+    removeVertexIndicesFromProxy(level, vertexIndices);
+    addVertexIndicesToProxy(level, vertexIndices);
 }

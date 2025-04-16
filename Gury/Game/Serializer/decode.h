@@ -14,6 +14,10 @@ static const char reverse_table[128] = {
    41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 64, 64, 64, 64, 64
 };
 
+bool isspace(char c) {
+    return (c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '\f' || c == '\v');
+}
+
 static std::string base64_decode(const std::string& ascdata)
 {
     using ::std::string;
@@ -24,7 +28,7 @@ static std::string base64_decode(const std::string& ascdata)
 
     for (string::const_iterator i = ascdata.begin(); i != last; ++i) {
         const int c = *i;
-        if (::std::isspace(c) || c == '=') {
+        if (isspace(c) || c == '=') {
             // Skip whitespace and padding. Be liberal in what you accept.
             continue;
         }

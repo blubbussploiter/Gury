@@ -1,3 +1,4 @@
+#pragma once
 
 #include "../Gury/Game/Objects/PVInstance/pvinstance.h"
 #include "../Gury/Game/Objects/PVInstance/pvenums.h"
@@ -8,8 +9,6 @@ namespace RBX
 {
 	namespace Render
 	{
-		extern void buildHeadMesh(Vector3 size);
-
 		enum MeshType
 		{
 			Head,
@@ -28,106 +27,119 @@ namespace RBX
 			Vector3 mesh_scale;
 		};
 
-		class WedgeMesh : public MeshBase
+		class HeadMesh
 		{
 		public:
 
-			Array<Vector3> getFaceVertices(CoordinateFrame position, Vector3 size, NormalId face);
-
-			void writeFace(NormalId Face, Vector2 uv, Vector3 v0, Vector3 v1, Vector3 v2, Vector3 v3, Vector3 v4, Vector3 v5);
-			void writeTriangleFace(NormalId Face, Vector2 uv, Vector3 v0, Vector3 v1, Vector3 v2);
-
-			void editFace(NormalId Face, Vector2 uv, Vector3 v0, Vector3 v1, Vector3 v2, Vector3 v3, Vector3 v4, Vector3 v5);
-			void editTriangleFace(NormalId Face, Vector2 uv, Vector3 v0, Vector3 v1, Vector3 v2);
-
-			void writeWedgeFace(NormalId face);
-			void editWedgeFace(NormalId face);
-
-			void writeWedge();
-			void editWedge();
+			static Array<Vector3> getFaceVertices(CoordinateFrame position, Vector3 size, NormalId face);
 
 		};
 
-		class SpecialMesh : 
-			public WedgeMesh
+		class WedgeMesh
 		{
-		private:
-			Content meshId;
-			std::vector<Vector3> vertices;
-			std::vector<Vector3> normals;
-			std::vector<Vector3> uvs;
-			MeshType meshType;
-			int faces;
-			int num_faces;
 		public:
 
-			MeshType getMeshType() { return meshType; }
+			static Array<Vector3> getFaceVertices(CoordinateFrame position, Vector3 size, NormalId face);
 
-			void setMeshType(MeshType _meshType)
+		};
+
+		class SpecialMesh :
+				public MeshBase
 			{
-				switch (_meshType)
+			private:
+				Content meshId;
+				std::vector<Vector3> vertices;
+				std::vector<Vector3> normals;
+				std::vector<Vector3> uvs;
+				MeshType meshType;
+				int faces;
+				int num_faces;
+			public:
+
+				MeshType getMeshType() { return meshType; }
+
+				void setMeshType(MeshType _meshType)
 				{
-					case Head:
+					if (_meshType != meshType)
 					{
-						fromFile(GetFileInPath("/content/font/head.mesh"));
-						break;
+						meshType = _meshType;
+						removeFromRenderEnvironment();
+						write();
 					}
-					default: break;
+
 				}
 
-				if (_meshType != meshType)
+				void setMeshScale(Vector3 scale)
 				{
-					meshType = _meshType;
-					removeFromRenderEnvironment();
-					write();
-				}
-
-			}
-
-			void setMeshScale(Vector3 scale)
-			{
-				RBX::PVInstance* parent = dynamic_cast<RBX::PVInstance*>(getParent());
-				if (parent)
-				{
-					Vector3 sz = parent->getSize();
-
-					mesh_scale = scale * 1.75f;
-
-					if (sz.y > mesh_scale.y && sz.x > mesh_scale.x)
+					RBX::PVInstance* parent = dynamic_cast<RBX::PVInstance*>(getParent());
+					if (parent)
 					{
-						mesh_scale *= sz;
+						Vector3 sz = parent->getSize();
+
+						mesh_scale = scale * 1.75f;
+
+						if (sz.y > mesh_scale.y && sz.x > mesh_scale.x)
+						{
+							mesh_scale *= sz;
+						}
 					}
+					edit();
 				}
-				edit();
-			}
-
-			Vector3 getMeshScale() { return mesh_scale; }
-
-			void fromFile(std::string path);
-			void fromMeshType(MeshType types);
-
-			void setMeshId(Content meshId);
-			Content getMeshId() { return meshId; }
-			
-			void write();
-
-			void edit();
-
-			void writeSpecialMesh();
-			void editSpecialMesh();
-
-			SpecialMesh()
-			{
-				setClassName("SpecialMesh");
-				setName("SpecialMesh");
-				setMeshType(Head);
 				
-				mesh_scale = Vector3::one();
-			}
-			virtual ~SpecialMesh() {}
+				CoordinateFrame getParentCoordinateFrame() {
+					PVInstance* pvInstance = toInstance<PVInstance>(parent);
+					if (pvInstance) {
 
-			RTTR_ENABLE(RBX::Render::IRenderable)
-		};
+					}
+				}
+
+				Vector3 getMeshScale() { return mesh_scale; }
+
+				void fromFile(std::string path);
+				void fromMeshType(MeshType types);
+
+				void setMeshId(Content meshId);
+				Content getMeshId() { return meshId; }
+
+				void write();
+
+				void edit();
+
+				void writeFace(NormalId Face, Vector2 uv, Vector3 v0, Vector3 v1, Vector3 v2, Vector3 v3, Vector3 v4, Vector3 v5);
+				void writeTriangleFace(NormalId Face, Vector2 uv, Vector3 v0, Vector3 v1, Vector3 v2);
+
+				void editFace(NormalId Face, Vector2 uv, Vector3 v0, Vector3 v1, Vector3 v2, Vector3 v3, Vector3 v4, Vector3 v5);
+				void editTriangleFace(NormalId Face, Vector2 uv, Vector3 v0, Vector3 v1, Vector3 v2);
+
+				void writeSpecialMesh();
+				void editSpecialMesh();
+
+				void writeWedgeFace(NormalId face);
+				void editWedgeFace(NormalId face);
+
+				void writeWedge();
+				void editWedge();
+
+				void writeHead();
+				void editHead();
+
+				static void onParentChanged(Instance* self, std::string propertyName);
+
+				SpecialMesh()
+				{
+					setClassName("SpecialMesh");
+					setName("SpecialMesh");
+					setMeshType(Head);
+
+					onChanged.connect(onParentChanged);
+
+					mesh_scale = Vector3::one();
+				}
+				virtual ~SpecialMesh() {}
+
+				RBX_CLONE_DEF(SpecialMesh)
+					RTTR_ENABLE(RBX::Render::IRenderable)
+			};
 
 	}
 }

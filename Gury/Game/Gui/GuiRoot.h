@@ -1,5 +1,4 @@
-#ifndef GUIROOT_H
-#define GUIROOT_H
+#pragma once
 
 #include <G3DAll.h>
 #include <vector>
@@ -59,8 +58,6 @@ namespace RBX
 
 		class GuiList : public GuiObject
 		{
-		private:
-			std::vector<GuiObject*> children;
 		public:
 
 			std::string listTitle;
@@ -148,14 +145,18 @@ namespace RBX
 		{
 		public:
 			std::string text;
+
 			void render(RenderDevice* d);
+
 		};
 
 		class GuiHint : public GuiObject
 		{
 		public:
 			std::string text;
+
 			void render(RenderDevice* d);
+
 		};
 
 		class GuiRoot : public Instance
@@ -168,7 +169,7 @@ namespace RBX
 
 			void render(RenderDevice* d);
 
-			void doButtonLogic(G3D::UserInput* ui, RenderDevice* d);
+			bool doButtonLogic(G3D::UserInput* ui, RenderDevice* d);
 
 			void initFont()
 			{
@@ -184,24 +185,24 @@ namespace RBX
 			}
 		};
 
-		namespace CameraPanMenu
+		class CameraPanMenu
 		{
-			extern void onArrowUpBtnClick(GuiButton* btn);
-			extern void onArrowDwnBtnClick(GuiButton* btn);
-			extern void onZoomInBtnClick(GuiButton* btn);
-			extern void onZoomOutBtnClick(GuiButton* btn);
-		}
+		public:
+			static void onArrowUpBtnClick(GuiButton* btn);
+			static void onArrowDwnBtnClick(GuiButton* btn);
+			static void onZoomInBtnClick(GuiButton* btn);
+			static void onZoomOutBtnClick(GuiButton* btn);
+		};
 
-		namespace MenuBar
+		class MenuBar
 		{
-			extern void onExitBtnClick(GuiButton* btn);
-			extern void onFullscreenBtnClick(GuiButton* btn);
-			extern void onEditModeBtnClick(GuiButton* btn);
-		}
+		public:
+			static void onExitBtnClick(GuiButton* btn);
+			static void onFullscreenBtnClick(GuiButton* btn);
+			static void onEditModeBtnClick(GuiButton* btn);
+		};
 
 		/* deprecated, use Datamodel->guiRoot */
 		GuiRoot* get(); 
 	}
 }
-
-#endif

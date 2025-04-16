@@ -5,12 +5,13 @@
 
 #pragma once
 
+/* Pretty much empty, everything handled in childFrame */
 
-class CsupergurymfcDoc : public CDocument
+class GuryDoc : public CDocument
 {
 protected: // create from serialization only
-	CsupergurymfcDoc() noexcept;
-	DECLARE_DYNCREATE(CsupergurymfcDoc)
+	GuryDoc() noexcept;
+	DECLARE_DYNCREATE(GuryDoc)
 
 // Attributes
 public:
@@ -20,7 +21,7 @@ public:
 
 // Overrides
 public:
-	virtual BOOL OnNewDocument();
+//	virtual BOOL OnNewDocument();
 	virtual void Serialize(CArchive& ar);
 #ifdef SHARED_HANDLERS
 	virtual void InitializeSearchContent();
@@ -29,7 +30,7 @@ public:
 
 // Implementation
 public:
-	virtual ~CsupergurymfcDoc();
+	virtual ~GuryDoc();
 #ifdef _DEBUG
 	virtual void AssertValid() const;
 	virtual void Dump(CDumpContext& dc) const;
@@ -46,5 +47,5 @@ protected:
 	void SetSearchContent(const CString& value);
 #endif // SHARED_HANDLERS
 public:
-	afx_msg void OnUpdateIdrRunservice(CCmdUI* pCmdUI);
+//	virtual BOOL OnOpenDocument(LPCTSTR lpszPathName);
 };

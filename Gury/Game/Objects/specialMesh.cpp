@@ -27,6 +27,72 @@ RTTR_REGISTRATION
 
 }
 
+void RBX::Render::SpecialMesh::writeFace(NormalId face, Vector2 uv, Vector3 v0, Vector3 v1, Vector3 v2, Vector3 v3, Vector3 v4, Vector3 v5)
+{
+	Vector3 normal = normalize((v0 - v2).cross(v1 - v3).direction());
+
+	if (!vertexIndices.containsKey(face))
+	{
+		Face newFace;
+
+		newFace.indices.push_back(RBX::Render::Mesh::write(v0, normal, uv, color));
+		newFace.indices.push_back(RBX::Render::Mesh::write(v1, normal, uv, color));
+		newFace.indices.push_back(RBX::Render::Mesh::write(v2, normal, uv, color));
+		newFace.indices.push_back(RBX::Render::Mesh::write(v3, normal, uv, color));
+		newFace.indices.push_back(RBX::Render::Mesh::write(v4, normal, uv, color));
+		newFace.indices.push_back(RBX::Render::Mesh::write(v5, normal, uv, color));
+
+		vertexIndices.set(face, newFace);
+	}
+}
+
+void RBX::Render::SpecialMesh::editFace(NormalId face, Vector2 uv, Vector3 v0, Vector3 v1, Vector3 v2, Vector3 v3, Vector3 v4, Vector3 v5)
+{
+	Vector3 normal = normalize((v0 - v2).cross(v1 - v3).direction());
+
+	if (vertexIndices.containsKey(face))
+	{
+		Face _face = vertexIndices[face];
+
+		RBX::Render::Mesh::edit(_face.indices[0], v0, normal, uv, color);
+		RBX::Render::Mesh::edit(_face.indices[1], v1, normal, uv, color);
+		RBX::Render::Mesh::edit(_face.indices[2], v2, normal, uv, color);
+		RBX::Render::Mesh::edit(_face.indices[3], v3, normal, uv, color);
+		RBX::Render::Mesh::edit(_face.indices[4], v4, normal, uv, color);
+		RBX::Render::Mesh::edit(_face.indices[5], v5, normal, uv, color);
+	}
+}
+
+void RBX::Render::SpecialMesh::writeTriangleFace(NormalId face, Vector2 uv, Vector3 v0, Vector3 v1, Vector3 v2)
+{
+	Vector3 normal = normalize((v0 - v1).cross(v1 - v2).direction());
+
+	if (!vertexIndices.containsKey(face))
+	{
+		Face newFace;
+
+		newFace.indices.push_back(RBX::Render::Mesh::write(v0, normal, uv, color));
+		newFace.indices.push_back(RBX::Render::Mesh::write(v1, normal, uv, color));
+		newFace.indices.push_back(RBX::Render::Mesh::write(v2, normal, uv, color));
+
+		vertexIndices.set(face, newFace);
+	}
+}
+
+void RBX::Render::SpecialMesh::editTriangleFace(NormalId face, Vector2 uv, Vector3 v0, Vector3 v1, Vector3 v2)
+{
+	Vector3 normal = normalize((v0 - v1).cross(v1 - v2).direction());
+
+	if (vertexIndices.containsKey(face))
+	{
+		Face _face = vertexIndices[face];
+
+		RBX::Render::Mesh::edit(_face.indices[0], v0, normal, uv, color);
+		RBX::Render::Mesh::edit(_face.indices[1], v1, normal, uv, color);
+		RBX::Render::Mesh::edit(_face.indices[2], v2, normal, uv, color);
+	}
+}
+
 void RBX::Render::SpecialMesh::fromMeshType(MeshType types)
 {
 	setMeshType(types);
@@ -61,7 +127,7 @@ void RBX::Render::SpecialMesh::fromFile(std::string path)
 	fclose(f);
 
 	num_faces = faces * 3;
-	meshId = Content::fromContent(path);
+	meshId = Content::fromStoredContent(path);
 }
 
 void RBX::Render::SpecialMesh::setMeshId(Content SpecialMeshId)
@@ -92,21 +158,27 @@ void RBX::Render::SpecialMesh::write()
 
 		transparency = part->transparency;
 		reflectance = part->reflectance;
+		color = part->color;
 		alpha = part->alpha;
 
 		switch (meshType)
 		{
-		case Wedge:
-		{
-			writeWedge();
-			break;
+			case Head:{
+				writeHead();
+				break;
+			}
+			case Wedge:
+			{
+				writeWedge();
+				break;
+			}
+			default:
+			{
+				writeSpecialMesh();
+				break;
+			}
 		}
-		default:
-		{
-			writeSpecialMesh();
-			break;
-		}
-		}
+		editGlobalProxyLocation();
 	}
 }
 
@@ -123,21 +195,43 @@ void RBX::Render::SpecialMesh::edit()
 
 		switch (meshType)
 		{
-		case Wedge:
-		{
-			editWedge();
-			break;
+			case Head: {
+				editHead();
+				break;
+			}
+			case Wedge:
+			{
+				editWedge();
+				break;
+			}
+			default:
+			{
+				editSpecialMesh();
+				break;
+			}
 		}
-		default:
-		{
-			editSpecialMesh();
-			break;
-		}
-		}
+		editGlobalProxyLocation();
 	}
 }
 
-void RBX::Render::buildHeadMesh(Vector3 size)
+void RBX::Render::SpecialMesh::onParentChanged(Instance* self, std::string propertyName)
 {
+	if (propertyName == "Parent") {
 
+		Instance* parent = self->parent;
+
+		if (parent) {
+
+			PVInstance* pvInstance = toInstance<PVInstance>(parent);
+
+			if (pvInstance) {
+
+				IRenderable* renderableSelf = toInstance<IRenderable>(self);
+				pvInstance->removeFromRenderEnvironment();
+				pvInstance->specialShape = renderableSelf;
+				renderableSelf->write();
+
+			}
+		}
+	}
 }

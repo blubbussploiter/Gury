@@ -44,8 +44,8 @@ namespace RBX
 		void setFace(NormalId _face) { face = _face; }
 
 		void fromFile(std::string file, 
-			Texture::WrapMode wrap = Texture::TILE, 
-			Texture::InterpolateMode interpolate = Texture::BILINEAR_MIPMAP);
+			G3D::Texture::WrapMode wrap = G3D::Texture::TILE,
+			G3D::Texture::InterpolateMode interpolate = G3D::Texture::BILINEAR_MIPMAP);
 
 		unsigned int getGLid() 
 		{ 
@@ -64,6 +64,7 @@ namespace RBX
 		}
 		~Decal() { delete& texture; }
 
+		RBX_CLONE_DEF(Decal)
 		RTTR_ENABLE(RBX::Instance);
 	};
 }

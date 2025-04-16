@@ -1,6 +1,11 @@
 #pragma once
 
+#ifndef BUILDWXP
 #include <Windows.h>
+#else
+#include <afxwin.h>
+#endif
+
 #include <string>
 
 static std::string ExePath() {

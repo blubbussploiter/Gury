@@ -2,6 +2,10 @@
 
 #include <stack>
 
+#ifndef BUILDWXP
+#include <afxwin.h>
+#endif
+
 #include "../Gury/Game/World/workspace.h"
 #include "../Gury/Game/Objects/model.h"
 
@@ -21,6 +25,7 @@ namespace RBX
 
 			Datamodel* datamodel;
 
+			Array<CWnd*> editoralHiddenWindows;
 			Camera* camera; /* main viewport */
 
 			bool                 _mouseButtons[3];
@@ -57,6 +62,8 @@ namespace RBX
 			void setWindowLong();
 			void resizeWithParent(int cx=0, int cy=0);
 			void resize(int cx, int cy);
+
+			bool inGuryWindow();
 
 			/* onXXX */
 

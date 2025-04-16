@@ -32,37 +32,37 @@ static dMessageFunction *debug_function = 0;
 static dMessageFunction *message_function = 0;
 
 
-extern "C" void dSetErrorHandler (dMessageFunction *fn)
+void dSetErrorHandler (dMessageFunction *fn)
 {
   error_function = fn;
 }
 
 
-extern "C" void dSetDebugHandler (dMessageFunction *fn)
+ void dSetDebugHandler (dMessageFunction *fn)
 {
   debug_function = fn;
 }
 
 
-extern "C" void dSetMessageHandler (dMessageFunction *fn)
+ void dSetMessageHandler (dMessageFunction *fn)
 {
   message_function = fn;
 }
 
 
-extern "C" dMessageFunction *dGetErrorHandler()
+dMessageFunction *dGetErrorHandler()
 {
   return error_function;
 }
 
 
-extern "C" dMessageFunction *dGetDebugHandler()
+ dMessageFunction *dGetDebugHandler()
 {
   return debug_function;
 }
 
 
-extern "C" dMessageFunction *dGetMessageHandler()
+dMessageFunction *dGetMessageHandler()
 {
   return message_function;
 }
@@ -127,11 +127,7 @@ extern "C" void dMessage (int num, const char *msg, ...)
 #define _vsnprintf vsnprintf
 #endif
 
-
-#include "windows.h"
-
-
-extern "C" void dError (int num, const char *msg, ...)
+void dError (int num, const char *msg, ...)
 {
   va_list ap;
   va_start (ap,msg);
@@ -147,7 +143,7 @@ extern "C" void dError (int num, const char *msg, ...)
 }
 
 
-extern "C" void dDebug (int num, const char *msg, ...)
+void dDebug (int num, const char *msg, ...)
 {
   va_list ap;
   va_start (ap,msg);
@@ -163,7 +159,7 @@ extern "C" void dDebug (int num, const char *msg, ...)
 }
 
 
-extern "C" void dMessage (int num, const char *msg, ...)
+void dMessage (int num, const char *msg, ...)
 {
   va_list ap;
   va_start (ap,msg);

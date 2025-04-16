@@ -11,6 +11,8 @@
 
 int main()
 {
+	HINSTANCE P;
+
 
 	//CStudioApp* studio;
 	//studio = new CStudioApp();

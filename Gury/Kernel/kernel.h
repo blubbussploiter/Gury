@@ -56,9 +56,7 @@ namespace RBX
 		{
 			world = dWorldCreate();
 
-			space = dHashSpaceCreate(0);
-			dHashSpaceSetLevels(space, 1, 4);
-
+			space = dSimpleSpaceCreate(0);
 			contacts = dJointGroupCreate(0);
 
 			dWorldSetGravity(world, 0, -9.81F, 0);

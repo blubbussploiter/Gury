@@ -14,10 +14,13 @@
 #ifndef G3D_VECTOR2_H
 #define G3D_VECTOR2_H
 
+#include <algorithm>
+#include <string>
+
 #include "G3D/platform.h"
 #include "G3D/g3dmath.h"
 #include "Vector2int16.h"
-#include <string>
+
 
 namespace G3D {
 
@@ -389,13 +392,13 @@ inline float Vector2::dot (const Vector2& rkVector) const {
 
 
 inline Vector2 Vector2::min(const Vector2 &v) const {
-    return Vector2(G3D::min(v.x, x), G3D::min(v.y, y));
+    return Vector2(std::min(v.x, x), std::min(v.y, y));
 }
 
 
 
 inline Vector2 Vector2::max(const Vector2 &v) const {
-    return Vector2(G3D::max(v.x, x), G3D::max(v.y, y));
+    return Vector2(std::max(v.x, x), std::max(v.y, y));
 }
 
 

@@ -2,12 +2,14 @@
 #include "../Gury/Studio/pch.h"
 #include "../Gury/Studio/StudioTool.h"
 #include "../Gury/Studio/MainFrm.h"
+#include "../Studio/ChildFrm.h"
 
 #include "../Gury/Game/Services/selection.h"
 #include "../Gury/Game/Network/Player/players.h"
 
 #include "../Gury/Game/World/camera.h"
 #include "../Gury/Game/Services/stdout.h"
+#include "../Gury/Game/Services/hopper.h"
 
 #include "../Gury/Game/Network/Player/Mouse.h"
 
@@ -82,25 +84,26 @@ void RBX::Experimental::Application::onLogic()
 			RBX::Camera::get()->cam_zoom(1);
 		}
 
-		if (userInput->keyPressed(SDLK_DELETE))
-		{
-			GlobalSounds::pageTurn->play();
-			RBX::SelectionService::get()->removeSelected();
-		}
-
 		if (RBX::Studio::current_Tool)
 		{
 			RBX::Studio::current_Tool->doLogic(userInput);
 		}
 
-		Mouse::get()->update(userInput);
-		getCamera()->update(userInput->keyDown(SDL_RIGHT_MOUSE_KEY));
+		RBX::Studio::StudioNavigator::get()->doActions(userInput);
+		RBX::Hopper::get()->doUserInput(userInput);
 
-		RBX::Gui::get()->doButtonLogic(userInput, renderDevice);
-		RBX::Network::Players::get()->onStep();
+		Mouse::get()->doUserInput(userInput);
 
-		RBX::ControllerService::get()->updateControllers(userInput);
-		RBX::SelectionService::get()->update(userInput);
+		getCamera()->update(inGuryWindow() && userInput->keyDown(SDL_RIGHT_MOUSE_KEY));
+
+		bool overGui = Gui::get()->doButtonLogic(userInput, renderDevice);
+		if (overGui) {
+			RBX::SelectionService::get()->update(userInput);
+		}
+
+		Mouse::get()->updateCursorInfo(overGui);
+
+		ControllerService::get()->updateControllers(userInput);
 
 	}
 
@@ -166,34 +169,34 @@ void RBX::Experimental::Application::onInit()
 
 void RBX::Experimental::Application::exitEditMode(bool _inEditMode)
 {
-	int n;
 	CMainFrame* mainFrame = CMainFrame::mainFrame;
 
-	if (!mainFrame) return;
-
-	inEditMode = _inEditMode;
-	n = inEditMode ? SW_RESTORE : SW_HIDE;
-
-	mainFrame->m_wndMainTools.ShowWindow(n);
-	mainFrame->m_wndCameraTools.ShowWindow(n);
-	mainFrame->m_wndClassView.ShowWindow(n);
-	mainFrame->m_wndStudioTools.ShowWindow(n);
-	mainFrame->m_wndRunServiceTools.ShowWindow(n);
-	mainFrame->m_wndProperties.ShowWindow(n);
-	mainFrame->m_wndOutput.ShowWindow(n);
-	mainFrame->m_wndMenuBar.ShowWindow(n);
-	mainFrame->m_wndStatusBar.ShowWindow(n);
-
-	if (inEditMode)
+	if (mainFrame)
 	{
-		ShowWindow(viewHwnd, SW_RESTORE);
-	}
-	else
-	{
-		ShowWindow(viewHwnd, SW_MAXIMIZE);
-	}
 
-	resizeWithParent();
+		inEditMode = _inEditMode;
+		int n = inEditMode ? SW_RESTORE : SW_HIDE;
+
+		mainFrame->m_wndMainTools.ShowWindow(n);
+		mainFrame->m_wndCameraTools.ShowWindow(n);
+		mainFrame->m_wndClassView.ShowWindow(n);
+		mainFrame->m_wndStudioTools.ShowWindow(n);
+		mainFrame->m_wndRunServiceTools.ShowWindow(n);
+		mainFrame->m_wndProperties.ShowWindow(n);
+		mainFrame->m_wndOutput.ShowWindow(n);
+		mainFrame->m_wndMenuBar.ShowWindow(n);
+		mainFrame->m_wndStatusBar.ShowWindow(n);
+
+
+		if (inEditMode)
+		{
+
+		}
+		else
+		{
+
+		}
+	}
 }
 
 void RBX::Experimental::Application::mainProcessStep()

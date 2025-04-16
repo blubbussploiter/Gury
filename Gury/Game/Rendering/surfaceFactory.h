@@ -24,20 +24,20 @@ namespace RBX
 		Vector2 getFacePositionRelative(NormalId face, Vector3 brickSize);
 		Vector2 getTextureDimensions(Shape shape, Vector3 brickSize);
 
-		std::string generateHash(Shape shape, Vector3 brickSize, Color4 brickColor, SurfaceType front, SurfaceType back, SurfaceType left, SurfaceType right, SurfaceType top, SurfaceType bottom);
+		std::string generateHash(RBX::Shape shape, Vector3 brickSize, Color4 brickColor, SurfaceType front, SurfaceType back, SurfaceType left, SurfaceType right, SurfaceType top, SurfaceType bottom);
 
 		void pasteFaceOnBrickTexture(GImage& bimage, GImage surfaceImage, NormalId face, Vector3 brickSize);
 
-		void allocateBrickTexture(Shape shape, Vector3 brickSize, GImage& bimage);
-		int generateBrickTexture(PVInstance* pv, Shape shape, Vector3 brickSize, Color4 brickColor, SurfaceType front, SurfaceType back, SurfaceType left, SurfaceType right, SurfaceType top, SurfaceType bottom);
-		void editBrickTexture(PVInstance* pv, int textureIndex, Shape shape, Vector3 brickSize, Color4 brickColor, SurfaceType front, SurfaceType back, SurfaceType left, SurfaceType right, SurfaceType top, SurfaceType bottom);
+		void allocateBrickTexture(RBX::Shape shape, Vector3 brickSize, GImage& bimage);
+		int generateBrickTexture(PVInstance* pv, RBX::Shape shape, Vector3 brickSize, Color4 brickColor, SurfaceType front, SurfaceType back, SurfaceType left, SurfaceType right, SurfaceType top, SurfaceType bottom);
+		void editBrickTexture(PVInstance* pv, int textureIndex, RBX::Shape shape, Vector3 brickSize, Color4 brickColor, SurfaceType front, SurfaceType back, SurfaceType left, SurfaceType right, SurfaceType top, SurfaceType bottom);
 		void removeBrickTexture(PVInstance* pv);
 
 		/* re-edit the guys */
 		void regen(PVInstance* current = 0);
 
 		void pasteSurface(NormalId face, SurfaceType surface, Color4 color, Vector3 brickSize, GImage& image);
-		void pasteSurfaces(GImage& brickTexture, Shape shape, Vector3 brickSize, Color4 brickColor, SurfaceType front, SurfaceType back, SurfaceType left, SurfaceType right, SurfaceType top, SurfaceType bottom);
+		void pasteSurfaces(GImage& brickTexture, RBX::Shape shape, Vector3 brickSize, Color4 brickColor, SurfaceType front, SurfaceType back, SurfaceType left, SurfaceType right, SurfaceType top, SurfaceType bottom);
 
 	};
 }

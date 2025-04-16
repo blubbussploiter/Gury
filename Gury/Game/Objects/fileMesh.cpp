@@ -20,17 +20,15 @@ void RBX::Render::SpecialMesh::writeSpecialMesh()
 	for (size_t i = 0; i < num_faces; i++)
 	{
 		Vector3 vertex = vertices.at(i) * mesh_scale, worldVertex;
-		Vector3 normal = normals.at(i).direction();
 		Vector3 uv = uvs.at(i);
 
 		worldVertex = newPosition.pointToWorldSpace(vertex);
+		Vector3 normal = normalize(worldVertex - newPosition.translation);
 
 		face.indices.push_back(RBX::Render::Mesh::write(vertex, normal, Vector2(uv.x, uv.y), color));
 	}
 
 	vertexIndices.set(UNDEFINED, face);
-
-	editGlobalProxyLocation();
 }
 
 void RBX::Render::SpecialMesh::editSpecialMesh()
@@ -44,16 +42,17 @@ void RBX::Render::SpecialMesh::editSpecialMesh()
 		CoordinateFrame newPosition;
 		if (IsA<PartInstance>(parent))
 		{
+			color = toInstance<PartInstance>(parent)->color;
 			newPosition = toInstance<PartInstance>(parent)->getCoordinateFrame();
 
 			for (int i = 0; i < num_faces; i++)
 			{
 				int index = face.indices[i];
 				Vector3 vertex = vertices.at(i) * mesh_scale, worldVertex;
-				Vector3 normal = normals.at(i).direction();
 				Vector3 uv = uvs.at(i);
 
 				worldVertex = newPosition.pointToWorldSpace(vertex);
+				Vector3 normal = normalize(worldVertex - newPosition.translation);
 
 				RBX::Render::Mesh::edit(index, worldVertex, normal, Vector2(uv.x, uv.y), color);
 			}
@@ -64,6 +63,4 @@ void RBX::Render::SpecialMesh::editSpecialMesh()
 	{
 		writeSpecialMesh();
 	}
-
-	editGlobalProxyLocation();
 }

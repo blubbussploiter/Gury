@@ -6,7 +6,6 @@
 #include "../Gury/Application/appmanager.h"
 
 #include "../Gury/Game/Objects/instance.h"
-#include "../Gury/Game/Objects/instance.h"
 #include "../Gury/Game/World/camera.h"
 #include "../Gury/Game/World/ray.h"
 
@@ -34,10 +33,8 @@ namespace RBX
 		Vector3 getDir() { getTarget(); return dir; }
 		Vector3 getHit() { getTarget(); return hitWorld; }
 
-		bool inGuryWindow();
-
-		void update(UserInput* ui);
-		void updateCursorInfo();
+		void doUserInput(UserInput* ui);
+		void updateCursorInfo(bool overGui);
 		void render(RenderDevice* rd);
 
 		HCURSOR get_cursor();

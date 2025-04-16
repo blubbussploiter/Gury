@@ -14,6 +14,8 @@ namespace RBX
 
 	public:
 
+		void clearContent();
+
 		void copy(Instance* what);
 		void copyMultiple(Instances* which);
 

@@ -12,6 +12,14 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifndef BUILDWXP
+#include <windows.h>
+#else
+#define MAX_PATH 260
+typedef unsigned long DWORD;
+
+#endif
+
 
 #define loadlib_c
 #define LUA_LIB
@@ -59,6 +67,7 @@ static lua_CFunction ll_sym (lua_State *L, void *lib, const char *sym);
 */
 
 #include <dlfcn.h>
+#include <minwindef.h>
 
 static void ll_unloadlib (void *lib) {
   dlclose(lib);
@@ -89,9 +98,6 @@ static lua_CFunction ll_sym (lua_State *L, void *lib, const char *sym) {
 ** =======================================================================
 */
 
-#include <windows.h>
-
-
 #undef setprogdir
 
 static void setprogdir (lua_State *L) {
@@ -112,7 +118,7 @@ static void setprogdir (lua_State *L) {
 static void pusherror (lua_State *L) {
   int error = GetLastError();
   char buffer[128];
-  if (FormatMessageA(FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_FROM_SYSTEM,
+  if (FormatMessageA(0x00000200 | 0x00001000,
       NULL, error, 0, buffer, sizeof(buffer), NULL))
     lua_pushstring(L, buffer);
   else
@@ -120,19 +126,19 @@ static void pusherror (lua_State *L) {
 }
 
 static void ll_unloadlib (void *lib) {
-  FreeLibrary((HINSTANCE)lib);
+  FreeLibrary(lib);
 }
 
 
 static void *ll_load (lua_State *L, const char *path) {
-  HINSTANCE lib = LoadLibraryA(path);
+  DWORD lib = LoadLibraryA(path);
   if (lib == NULL) pusherror(L);
   return lib;
 }
 
 
 static lua_CFunction ll_sym (lua_State *L, void *lib, const char *sym) {
-  lua_CFunction f = (lua_CFunction)GetProcAddress((HINSTANCE)lib, sym);
+  lua_CFunction f = (lua_CFunction)GetProcAddress(lib, sym);
   if (f == NULL) pusherror(L);
   return f;
 }

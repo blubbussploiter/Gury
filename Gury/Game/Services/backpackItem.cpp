@@ -1,11 +1,12 @@
 #include "backpack.h"
+#include "hopper.h"
 
 #include "../Gury/Game/Network/Player/players.h"
 #include "../Gury/Game/World/sounds.h"
 
-static RBX::Sound* ping = RBX::Sound::fromFile(GetFileInPath("/content/sounds/electronicpingshort.wav"));
+static RBX::Sound* ping = RBX::Sound::fromFile("rbxasset://sounds\\electronicpingshort.wav");
 
-void drawOutline(RenderDevice* rd, Vector2 from, Vector2 to, float thickness, Color3 color)
+void RBX::BackpackItem::drawOutline(RenderDevice* rd, Vector2 from, Vector2 to, float thickness, Color3 color)
 {
 	Vector2 p0, p1, p2, p3, p4, p5, p6, p7;
 
@@ -29,144 +30,221 @@ void drawOutline(RenderDevice* rd, Vector2 from, Vector2 to, float thickness, Co
 
 }
 
-void RBX::BackpackItem::getTextureId()
+void RBX::BackpackItem::doActivate()
 {
-	switch (item->binType)
-	{
-		case SCRIPT_BIN: return;
-		case GAMETOOL_BIN:
+	RBX::HopperBin* item = getItem();
+	RBX::Network::Player* player = RBX::Network::Players::get()->localPlayer;
+
+	if (player) {
+
+		RBX::HopperBin* activeBin;
+		RBX::BackpackItem* active;
+
+		activeBin = player->activeBin;
+		ping->play();
+
+		if (!player)
+			return;
+
+		if (!item->active)
 		{
-			textureId = GetFileInPath("/content/textures/GameTool.png");
-			break;
+			if (player->activeBin)
+			{
+				active = Hopper::get()->getBackpackItem(player->activeBin);
+				activeBin->deactivate();
+				activeBin->active = 0;
+			}
+
+			player->activeBin = item;
+			item->activate();
+			item->active = 1;
 		}
-		case CLONE_BIN:
+		else
 		{
-			textureId = GetFileInPath("/content/textures/Clone.png");
-			break;
+			activeBin->deactivate();
+			player->activeBin = 0;
+			item->active = 0;
 		}
-		case ROCKET_BIN:
-		{
-			textureId = GetFileInPath("/content/textures/Rocket.png");
-			break;
-		}
+
 	}
-	if(!textureId.empty()) texture->texture = Texture::fromFile(textureId);
 }
 
-void RBX::BackpackItem::fromitem(HopperBin* bin)
+void RBX::BackpackItem::getTextureId()
+{
+	textureId = item->getTextureId();
+
+	if (!textureId.isEmpty)
+	{
+		if (textureId.resolve())
+		{
+			GImage textureImage = GImage(textureId.content, textureId.contentLength);
+			if (textureImage.channels > 0) {
+				texture->texture = Texture::fromGImage(name, textureImage);
+			}
+		}
+	}
+}
+
+void RBX::BackpackItem::fromHopperBin(HopperBin* bin)
 {
 	item = bin;
 	title = bin->getName();
+	bin->onChanged.connect(doOnChanged);
 	getTextureId();
+}
+
+RBX::BackpackItem::BackpackItem()
+{
+	alignBottom = true;
+
+	texture = new RBX::Gui::GuiImage();
+	outlineBox = new RBX::Gui::GuiBox();
+	numberOutlineBox = new RBX::Gui::GuiBox();
+	disabledBox = new RBX::Gui::GuiBox();
+
+	number = new Gui::GuiLabel();
+
+	size = Vector2(100, 100);
+	outlineBox->size = Vector2(70, 70);
+	texture->size = Vector2(70, 70);
+	numberOutlineBox->size = Vector2(20, 20);
+	number->sz = 10;
+	sz = 10;
+
+	number->title = "-1";
+
+	outlineBox->background = Color4::clear();
+	numberOutlineBox->background = Color3(0.8f, 0.8f, 0.8f);
+
+	position = Vector2(0, 95);
+	titleOff = Vector2(0, 50);
+
+	number->textColor = Color3::white();
+	titleColor = Color3::white();
+
+	background = BACKPACK_ITEM_NEUTRAL_COLOR;
+	clickedColor = BACKPACK_ITEM_CLICKED_COLOR;
+	hoverColor = BACKPACK_ITEM_HOVER_COLOR;
+
+	onClick = onClickFn;
+
+	setName("BackpackItem");
+	setClassName("BackpackItem");
 }
 
 void RBX::BackpackItem::render(RenderDevice* rd)
 {
-	Vector2 pos;
+	RBX::Network::Player* player = RBX::Network::Players::get()->localPlayer;
 
-	if (!frame && !number)
-	{
-		frame = new Gui::GuiBox();
-		number = new Gui::GuiLabel();
+	numberOutlineBox->position = position + Vector2(2, 80);
+	number->position = numberOutlineBox->position + Vector2(5, 2);
+	texture->position = position + Vector2(15, 15);
 
-		frame->size = Vector2(15, 15);
-		frame->background = Color4(0.8f, 0.8f, 0.8f, 1.f);
+	outlineBox->position = texture->position;
 
-		number->textColor = Color3::white();
-		number->sz = 10;
-	}
-
-	pos = Vector2(position.x + 1, (position.y + size.y) - ((frame->size.y) + 1));
-
-	frame->position = pos;
-	number->position = pos + Vector2(2, 0);
-	texture->position = position + Vector2(10, 10);
-	f_outline->position = position + Vector2(8, 8);
-
-	frame->render(rd);
-	number->render(rd);
 	GuiButton::render(rd);
 
-	if (!hovered)
-	{
-		if (item->active)
-		{
-			drawOutline(rd, position, size, 4, Color3::green());
+	if (player) {
+
+		if (disabled) {
+			disabled = false;
 		}
-		f_outline->background = Color4::clear();
+
+		if (!hovered)
+		{
+			if (item->active)
+			{
+				drawOutline(rd, position, size, 2, Color3::green());
+			}
+			outlineBox->background = Color4::clear();
+		}
+		else
+		{
+			if (item->active)
+			{
+				drawOutline(rd, position, size, 4, Color3::green());
+			}
+			outlineBox->background = Color3::yellow();
+		}
+
+		if (clicked)
+		{
+			outlineBox->background = Color3::blue();
+		}
+		else
+		{
+			if (!hovered)
+				outlineBox->background = Color4::clear();
+		}
+
+	}
+	else { 
+		if (!disabled) {
+			disabled = true;
+		}
+	}
+
+	numberOutlineBox->render(rd);
+	number->render(rd);
+
+	if (texture->texture.isNull())
+	{
+		title = item->getName();
+
+		clickedColor = BACKPACK_ITEM_CLICKED_COLOR;
+		hoverColor = BACKPACK_ITEM_HOVER_COLOR;
 	}
 	else
 	{
-		if (item->active)
-		{
-			drawOutline(rd, position, size, 2, Color3::green());
-		}
-		f_outline->background = Color3::yellow();
-	}
-
-	if (clicked)
-	{
-		f_outline->background = Color3::blue();
-	}
-	else
-	{
-		if(!hovered)
-			f_outline->background = Color4::clear();
-	}
-
-	if (!texture->texture.isNull())
-	{
-		f_outline->render(rd);
+		outlineBox->render(rd);
 		texture->render(rd);
 
 		hoverColor = background;
 		clickedColor = background;
 
+		disabledBox->background = Color4(1, 1, 1, 0.5f);
+		disabledBox->position = texture->position;
+		disabledBox->size = texture->size;
+
+		if (disabled) {
+			disabledBox->render(rd);
+		}
+
 		title.clear();
-	}
-	else
-	{
-		title = item->getName();
-		clickedColor = BACKPACK_ITEM_CLICKED_COLOR;
-		hoverColor = BACKPACK_ITEM_HOVER_COLOR;
 	}
 
 }
 
-void RBX::onClickFn(RBX::Gui::GuiButton* b) /* move this to Backpack::activateBin() */
+void RBX::BackpackItem::doUpdateGridPosition(int backpackIndex)
 {
-	RBX::BackpackItem* bitem = (RBX::BackpackItem*)(b);
-	RBX::HopperBin* item = bitem->getItem();
-	RBX::Network::Player* player = RBX::Network::Players::get()->localPlayer;
+	this->backpackIndex = backpackIndex;
+	if (number) {
+		number->title = std::to_string(backpackIndex + 1);
+	}
+	origin = Vector2(backpackIndex * 100, 95);
+}
 
-	RBX::HopperBin* activeBin;
-	RBX::BackpackItem* active;
+void RBX::BackpackItem::doOnChanged(Instance* hopperBin, std::string propertyName)
+{
+	HopperBin* bin = toInstance<HopperBin>(hopperBin);
+	if (bin) {
 
-	activeBin = player->activeBin;
-	ping->play();
+		if (propertyName == "TextureId") {
 
-	if (!player)
-		return;
+			BackpackItem* item = Hopper::get()->getBackpackItem(bin);
 
-	if (!item->active)
-	{
-		if (player->activeBin)
-		{
-			active = player->backpack->getBackpackItem(player->activeBin);
-			activeBin->deactivate();
-			activeBin->active = 0;
+			if (item) {
+				item->getTextureId();
+			}
 		}
 
-		player->activeBin = item;
-		item->activate();
-		item->active = 1;
 	}
-	else
-	{
-		activeBin->deactivate();
-		player->activeBin = 0;
-		item->active = 0;
-	}
+}
+
+void RBX::BackpackItem::onClickFn(RBX::Gui::GuiButton* b) /* move this to Backpack::activateBin() */
+{
+	RBX::BackpackItem* bitem = (RBX::BackpackItem*)(b);
+	bitem->doActivate();
 }
 
 void RBX::BackpackItem::handleMouse(G3D::UserInput* ui)

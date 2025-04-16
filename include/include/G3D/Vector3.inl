@@ -21,6 +21,7 @@
     // http://download.microsoft.com/download/vb60ent/Update/6/W9X2KXP/EN-US/vcpp5.exe
     //
     // to get this file.
+#include <algorithm>
 #   include <xmmintrin.h>
 #endif
 
@@ -228,12 +229,12 @@ inline Vector3 Vector3::unitCross (const Vector3& rkVector) const {
 
 //----------------------------------------------------------------------------
 inline Vector3 Vector3::min(const Vector3 &v) const {
-    return Vector3(G3D::min(v.x, x), G3D::min(v.y, y), G3D::min(v.z, z));
+    return Vector3(std::min(v.x, x), std::min(v.y, y), std::min(v.z, z));
 }
 
 //----------------------------------------------------------------------------
 inline Vector3 Vector3::max(const Vector3 &v) const {
-    return Vector3(G3D::max(v.x, x), G3D::max(v.y, y), G3D::max(v.z, z));
+    return Vector3(std::max(v.x, x), std::max(v.y, y), std::max(v.z, z));
 }
 
 //----------------------------------------------------------------------------

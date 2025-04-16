@@ -1,5 +1,9 @@
-#include <Windows.h>
+
 #include "guid.h"
+
+#ifndef BUILDWXP
+#include <combaseapi.h>
+#endif
 
 std::string localScope;
 

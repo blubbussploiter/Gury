@@ -124,22 +124,26 @@ void RBX::Render::Mesh::beginRender(RenderDevice* renderDevice)
 
 	if (global->texCoordVAR.valid())
 	{
-		renderDevice->setVertexAttribArray(10, global->texCoordVAR, true);
+		renderDevice->setTexCoordArray(0, global->texCoordVAR);
+		//renderDevice->setVertexAttribArray(10, global->texCoordVAR, true);
 	}
 
 	if (global->vertexVAR.valid())
 	{
-		renderDevice->setVertexAttribArray(0, global->vertexVAR, false);
+		renderDevice->setVertexArray(global->vertexVAR);
+		//renderDevice->setVertexAttribArray(0, global->vertexVAR, false);
 	}
 
 	if (global->normalVAR.valid())
 	{
-		renderDevice->setVertexAttribArray(2, global->normalVAR, true);
+		renderDevice->setNormalArray(global->normalVAR);
+		//renderDevice->setVertexAttribArray(2, global->normalVAR, false);
 	}
 
 	if (global->colorVAR.valid())
 	{
-		renderDevice->setVertexAttribArray(3, global->colorVAR, false);
+		renderDevice->setColorArray(global->colorVAR);
+		//renderDevice->setVertexAttribArray(3, global->colorVAR, false);
 	}
 
 }

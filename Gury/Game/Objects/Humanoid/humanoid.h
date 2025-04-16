@@ -75,7 +75,7 @@ namespace RBX
 			jumpTimer = 1.5f;
 			jumpClock = 0.0f;
 			jumping = 0;
-			hipHeight = 4.5f;
+			hipHeight = 4.20f;
 			canJump = 1;
 			currentlyJumping = 0;
 			renderedLast = 1;
@@ -129,7 +129,7 @@ namespace RBX
 
 		void updateHumanoidState();
 
-		void plainRender(RenderDevice* renderDevice);
+		void renderAdornee(RenderDevice* renderDevice);
 		void renderMultiplayer(RenderDevice* rd);
 		void drawHealthbar(RenderDevice* rd, CoordinateFrame center, float distance);
 		
@@ -139,7 +139,7 @@ namespace RBX
 
 		/* balancing physics stuff */
 
-		void getFeetOffGround(float damper=0.2f, float multiplier=2.f); /* balancing */
+		void getFeetOffGround(); /* balancing */
 		void applyHipHeight();
 
 		void tryEnable();
@@ -151,6 +151,7 @@ namespace RBX
 
 		virtual ~Humanoid() {}
 
+		RBX_CLONE_DEF(Humanoid)
 		RTTR_ENABLE(RBX::Render::IRenderable);
 	};
 }

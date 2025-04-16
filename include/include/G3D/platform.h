@@ -147,7 +147,7 @@
 // Prevent Winsock conflicts by hiding the winsock API
 #ifndef _WINSOCKAPI_
 #   define _G3D_INTERNAL_HIDE_WINSOCK_
-#   define _WINSOCKAPI_
+//#   define _WINSOCKAPI_
 #   endif
 
 // Disable 'name too long for browse information' warning
@@ -228,7 +228,11 @@
 
 
 #   define NOMINMAX 1
-#   include <windows.h>
+#ifndef BUILDWXP
+#include <windows.h>
+#else
+#include <afxwin.h>
+#endif
 #   undef WIN32_LEAN_AND_MEAN
 #   undef NOMINMAX
 
