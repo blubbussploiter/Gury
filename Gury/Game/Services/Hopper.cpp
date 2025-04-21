@@ -112,7 +112,7 @@ RBX::BackpackItem* RBX::Hopper::getBackpackItemByIndex(int backpackIndex) {
 	return 0;
 }
 
-void RBX::Hopper::doOnChildAdded(Instance* hopperBin)
+void RBX::Hopper::doOnChildAdded(Instance* _this, Instance* hopperBin)
 {
 	RBX::HopperBin* bin = toInstance<RBX::HopperBin>(hopperBin);
 
@@ -123,7 +123,7 @@ void RBX::Hopper::doOnChildAdded(Instance* hopperBin)
 	}
 }
 
-void RBX::Hopper::doOnChildRemoved(Instance* hopperBin)
+void RBX::Hopper::doOnChildRemoved(Instance* _this, Instance* hopperBin)
 {
 	RBX::HopperBin* bin = toInstance<RBX::HopperBin>(hopperBin);
 
@@ -136,7 +136,7 @@ void RBX::Hopper::doOnChildRemoved(Instance* hopperBin)
 	}
 }
 
-void RBX::Hopper::onPlayerAdded(Instance* Player)
+void RBX::Hopper::onPlayerAdded(Instance* players, Instance* Player)
 {
 	Network::Player* player = toInstance<Network::Player>(Player);
 	if (player)

@@ -14,8 +14,8 @@
 
 #include "scriptcontext.h"
 
-RBX_LUA_REGISTER_NAME(RBX::Instance, "Instance");
-RBX_LUA_REGISTER_NAME(RBX::SignalInstance, "Signal");
+RBX_REGISTERPTRCLASS(RBX::Instance, "Instance");
+RBX_REGISTERPTRCLASS(RBX::SignalInstance, "SignalInstance");
 
 int RBX::ScriptContext::instanceNew(lua_State* L)
 {
@@ -42,7 +42,15 @@ void RBX::ScriptContext::openState()
 	RBX::StandardOut::print(RBX::MESSAGE_INFO, "ScriptContext::openState() opening");
 	if (!globalState)
 	{
-		globalState = luaL_newstate();
+		RunService::get()->onReset.connect(ScriptContext::onRunServiceReset);
+
+		lua_Allocator = new LuaAllocator();
+		globalState = lua_newstate(LuaAllocator::alloc, lua_Allocator);
+
+		if (!globalState)
+		{
+			throw std::exception("Failed to create Lua state");
+		}
 
 		luaopen_base(globalState);
 		luaopen_math(globalState);
@@ -53,8 +61,8 @@ void RBX::ScriptContext::openState()
 
 		RBX_LUA_REGISTER(globalState, G3D::Vector3);
 		RBX_LUA_REGISTER(globalState, G3D::CoordinateFrame);
-		RBX_PTR_LUA_REGISTER(globalState, RBX::SignalInstance);
 		RBX_PTR_LUA_REGISTER(globalState, RBX::Instance);
+		RBX_PTR_LUA_REGISTER(globalState, RBX::SignalInstance);
 
 		RBX::Lua::SharedPtrBridge<RBX::Instance>::pushObject(globalState, Datamodel::get());
 		lua_setglobal(globalState, "game");
@@ -84,7 +92,10 @@ void RBX::ScriptContext::executeInNewThread(std::string script)
 	RBX::StandardOut::print(RBX::MESSAGE_INFO, "ScriptContext::executeInNewThread %.64s", script.c_str());
 	if (luaL_loadbuffer(thread, script.c_str(), script.size(), "="))
 	{
-		throw std::runtime_error(lua_tostring(thread, -1));
+		const char* error = lua_tostring(thread, -1);
+		lua_settop(thread, 0);
+
+		throw std::runtime_error(error);
 	}
 	else
 	{
@@ -117,7 +128,10 @@ int RBX::ScriptContext::resume(lua_State* L, int narg)
 
 	if (status)
 	{
-		throw std::runtime_error(lua_tostring(L, -1));
+		const char* string = lua_tostring(L, -1);
+		lua_settop(L, 0);
+
+		throw std::runtime_error(string);
 	}
 
 	return 0;
@@ -125,20 +139,38 @@ int RBX::ScriptContext::resume(lua_State* L, int narg)
 
 int RBX::ScriptContext::resumeProtected(lua_State* L, int narg)
 {
+	int result = 0;
 	try 
 	{
-		return resume(L, narg);
+		result = resume(L, narg);
 	}
 	catch (std::exception err)
 	{
 		RBX::StandardOut::print(RBX::MESSAGE_ERROR, err.what());
-		return 1;
+	}
+	return result;
+}
+
+void RBX::ScriptContext::onRunServiceReset()
+{
+	ScriptContext* scriptContext = ScriptContext::get();
+	scriptContext->resetScriptThreads();
+}
+
+void RBX::ScriptContext::splashAllocatorStats()
+{
+	uint32_t heapSize, heapCount, maxHeapSize, maxHeapCount;
+
+	if (lua_Allocator)
+	{
+		lua_Allocator->getHeapStats(&heapSize, &heapCount, &maxHeapSize, &maxHeapCount);
+		RBX::StandardOut::print(RBX::MESSAGE_INFO, "Script Heap Stats: Max Size = %u bytes, Max Count = %u blocks", maxHeapSize, maxHeapCount);
 	}
 }
 
 void RBX::ScriptContext::onWorkspaceDescendentAdded(RBX::Instance* descendent)
 {
-	RBX::BaseScript* script = dynamic_cast<RBX::BaseScript*>(descendent);
+	RBX::BaseScript* script = toInstance<RBX::BaseScript>(descendent);
 	if (script)
 	{
 		scripts.push_back(script);
@@ -183,15 +215,16 @@ void RBX::ScriptContext::runScript(RBX::BaseScript* script)
 		if (!raw.empty())
 		{
 
-			if (luaL_loadbuffer(thread, raw.c_str(), raw.size(), script->getName().c_str()))
+			if (luaL_loadbuffer(thread, raw.c_str(), raw.size(), script->getFullName().c_str()))
 			{
 				doError(lua_tolstring(thread, -1, 0));
-				lua_pop(thread, 1);
+				lua_settop(thread, 0);
 				return;
 			}
 			else
 			{
 				resume(thread, 0);
+				lua_pop(thread, 1);
 			}
 
 		}
@@ -199,7 +232,20 @@ void RBX::ScriptContext::runScript(RBX::BaseScript* script)
 	}
 }
 
-void RBX::ScriptContext::close()
+void RBX::ScriptContext::resetScriptThreads()
+{
+	for (size_t i = 0; i < scripts.size(); i++)
+	{
+		BaseScript* script = scripts.at(i);
+		if (script)
+		{
+			script->resetScriptThread(globalState);
+		}
+	}
+	splashAllocatorStats();
+}
+
+void RBX::ScriptContext::closeState()
 {
 	scripts.clear();
 	if (globalState)

@@ -25,38 +25,48 @@ RTTR_REGISTRATION
 
 void RBX::RunService::run()
 {
-    if (isRunning) return;
-
-    RBX::Network::Player* localPlayer;
-    localPlayer = RBX::Network::Players::get()->localPlayer;
-
-    Scene::get()->saveStartPVs();
-    Gurnel::get()->spawnWorld();
-
-    if (!hasStarted)
+    if (!isRunning)
     {
-        reset();
-        hasStarted = 1;
-    }
+        RBX::Network::Player* localPlayer;
+        localPlayer = RBX::Network::Players::get()->localPlayer;
 
-    if (localPlayer)
-    {
-        localPlayer->setAsController();
-    }
+        Scene::get()->saveStartPVs();
+        Gurnel::get()->spawnWorld();
 
-    if (scriptContext)
-    {
-        scriptContext->runScripts();
-    }
+        if (!hasStarted)
+        {
+            reset();
+            hasStarted = 1;
+        }
 
-    isRunning = true;
-    isPaused = false;
+        if (localPlayer)
+        {
+            localPlayer->setAsController();
+        }
+
+        if (!isPaused) /* dont restart scripts on resume */
+        {
+            if (scriptContext)
+            {
+                scriptContext->runScripts();
+            }
+        }
+        else
+        {
+            onResume();
+        }
+
+        isRunning = true;
+        isPaused = false;
+     
+    }
 }
 
 void RBX::RunService::pause()
 {
     stop();
     isPaused = true;
+    onPause();
 }
 
 void RBX::RunService::stop()
@@ -101,6 +111,7 @@ void RBX::RunService::update()
     if (shouldReset)
     {
         resetPvs();
+        onReset();
         shouldReset = 0;
     }
 

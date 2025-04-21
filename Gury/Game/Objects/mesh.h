@@ -31,7 +31,11 @@ namespace RBX
 		{
 		public:
 
-			static Array<Vector3> getFaceVertices(CoordinateFrame position, Vector3 size, NormalId face);
+			static void buildTube(Vector3 from, Vector3 to, int slices, Array<Vector3>& vertices, Array<Vector3>& normals);
+
+			static void buildCircle(float circleRadius, float circleY, int triangles, Array<Vector3>& vertices, Array<Vector3>& normals, bool invertSecondVertex);
+
+			static void getFaceVertices(Vector3 size, NormalId face, Array<Vector3>& vertices, Array<Vector3>& normals);
 
 		};
 
@@ -48,9 +52,9 @@ namespace RBX
 			{
 			private:
 				Content meshId;
-				std::vector<Vector3> vertices;
-				std::vector<Vector3> normals;
-				std::vector<Vector3> uvs;
+				Array<Vector3> vertices;
+				Array<Vector3> normals;
+				Array<Vector3> uvs;
 				MeshType meshType;
 				int faces;
 				int num_faces;
@@ -71,29 +75,29 @@ namespace RBX
 
 				void setMeshScale(Vector3 scale)
 				{
-					RBX::PVInstance* parent = dynamic_cast<RBX::PVInstance*>(getParent());
-					if (parent)
-					{
-						Vector3 sz = parent->getSize();
-
-						mesh_scale = scale * 1.75f;
-
-						if (sz.y > mesh_scale.y && sz.x > mesh_scale.x)
-						{
-							mesh_scale *= sz;
-						}
-					}
-					edit();
+					mesh_scale = scale;
+					removeFromRenderEnvironment();
+					write();
 				}
 				
 				CoordinateFrame getParentCoordinateFrame() {
 					PVInstance* pvInstance = toInstance<PVInstance>(parent);
 					if (pvInstance) {
-
+						return pvInstance->getCoordinateFrame();
 					}
+					return CoordinateFrame();
 				}
 
 				Vector3 getMeshScale() { return mesh_scale; }
+
+				Vector3 getMeshScaleBySize() 
+				{
+					PVInstance* pvInstance = toInstance<PVInstance>(parent);
+					if (pvInstance) {
+						return mesh_scale * pvInstance->getSize();
+					}
+					return mesh_scale;
+				}
 
 				void fromFile(std::string path);
 				void fromMeshType(MeshType types);
@@ -123,7 +127,10 @@ namespace RBX
 				void writeHead();
 				void editHead();
 
+				void removeFromRenderEnvironment();
+
 				static void onParentChanged(Instance* self, std::string propertyName);
+				static void onParentSizeChanged(Instance* self, std::string propertyName);
 
 				SpecialMesh()
 				{

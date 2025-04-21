@@ -55,8 +55,8 @@ namespace RBX
 	{
 	public:
 
-		static void doOnChildAdded(Instance* child);
-		static void doOnChildRemoved(Instance* child);
+		static void doOnChildAdded(Instance* _this, Instance* child);
+		static void doOnChildRemoved(Instance* _this, Instance* child);
 
 		Backpack()
 		{

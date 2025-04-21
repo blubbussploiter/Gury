@@ -83,14 +83,14 @@ void RBX::Workspace::getAllInstancesOfClass(RBX::Instances* instances, std::stri
     }
 }
 
-void RBX::Workspace::workspaceDescendentAdded(RBX::Instance* descendent)
+void RBX::Workspace::workspaceDescendentAdded(Instance* _this, Instance* descendent)
 {
     RBX::RunService::get()->onWorkspaceDescendentAdded(descendent);
     RBX::ScriptContext::get()->onWorkspaceDescendentAdded(descendent);
     RBX::Render::RenderScene::get()->onWorkspaceDescendentAdded(descendent);
 }
 
-void RBX::Workspace::workspaceDescendentRemoved(RBX::Instance* descendent)
+void RBX::Workspace::workspaceDescendentRemoved(Instance* _this, Instance* descendent)
 {
     RBX::Render::RenderScene::get()->onWorkspaceDescendentRemoved(descendent);
     RBX::ScriptContext::get()->onWorkspaceDescendentRemoved(descendent);

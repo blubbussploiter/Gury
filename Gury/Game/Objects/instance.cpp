@@ -19,12 +19,16 @@ RTTR_REGISTRATION
 		 .constructor<>()
 		 .property("Name", &RBX::Instance::getName,
 			&RBX::Instance::setName)(rttr::metadata("Type", RBX::Data))
-		 .property_readonly("className", &RBX::Instance::getClassName)(rttr::metadata("Type", RBX::Data),rttr::metadata("Serializable", false))
+		 .property_readonly("className", &RBX::Instance::getClassName)(rttr::metadata("Type", RBX::Data),rttr::metadata("Nonserializable", 0))
 		 .property("archivable", &RBX::Instance::getArchivable, &RBX::Instance::setArchivable)(rttr::metadata("Type", RBX::Behavior))
 		 .property("Parent", &RBX::Instance::getParent,
-			 &RBX::Instance::setParent)(rttr::metadata("Serializable", false))
-		.property_readonly("Changed", &RBX::Instance::desc_onChanged) /* Signal? */
+			 &RBX::Instance::setParent)(rttr::metadata("Nonserializable", 0))
+		.property_readonly("Changed", &RBX::Instance::desc_onChanged)
 		.property_readonly("ChildAdded", &RBX::Instance::desc_onChildAdded)
+		.property_readonly("ChildRemoved", &RBX::Instance::desc_onChildRemoved)
+		.property_readonly("DescendentRemoving", &RBX::Instance::desc_onDescendentRemoved)
+		.property_readonly("DescendentAdded", &RBX::Instance::desc_onDescendentAdded)
+		.property_readonly("AncestryChanged", &RBX::Instance::desc_onAncestryChanged)
 		.method("remove", &RBX::Instance::remove)
 		.method("clone", &RBX::Instance::clone)
 		.method("children", &RBX::Instance::getChildren)
@@ -74,7 +78,7 @@ void RBX::Instance::signalOnDescendentAdded(RBX::Instance* beginParent, RBX::Ins
 
 	for (i = beginParent; i; i = i->parent)
 	{
-		i->onDescendentAdded(child);
+		i->onDescendentAdded(i, child);
 	}
 
 	for (unsigned int i = 0; i < c->size(); i++)
@@ -93,7 +97,7 @@ void RBX::Instance::signalOnDescendentRemoved(RBX::Instance* newParent, RBX::Ins
 
 	for (i = child; i; i = i->parent)
 	{
-		i->onDescendentRemoved(child);
+		i->onDescendentRemoved(i, child);
 	}
 
 	for (unsigned int i = 0; i < c->size(); i++)
@@ -125,7 +129,7 @@ void RBX::Instance::setParent(Instance* instance)
 			{
 				parent->signalOnDescendentRemoved(instance, this);
 				parent->getChildren()->erase(std::remove(parent->getChildren()->begin(), parent->getChildren()->end(), this));
-				oldParent->onChildRemoved(this);
+				oldParent->onChildRemoved(oldParent, this);
 			}
 		}
 		parent = instance;
@@ -133,9 +137,9 @@ void RBX::Instance::setParent(Instance* instance)
 		if (parent)
 		{
 			parent->children->push_back(this);
-			parent->onChildAdded(this);
+			parent->onChildAdded(parent, this);
 
-			if (!parent->contains(oldParent))
+			//if (!parent->contains(oldParent))
 				parent->signalOnDescendentAdded(parent, this);
 		}
 

@@ -132,14 +132,14 @@ void Player::setAsController()
 	}
 }
 
-void RBX::Network::Player::onPlayerMessageAdded(Instance* playerMsg)
+void RBX::Network::Player::onPlayerMessageAdded(Instance* _this, Instance* playerMsg)
 {
 	if (IsA<Render::IRenderable>(playerMsg)) {
 		Scene::get()->onWorkspaceDescendentAdded(toInstance<Render::IRenderable>(playerMsg));
 	}
 }
 
-void RBX::Network::Player::onPlayerMessageRemoved(Instance* playerMsg)
+void RBX::Network::Player::onPlayerMessageRemoved(Instance* _this, Instance* playerMsg)
 {
 	if (IsA<Render::IRenderable>(playerMsg)) {
 		Scene::get()->onWorkspaceDescendentRemoved(toInstance<Render::IRenderable>(playerMsg));

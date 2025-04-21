@@ -8,7 +8,7 @@
 #include "cframebridge.h"
 
 
-RBX_LUA_REGISTER_NAME(G3D::CoordinateFrame, "CoordinateFrame");
+RBX_REGISTERCLASS(G3D::CoordinateFrame, "CoordinateFrame");
 
 const luaL_reg RBX::Lua::CoordinateFrameBridge::classLibrary[] =
 {

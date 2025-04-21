@@ -18,25 +18,16 @@ void RBX::StudioClipboard::clearContent()
 
 void RBX::StudioClipboard::copy(Instance* what)
 {
-    Experimental::Application* application = RBXManager::get()->getApplication();
-    if (application->isThinking) {
-
-        content->push_back(what->clone());
-    }
+    content->push_back(what->clone());
 }
 
 void RBX::StudioClipboard::cut(Instance* what)
 {
+    GlobalSounds::pageTurn->play();
+    content->push_back(what);
 
-    Experimental::Application* application = RBXManager::get()->getApplication();
-    if (application->isThinking) {
-
-        GlobalSounds::pageTurn->play();
-        content->push_back(what);
-
-        /* set parent to nil (for cutting) */
-        what->setParent(0);
-    }
+    /* set parent to nil (for cutting) */
+    what->setParent(0);
 }
 
 void RBX::StudioClipboard::copyMultiple(Instances* which)

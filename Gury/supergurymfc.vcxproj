@@ -149,6 +149,7 @@
     <ClCompile Include="Game\log.cpp" />
     <ClCompile Include="Game\Lua\cframemt.cpp" />
     <ClCompile Include="Game\Lua\instanceBridge.cpp" />
+    <ClCompile Include="Game\Lua\luaAllocator.cpp" />
     <ClCompile Include="Game\Lua\luargs.cpp" />
     <ClCompile Include="Game\Lua\signalBridge.cpp" />
     <ClCompile Include="Game\Lua\signaldescriptor.cpp" />
@@ -267,10 +268,12 @@
     <ClInclude Include="Application\gurycursor.h" />
     <ClInclude Include="Application\md5.h" />
     <ClInclude Include="Game\globalSounds.h" />
+    <ClInclude Include="Game\Lua\luaAllocator.h" />
     <ClInclude Include="Game\Lua\signaldescriptor.h" />
     <ClInclude Include="Game\Lua\signalInstance.h" />
     <ClInclude Include="Game\Objects\World\hint.h" />
     <ClInclude Include="Game\Objects\World\message.h" />
+    <ClInclude Include="Game\Reflection\scriptSlot.h" />
     <ClInclude Include="Game\Services\Hopper.h" />
     <ClInclude Include="Main\framework.h" />
     <ClInclude Include="Game\classes.h" />

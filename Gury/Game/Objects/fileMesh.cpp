@@ -19,8 +19,8 @@ void RBX::Render::SpecialMesh::writeSpecialMesh()
 
 	for (size_t i = 0; i < num_faces; i++)
 	{
-		Vector3 vertex = vertices.at(i) * mesh_scale, worldVertex;
-		Vector3 uv = uvs.at(i);
+		Vector3 vertex = vertices[i] * getMeshScaleBySize(), worldVertex;
+		Vector3 uv = uvs[i];
 
 		worldVertex = newPosition.pointToWorldSpace(vertex);
 		Vector3 normal = normalize(worldVertex - newPosition.translation);
@@ -48,8 +48,8 @@ void RBX::Render::SpecialMesh::editSpecialMesh()
 			for (int i = 0; i < num_faces; i++)
 			{
 				int index = face.indices[i];
-				Vector3 vertex = vertices.at(i) * mesh_scale, worldVertex;
-				Vector3 uv = uvs.at(i);
+				Vector3 vertex = vertices[i] * getMeshScaleBySize(), worldVertex;
+				Vector3 uv = uvs[i];
 
 				worldVertex = newPosition.pointToWorldSpace(vertex);
 				Vector3 normal = normalize(worldVertex - newPosition.translation);

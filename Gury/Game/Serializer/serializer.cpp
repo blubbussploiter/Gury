@@ -96,7 +96,7 @@ void writeProperty(rapidxml::xml_document<>& doc, rapidxml::xml_node<>* properti
     rttr::type type = property.get_type();
     rttr::variant variant = property.get_value(instance);
 
-    rttr::variant serializable = property.get_metadata("Serializable");
+    rttr::variant serializable = property.get_metadata("Nonserializable");
 
     if (!serializable.is_valid()) /* Dont write non serializable properties */
     {

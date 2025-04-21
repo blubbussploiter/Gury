@@ -36,10 +36,10 @@ namespace RBX
 			return items.containsKey(hopperBin);
 		}
 
-		static void doOnChildAdded(Instance* hopperBin);
-		static void doOnChildRemoved(Instance* hopperBin);
+		static void doOnChildAdded(Instance* _this, Instance* hopperBin);
+		static void doOnChildRemoved(Instance* _this, Instance* hopperBin);
 
-		static void onPlayerAdded(Instance* Player);
+		static void onPlayerAdded(Instance* players, Instance* Player);
 
 		static Hopper* get();
 

@@ -28,8 +28,8 @@ namespace RBX
 
 			RBX::Gui::GuiList* playerList;
 
-			boost::signal<void(Player*)> onPlayerAdded;
-			boost::signal<void(Player*)> onPlayerRemoving;
+			boost::signal<void(Instance*, Player*)> onPlayerAdded;
+			boost::signal<void(Instance*, Player*)> onPlayerRemoving;
 
 			Player* localPlayer;
 			Player* getLocalPlayer() { return localPlayer; }
@@ -59,14 +59,15 @@ namespace RBX
 			void setMaxPlayers(int newMaxPlayers) 
 			{ 
 				maxPlayers = newMaxPlayers;
+				onChanged(this, "maxPlayers");
 			}
 			int getMaxPlayers()
 			{
 				return maxPlayers; 
 			}
 
-			static void doOnChildAdded(Instance* child);
-			static void doOnChildRemoved(Instance* child);
+			static void doOnChildAdded(Instance* _this, Instance* child);
+			static void doOnChildRemoved(Instance* _this, Instance* child);
 
 			/* unlike actual function, no arguments, instead dependant on there being a global Players class */
 
@@ -142,8 +143,8 @@ namespace RBX
 
 			void setAsController();
 
-			static void onPlayerMessageAdded(Instance* playerMsg);
-			static void onPlayerMessageRemoved(Instance* playerMsg);
+			static void onPlayerMessageAdded(Instance* _this, Instance* playerMsg);
+			static void onPlayerMessageRemoved(Instance* _this, Instance* playerMsg);
 
 			Player()
 			{

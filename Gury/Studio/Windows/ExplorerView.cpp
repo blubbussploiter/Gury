@@ -28,7 +28,9 @@ std::map<std::string, int> instanceImages =
 	{"Workspace", 12},
 	{"Model", 12},
 	{"Debris", 13},
-	{"NetworkClient", 14}
+	{"NetworkClient", 14},
+	{"Hint", 14},
+	{"Message", 14}
 };
 
 class CClassViewMenuButton : public CMFCToolBarMenuButton
@@ -125,24 +127,30 @@ void ExplorerTreeView::OnSize(UINT nType, int cx, int cy)
 
 void ExplorerTreeView::AddInstance(RBX::Instance* instance, bool addDescending)
 {
-	if (instance && instance->getParent()) {
+	RBX::Instance* parent = instance->getParent();
+	if (instance && parent) {
 
 		std::string name = instance->getName();
-		HTREEITEM parent = GetInstance(instance->getParent());
+		HTREEITEM parentItem = GetInstance(parent);
 
-		int i = instanceImages[instance->getClassName()];
-
-		HTREEITEM instanceItem = m_wndClassView.InsertItem(name.c_str(), i, i, parent);
-		items.set(instance, instanceItem);
-
-		if (addDescending)
+		if (parentItem
+			|| parent == RBX::Datamodel::get())
 		{
-			RBX::Instances* instances = instance->getChildren();
-			for (unsigned int i = 0; i < instances->size(); i++)
+			int i = instanceImages[instance->getClassName()];
+
+			HTREEITEM instanceItem = m_wndClassView.InsertItem(name.c_str(), i, i, parentItem);
+			items.set(instance, instanceItem);
+
+			if (addDescending)
 			{
-				AddInstance(instances->at(i));
+				RBX::Instances* instances = instance->getChildren();
+				for (unsigned int i = 0; i < instances->size(); i++)
+				{
+					AddInstance(instances->at(i));
+				}
 			}
 		}
+
 	}
 }
 
@@ -331,7 +339,7 @@ void ExplorerTreeView::OnSetFocus(CWnd* pOldWnd)
 
 void ExplorerTreeView::OnChangeVisualStyle()
 {
-	m_ClassViewImages.DeleteImageList();
+	m_wndClassView.m_ClassViewImages.DeleteImageList();
 
 	UINT uiBmpId = theApp.m_bHiColorIcons ? IDB_CLASS_VIEW_24 : IDB_CLASS_VIEW;
 
@@ -350,10 +358,10 @@ void ExplorerTreeView::OnChangeVisualStyle()
 
 	nFlags |= (theApp.m_bHiColorIcons) ? ILC_COLOR24 : ILC_COLOR4;
 
-	m_ClassViewImages.Create(16, bmpObj.bmHeight, nFlags, 0, 0);
-	m_ClassViewImages.Add(&bmp, RGB(255, 0, 220));
+	m_wndClassView.m_ClassViewImages.Create(16, bmpObj.bmHeight, nFlags, 0, 0);
+	m_wndClassView.m_ClassViewImages.Add(&bmp, RGB(255, 0, 220));
 
-	m_wndClassView.SetImageList(&m_ClassViewImages, TVSIL_NORMAL);
+	m_wndClassView.SetImageList(&m_wndClassView.m_ClassViewImages, TVSIL_NORMAL);
 }
 
 void ExplorerTreeView::MoveInstanceParent(RBX::Instance* instance)

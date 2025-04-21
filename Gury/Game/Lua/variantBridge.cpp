@@ -34,14 +34,6 @@ void RBX::pushVariant(lua_State* L, rttr::variant var)
 		return;
 	}
 
-	if (type.is_derived_from(rttr::type::get<Instance>()))
-	{
-		RBX::StandardOut::print(RBX::MESSAGE_ERROR, "Is a instance");
-		Instance* instance = var.get_value<Instance*>();
-		Lua::SharedPtrBridge<Instance>::pushObject(L, instance);
-		return;
-	}
-
 	if (var.can_convert<G3D::Vector3>())
 	{
 		G3D::Vector3 vector3 = var.convert<G3D::Vector3>(); 
@@ -56,9 +48,15 @@ void RBX::pushVariant(lua_State* L, rttr::variant var)
 		return;
 	}
 
+	if (type.is_derived_from(rttr::type::get<Instance>()))
+	{
+		Instance* instance = var.get_value<Instance*>();
+		Lua::SharedPtrBridge<Instance>::pushObject(L, instance);
+		return;
+	}
+
 	if (type.is_derived_from(rttr::type::get<SignalInstance>()))
 	{
-		RBX::StandardOut::print(RBX::MESSAGE_ERROR, "Is a signal instance");
 		SignalInstance* signal = var.get_value<SignalInstance*>();
 		Lua::SharedPtrBridge<SignalInstance>::pushObject(L, signal);
 		return;

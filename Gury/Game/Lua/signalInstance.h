@@ -14,8 +14,7 @@ namespace RBX
 		static G3D::Table<int, lua_State*> connectedLuaSlots;
 		
 		static void disconnectLuaFunction(lua_State* L, int function);
-		static void callLuaFunction(lua_State* L, int function, int narg);
-		static void pushLuaFunction(lua_State* L);
+		static int pushLuaFunction(lua_State* L);
 
 		static int connect(lua_State* L);
 

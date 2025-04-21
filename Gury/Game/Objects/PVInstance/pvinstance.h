@@ -189,6 +189,7 @@ namespace RBX
 			{
 				primitive->body->modifyVelocity(pv->velocity);
 			}
+			onChanged(this, "Velocity");
 		}
 
 		void setRotVelocity(Vector3 newVelocity)
@@ -199,6 +200,7 @@ namespace RBX
 			{
 				primitive->body->modifyVelocity(pv->velocity);
 			}
+			onChanged(this, "RotVelocity");
 		}
 
 		void setAnchored(bool a)
@@ -215,6 +217,7 @@ namespace RBX
 					primitive->body->attachPrimitive(primitive);
 				}
 			}
+			onChanged(this, "Anchored");
 		}
 
 		void setCanCollide(bool c)
@@ -234,6 +237,7 @@ namespace RBX
 		{
 			formFactor = f;
 			edit();
+			onChanged(this, "formFactor");
 		}
 
 		bool getShowControllerFlag() { return showControllerFlag; }
@@ -246,8 +250,8 @@ namespace RBX
 		void edit();
 		void write();
 
-		static void onMeshAdded(Instance* child);
-		static void onMeshRemoved(Instance* child);
+		static void onMeshAdded(Instance* _this, Instance* child);
+		static void onMeshRemoved(Instance* _this, Instance* child);
 
 		void writeSurfaces();
 		void editSurfaces();
@@ -290,6 +294,7 @@ namespace RBX
 				primitive->body->modifySize(size);
 			}
 			edit();
+			onChanged(this, "Size");
 		}
 
 		Vector3 getPosition() { return pv->position.translation; }

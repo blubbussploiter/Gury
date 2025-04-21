@@ -165,8 +165,11 @@ void setProperty(rapidxml::xml_node<>* node, RBX::Instance* instance, std::strin
 			case 5:
 			case 6:
 			{
-				int i = std::stoi(propertyValue);
-				property.set_value(instance, i);
+				try {
+					int i = std::stoi(propertyValue);
+					property.set_value(instance, i);
+				}
+				catch (...) {}
 				break;
 			}
 			case 7:

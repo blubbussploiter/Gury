@@ -27,6 +27,10 @@ namespace RBX
 
 		ScriptContext* scriptContext;
 
+		boost::signal<void()> onPause;
+		boost::signal<void()> onResume;
+		boost::signal<void()> onReset;
+
 		float deltaTime;
 
 		bool isRunning;
@@ -38,8 +42,10 @@ namespace RBX
 		void run();
 		void pause();
 		void stop();
+
 		void reset();
 		void update();
+
 		void heartbeat(float deltaTime);
 		void updateSteppers();
 

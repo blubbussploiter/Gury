@@ -21,23 +21,40 @@ namespace RBX
 		lua_State* scriptThread;
 	public:
 
+		void setSource(ProtectedString newSource) {
+			source = newSource;
+		}
+
+		ProtectedString getSource() {
+			return source; 
+		}
+
 		void setSourceFromString(std::string newSource) {
 			source.source = newSource;
 		}
 
 		std::string getSourceAsString() {
-			return "(Script)";
+			return source.source;
 		}
 
-		void setSource(ProtectedString newSource) { 
-			source = newSource; 
+		lua_State* getScriptThread()
+		{
+			return scriptThread;
 		}
-		ProtectedString getSource() { return source; }
 
 		lua_State* establishScriptThread(lua_State* globalState)
 		{
-			if (!scriptThread) scriptThread = lua_newthread(globalState);
+			if (!scriptThread)
+			{
+				scriptThread = lua_newthread(globalState);
+			}
 			return scriptThread;
+		}
+
+		void resetScriptThread(lua_State* globalState)
+		{
+			scriptThread = 0;
+			establishScriptThread(globalState);
 		}
 
 		BaseScript()

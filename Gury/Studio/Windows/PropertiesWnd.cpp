@@ -306,12 +306,18 @@ void CPropertiesWnd::InitPropList()
 {
 	SetPropListFont();
 
-	m_wndPropList.SetVSDotNetLook(0);
+	m_wndPropList.SetVSDotNetLook(1);
 	m_wndPropList.MarkModifiedProperties();
 
 	m_wndPropList.EnableHeaderCtrl(0);
 	m_wndPropList.EnableScrollBar(SB_HORZ);
 
+	m_wndPropList.EnableDescriptionArea(0);
+
+	COLORREF background, text, groupBackground, groupText, descriptionBackground, descriptionText, line;
+
+	m_wndPropList.GetCustomColors(background, text, groupBackground, groupText, descriptionBackground, descriptionText, line);
+	m_wndPropList.SetCustomColors(background, text, groupBackground, RGB(0,0,0), descriptionBackground, descriptionText, line);
 }
 
 void CPropertiesWnd::OnSetFocus(CWnd* pOldWnd)

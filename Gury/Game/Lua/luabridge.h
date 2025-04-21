@@ -12,11 +12,13 @@ extern "C"
 #include "lualib.h"
 }
 
-#define RBX_LUA_REGISTER(L, c) RBX::Lua::Bridge<c>::open(L)
-#define RBX_PTR_LUA_REGISTER(L, c) RBX::Lua::SharedPtrBridge<c>::open(L)
+#include "..\Services\stdout.h"
 
-#define RBX_LUA_REGISTER_NAME(c, n) const char* RBX::Lua::Bridge<c>::className = n; \
-  const char* RBX::Lua::SharedPtrBridge<c>::className = n;
+#define RBX_LUA_REGISTER(L, c) RBX::Lua::Bridge<c>::open(L)
+#define RBX_PTR_LUA_REGISTER(L, c) RBX::Lua::Bridge<c>::open(L)
+
+#define RBX_REGISTERCLASS(c, n) const char* RBX::Lua::Bridge<c>::className = n;
+#define RBX_REGISTERPTRCLASS(c, n) const char* RBX::Lua::Bridge<c>::className = n;
 
 namespace RBX
 {
@@ -40,6 +42,19 @@ namespace RBX
 				newObject = (Class*)lua_newuserdata(L, sizeof(Class));
 				if (newObject)
 					*newObject = object;
+				luaL_getmetatable(L, className);
+				lua_setmetatable(L, -2);
+				return newObject;
+			}
+
+			static Class** pushPointerAsNewObject(lua_State* L, Class* object)
+			{
+				Class** newObject;
+				newObject = (Class**)lua_newuserdata(L, sizeof(Class*));
+				if (newObject)
+				{
+					*newObject = object;
+				}
 				luaL_getmetatable(L, className);
 				lua_setmetatable(L, -2);
 				return newObject;
@@ -73,7 +88,7 @@ namespace RBX
 
 			static Class* getObject(lua_State* L, int index)
 			{
-				return (Class*)luaL_checkudata(L, index, className);
+				return *(Class**)luaL_checkudata(L, index, className);
 			}
 
 			/* `reflected` roblox methods */
@@ -116,42 +131,50 @@ namespace RBX
 
 			/* math __methods */
 
-			static int on_add(lua_State* L);
-			static int on_sub(lua_State* L);
-			static int on_div(lua_State* L);
-			static int on_mul(lua_State* L);
-			static int on_unm(lua_State* L);
+			static int on_add(lua_State* L) { return 0; }
+			static int on_sub(lua_State* L) { return 0; }
+			static int on_div(lua_State* L) { return 0; }
+			static int on_mul(lua_State* L) { return 0; }
+			static int on_unm(lua_State* L) { return 0; }
 
 			static void openMath(lua_State* L)
 			{
+				lua_pushstring(L, "__add");
 				lua_pushcfunction(L, on_add);
-				lua_setfield(L, -2, "__add");
+				lua_settable(L, -3);
 
+				lua_pushstring(L, "__sub");
 				lua_pushcfunction(L, on_sub);
-				lua_setfield(L, -2, "__sub");
+				lua_settable(L, -3);
 
+				lua_pushstring(L, "__mul");
 				lua_pushcfunction(L, on_mul);
-				lua_setfield(L, -2, "__mul");
+				lua_settable(L, -3);
 
+				lua_pushstring(L, "__div");
 				lua_pushcfunction(L, on_div);
-				lua_setfield(L, -2, "__div");
+				lua_settable(L, -3);
 
+				lua_pushstring(L, "__unm");
 				lua_pushcfunction(L, on_unm);
-				lua_setfield(L, -2, "__unm");
+				lua_settable(L, -3);
 			}
 
 			static void open(lua_State* L)
 			{
 				luaL_newmetatable(L, className);
 
+				lua_pushstring(L, "__index");
 				lua_pushcfunction(L, on_index);
-				lua_setfield(L, -2, "__index");
+				lua_settable(L, -3);
 
+				lua_pushstring(L, "__newindex");
 				lua_pushcfunction(L, on_newindex);
-				lua_setfield(L, -2, "__newindex");
+				lua_settable(L, -3);
 
+				lua_pushstring(L, "__tostring");
 				lua_pushcfunction(L, on_tostring);
-				lua_setfield(L, -2, "__tostring");
+				lua_settable(L, -3);
 
 				openMath(L);
 
@@ -167,17 +190,21 @@ namespace RBX
 		{
 		public:
 
-			static const char* className;
-
 			/* pushers and pullers */
 
 			static void pushObject(lua_State* L, Class* object)
 			{
 				if (object) {
-					lua_pushlightuserdata(L, (void*)object);
-					luaL_getmetatable(L, className);
-					lua_setmetatable(L, -2);
-					RBX::StandardOut::print(RBX::MESSAGE_INFO, "ppush top = %s, %s", luaL_typename(L, -1), className);
+					lua_pushlightuserdata(L, object);
+					lua_rawget(L, LUA_REGISTRYINDEX);
+					if (lua_isnil(L, -1))
+					{
+						lua_pop(L, 1);
+						Class** wrappedPtr = Bridge<Class>::pushPointerAsNewObject(L, object);
+						lua_pushlightuserdata(L, object); /* key */
+						lua_pushvalue(L, -2); /* value */
+						lua_rawset(L, LUA_REGISTRYINDEX);
+					}
 				}
 				else
 				{
@@ -187,72 +214,9 @@ namespace RBX
 
 			static Class* getPtr(lua_State* L, int index)
 			{
-				RBX::StandardOut::print(RBX::MESSAGE_INFO, "get type %s at %d", className, index);
-				return (Class*)luaL_checkudata(L, index, className);
+				return Bridge<Class>::getObject(L, index);
 			}
 
-			/* `reflected` roblox methods */
-
-			static int on_index(Class* object, const char* name, lua_State* L);
-			static int on_newindex(Class* object, const char* name, lua_State* L);
-			static int on_tostring(Class* object, lua_State* L);
-
-			/* base lua __methods */
-
-			static int on_indexDefinition(lua_State* L)
-			{
-				Class* object;
-				const char* name;
-
-				object = getPtr(L, 1);
-				name = luaL_checkstring(L, 2);
-
-				return on_index(object, name, L);
-			}
-
-			static int on_newindexDefinition(lua_State* L)
-			{
-				Class* object;
-				const char* name;
-
-				object = getPtr(L, 1);
-				name = luaL_checkstring(L, 2);
-
-				return on_newindex(object, name, L);
-			}
-
-			static int on_tostringDefinition(lua_State* L)
-			{
-				Class* object;
-				object = getPtr(L, 1);
-
-				return on_tostring(object, L);
-			}
-
-			/* registration */
-
-			static void open(lua_State* L)
-			{
-				luaL_newmetatable(L, className);
-				RBX::StandardOut::print(RBX::MESSAGE_INFO, "open for %s", className);
-
-				lua_pushcfunction(L, on_indexDefinition);
-				lua_setfield(L, -2, "__index");
-
-				RBX::StandardOut::print(RBX::MESSAGE_INFO, "farting type = %s", luaL_typename(L, -1));
-
-				lua_pushcfunction(L, on_newindexDefinition);
-				lua_setfield(L, -2, "__newindex");
-
-				RBX::StandardOut::print(RBX::MESSAGE_INFO, "farting type 1 = %s", luaL_typename(L, -1));
-
-				lua_pushcfunction(L, on_tostringDefinition);
-				lua_setfield(L, -2, "__tostring");
-
-				RBX::StandardOut::print(RBX::MESSAGE_INFO, "farting type 2 = %s", luaL_typename(L, -1));
-
-				lua_pop(L, 1);
-			}
 
 		};
 

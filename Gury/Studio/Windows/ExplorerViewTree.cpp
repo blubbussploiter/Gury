@@ -111,23 +111,21 @@ void CViewTree::TryDoubleClick(HTREEITEM item)
 {
     RBX::Instance* instance = CMainFrame::mainFrame->m_wndClassView.GetTreeItem(item);
 
-    if (lastSelected == instance) {
+    /* if this is a script */
 
-        /* if this is a script */
+    RBX::BaseScript* script = RBX::toInstance<RBX::BaseScript>(instance);
+    if (script) {
 
-        RBX::BaseScript* script = RBX::toInstance<RBX::BaseScript>(instance);
-        if (script) {
+        /* then open in ide... */
 
-            /* then open in ide... */
+        CDocument* document = theApp.pScriptDocTemplate->OpenDocumentFile(0);
+        scriptEditDoc* ideDocument = dynamic_cast<scriptEditDoc*>(document);
 
-            CDocument* document = theApp.pScriptDocTemplate->OpenDocumentFile(0);
-            scriptEditDoc* ideDocument = dynamic_cast<scriptEditDoc*>(document);
-
-            if (ideDocument) {
-                ideDocument->attachedScript = script;
-                ideDocument->update();
-            }
+        if (ideDocument) {
+            ideDocument->attachedScript = script;
+            ideDocument->update();
         }
+
     }
 }
 
@@ -139,6 +137,9 @@ BEGIN_MESSAGE_MAP(CViewTree, CTreeCtrl)
 	ON_NOTIFY_REFLECT(TVN_SELCHANGED, &CViewTree::OnTvnSelchanged)
 	ON_WM_KILLFOCUS()
 	ON_WM_LBUTTONDOWN()
+    ON_WM_LBUTTONDBLCLK()
+    ON_WM_LBUTTONUP()
+    ON_WM_MOUSEMOVE()
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -178,6 +179,63 @@ void CViewTree::OnKillFocus(CWnd* pNewWnd)
 	//CMainFrame::mainFrame->m_wndProperties.ClearProperties();
 }
 
+void CViewTree::OnLButtonDblClk(UINT nFlags, CPoint point)
+{
+    UINT nHitFlags = 0;
+    HTREEITEM hClickedItem = HitTest(point, &nHitFlags);
+
+    if (nHitFlags & LVHT_ONITEM)
+    {
+        HTREEITEM hSelectedItem = GetSelectedItem();
+        TryDoubleClick(hSelectedItem);
+    }
+
+    CTreeCtrl::OnLButtonDblClk(nFlags, point);
+}
+
+void CViewTree::OnMouseMove(UINT nFlags, CPoint point)
+{
+    CClientDC dc(this);
+    
+    if (m_isDraggingItem)
+    {
+        if (hDraggedItem)
+        {
+
+        }
+    }
+
+    CTreeCtrl::OnMouseMove(nFlags, point);
+}
+
+void CViewTree::OnLButtonUp(UINT nFlags, CPoint point)
+{
+    if (m_isDraggingItem) /* drop item in parent */
+    {
+        UINT nHitFlags = 0;
+        HTREEITEM hNewParent = HitTest(point, &nHitFlags);
+        HTREEITEM hOldParent = GetNextItem(hDraggedItem, TVGN_PARENT);
+
+        RBX::Instance* child = CMainFrame::mainFrame->m_wndClassView.GetTreeItem(hDraggedItem);
+        RBX::Instance* newParent = CMainFrame::mainFrame->m_wndClassView.GetTreeItem(hNewParent);
+
+        if (child && newParent)
+        {
+            if (child != newParent &&
+                newParent != child->parent)
+            {
+                DeselectAll();
+                child->setParent(newParent);
+                SelectWorldItem(hNewParent, false);
+            }
+        }
+
+        m_isDraggingItem = false;
+        hDraggedItem = 0;
+    }
+
+    CTreeCtrl::OnLButtonUp(nFlags, point);
+}
 
 void CViewTree::OnLButtonDown(UINT nFlags, CPoint point)
 {
@@ -186,104 +244,107 @@ void CViewTree::OnLButtonDown(UINT nFlags, CPoint point)
     UINT nHitFlags = 0;
     HTREEITEM hClickedItem = treeCtrl.HitTest(point, &nHitFlags);
 
-    if (nHitFlags & LVHT_ONITEM)
+    if (!m_isDraggingItem)
     {
-        // Find which item is currently selected
-        HTREEITEM hSelectedItem = treeCtrl.GetSelectedItem();
-
-        // Action depends on whether the user holds down the Shift or Ctrl key
-        if (nFlags & MK_SHIFT)
+        if (nHitFlags & LVHT_ONITEM)
         {
-            // Is the clicked item above or below the selected item ?
-            HTREEITEM hItem = treeCtrl.GetFirstVisibleItem();
+            // Find which item is currently selected
+            HTREEITEM hSelectedItem = treeCtrl.GetSelectedItem();
 
-            BOOL bReverse = FALSE;
-            while (1)
+            // Action depends on whether the user holds down the Shift or Ctrl key
+            if (nFlags & MK_SHIFT)
             {
-                if (hItem == hClickedItem)
+                // Is the clicked item above or below the selected item ?
+                HTREEITEM hItem = treeCtrl.GetFirstVisibleItem();
+
+                BOOL bReverse = FALSE;
+                while (1)
                 {
-                    bReverse = TRUE;
-                    break;
-                }
-                else if (hItem == hSelectedItem)
-                    break;
+                    if (hItem == hClickedItem)
+                    {
+                        bReverse = TRUE;
+                        break;
+                    }
+                    else if (hItem == hSelectedItem)
+                        break;
 
-                hItem = treeCtrl.GetNextVisibleItem(hItem);
-            };
-
-            // Select the clicked item (this will also deselect the previous one!)
-            treeCtrl.SelectItem(hClickedItem);
-            SelectWorldItem(hClickedItem, 1);
-
-            // Now select all visible items between previously selected item
-            // and the newly selected item
-            hItem = hSelectedItem;
-            do
-            {
-                treeCtrl.SetItemState(hItem, TVIS_SELECTED, TVIS_SELECTED);
-                if (bReverse)
-                    hItem = treeCtrl.GetPrevVisibleItem(hItem);
-                else
                     hItem = treeCtrl.GetNextVisibleItem(hItem);
-                SelectWorldItem(hItem, 1);
-            } while (hItem != hClickedItem && hItem != NULL);
-        }
-        else if (nFlags & MK_CONTROL)
-        {
-            // Is the clicked item already selected ?
-            BOOL bIsClickedItemSelected = treeCtrl.GetItemState(hClickedItem,
-                TVIS_SELECTED) & TVIS_SELECTED;
-            BOOL bIsSelectedItemSelected = treeCtrl.GetItemState(hSelectedItem,
-                TVIS_SELECTED) & TVIS_SELECTED;
+                };
 
-            // Select the clicked item (this will also deselect the previous one!)
-            treeCtrl.SelectItem(hClickedItem);
+                // Select the clicked item (this will also deselect the previous one!)
+                treeCtrl.SelectItem(hClickedItem);
+                SelectWorldItem(hClickedItem, 1);
 
-            // If the previously selected item was selected, re-select it
-            if (bIsSelectedItemSelected)
-                treeCtrl.SetItemState(hSelectedItem, TVIS_SELECTED, TVIS_SELECTED);
-
-            // We want the newly selected item to toggle its selected state,
-            // so unselect now if it was already selected before
-            if (bIsClickedItemSelected)
+                // Now select all visible items between previously selected item
+                // and the newly selected item
+                hItem = hSelectedItem;
+                do
+                {
+                    treeCtrl.SetItemState(hItem, TVIS_SELECTED, TVIS_SELECTED);
+                    if (bReverse)
+                        hItem = treeCtrl.GetPrevVisibleItem(hItem);
+                    else
+                        hItem = treeCtrl.GetNextVisibleItem(hItem);
+                    SelectWorldItem(hItem, 1);
+                } while (hItem != hClickedItem && hItem != NULL);
+            }
+            else if (nFlags & MK_CONTROL)
             {
-                DeselectItem(hClickedItem);
-                treeCtrl.SetItemState(hClickedItem, 0, TVIS_SELECTED);
+                // Is the clicked item already selected ?
+                BOOL bIsClickedItemSelected = treeCtrl.GetItemState(hClickedItem,
+                    TVIS_SELECTED) & TVIS_SELECTED;
+                BOOL bIsSelectedItemSelected = treeCtrl.GetItemState(hSelectedItem,
+                    TVIS_SELECTED) & TVIS_SELECTED;
+
+                // Select the clicked item (this will also deselect the previous one!)
+                treeCtrl.SelectItem(hClickedItem);
+
+                // If the previously selected item was selected, re-select it
+                if (bIsSelectedItemSelected)
+                    treeCtrl.SetItemState(hSelectedItem, TVIS_SELECTED, TVIS_SELECTED);
+
+                // We want the newly selected item to toggle its selected state,
+                // so unselect now if it was already selected before
+                if (bIsClickedItemSelected)
+                {
+                    DeselectItem(hClickedItem);
+                    treeCtrl.SetItemState(hClickedItem, 0, TVIS_SELECTED);
+                }
+                else
+                {
+                    SelectWorldItem(hClickedItem, 1);
+                    treeCtrl.SetItemState(hClickedItem, TVIS_SELECTED, TVIS_SELECTED);
+                }
             }
             else
             {
-                SelectWorldItem(hClickedItem, 1);
-                treeCtrl.SetItemState(hClickedItem, TVIS_SELECTED, TVIS_SELECTED);
+                    // Clear selection of all "multiple selected" items first
+
+                    HTREEITEM hItem = treeCtrl.GetFirstVisibleItem();
+                    RBX::SelectionService::get()->deselectAll();
+
+                    do
+                    {
+                        if (treeCtrl.GetItemState(hItem, TVIS_SELECTED) & TVIS_SELECTED)
+                            treeCtrl.SetItemState(hItem, 0, TVIS_SELECTED);
+                        hItem = treeCtrl.GetNextVisibleItem(hItem);
+
+                    } while (hItem != NULL);
+
+                    // Then select the clicked item
+                    treeCtrl.SelectItem(hClickedItem);
+                    treeCtrl.SetItemState(hClickedItem, TVIS_SELECTED, TVIS_SELECTED);
+                    SelectWorldItem(hClickedItem, 0);
+
+                    m_isDraggingItem = true;
+                    hDraggedItem = hClickedItem;
             }
+
+            /* no matter what happens - grab focus*/
+            SetFocus();
         }
         else
-        {
-            // Clear selection of all "multiple selected" items first
-
-            HTREEITEM hItem = treeCtrl.GetFirstVisibleItem();
-            RBX::SelectionService::get()->deselectAll();
-
-            do
-            {
-                if (treeCtrl.GetItemState(hItem, TVIS_SELECTED) & TVIS_SELECTED)
-                    treeCtrl.SetItemState(hItem, 0, TVIS_SELECTED);
-                hItem = treeCtrl.GetNextVisibleItem(hItem);
-
-            } while (hItem != NULL);
-
-            // Then select the clicked item
-            treeCtrl.SelectItem(hClickedItem);
-            treeCtrl.SetItemState(hClickedItem, TVIS_SELECTED, TVIS_SELECTED);
-            SelectWorldItem(hClickedItem, 0);
-
-            // Try to open - if a script 
-            TryDoubleClick(hClickedItem);
-        }
-
-        /* no matter what happens - grab focus*/
-        SetFocus();
+            // Behave normally
+            CTreeCtrl::OnLButtonDown(nFlags, point);
     }
-    else
-        // Behave normally
-        CTreeCtrl::OnLButtonDown(nFlags, point);
 }

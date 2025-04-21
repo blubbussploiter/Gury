@@ -158,18 +158,12 @@ void RBX::Humanoid::onTurn()
         Vector3 lookPosition = Vector3(target.x, 0, target.z);
         origin.y = 0;
 
-        RBX::StandardOut::print(RBX::MESSAGE_INFO, "walkDirection = %f, %f, %f, origin = %f, %f, %f", walkDirection.x, walkDirection.y, walkDirection.z, humanoidCFrame.translation.x, humanoidCFrame.translation.y, humanoidCFrame.translation.z);
-        RBX::StandardOut::print(RBX::MESSAGE_INFO, "target = %f, %f, %f", lookPosition.x, lookPosition.y, lookPosition.z);
-
         float magnitude = 2;
 
         float angle = Math::angleFromTwoPoints(origin, lookPosition);
-        RBX::StandardOut::print(RBX::MESSAGE_INFO, "angle = %f", angle);
         float angRad = toRadians(angle);
-        RBX::StandardOut::print(RBX::MESSAGE_INFO, "angle rad = %f", angRad);
 
         r_turnVelocity = magnitude * sin(angRad);
-        RBX::StandardOut::print(RBX::MESSAGE_INFO, "turnVelocity = %f", r_turnVelocity);
     }
 
 }

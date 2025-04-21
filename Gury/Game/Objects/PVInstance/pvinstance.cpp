@@ -23,26 +23,26 @@ RTTR_REGISTRATION
          .property("CanCollide", &RBX::PVInstance::getCanCollide, &RBX::PVInstance::setCanCollide)(rttr::metadata("Type", RBX::Behavior))
          .property("Locked", &RBX::PVInstance::getLocked, 
              &RBX::PVInstance::setLocked)(rttr::metadata("Type", RBX::Behavior))
-         .property("Position", &RBX::PVInstance::getPosition, &RBX::PVInstance::setPosition)(rttr::metadata("Type", RBX::Data), rttr::metadata("Serializable", false))
+         .property("Position", &RBX::PVInstance::getPosition, &RBX::PVInstance::setPosition)(rttr::metadata("Type", RBX::Data), rttr::metadata("Nonserializable", false))
          .property("Velocity", &RBX::PVInstance::getVelocity, &RBX::PVInstance::setVelocity)(rttr::metadata("Type", RBX::Data))
          .property("RotVelocity", &RBX::PVInstance::getRotVelocity, &RBX::PVInstance::setRotVelocity)(rttr::metadata("Type", RBX::Data))
-         .property("Color", &RBX::PVInstance::getColor, &RBX::PVInstance::setColor4)(rttr::metadata("Serializable", false))
+         .property("Color", &RBX::PVInstance::getColor, &RBX::PVInstance::setColor4)(rttr::metadata("Nonserializable", false))
          .property("CFrame", &RBX::PVInstance::getCFrame, &RBX::PVInstance::setCFrame)
-         .property("CoordinateFrame", &RBX::PVInstance::getCFrame, &RBX::PVInstance::setCFrame)(rttr::metadata("Serializable", false))
+         .property("CoordinateFrame", &RBX::PVInstance::getCFrame, &RBX::PVInstance::setCFrame)(rttr::metadata("Nonserializable", false))
          .property("Elasticity", &RBX::PVInstance::getElasticity, &RBX::PVInstance::setElasticity)(rttr::metadata("Type", RBX::Part))
          .property("Friction", &RBX::PVInstance::getFriction, &RBX::PVInstance::setFriction)(rttr::metadata("Type", RBX::Part))
          .property("Shape", &RBX::PVInstance::getShape, &RBX::PVInstance::setShape)(rttr::metadata("Type", RBX::Part))
-         .property("shape", &RBX::PVInstance::getShape, &RBX::PVInstance::setShape)(rttr::metadata("Serializable", false))
+         .property("shape", &RBX::PVInstance::getShape, &RBX::PVInstance::setShape)(rttr::metadata("Nonserializable", false))
          .property("size", &RBX::PVInstance::getSizeExternal, &RBX::PVInstance::setSize)(rttr::metadata("Type", RBX::Part))
-         .property("Size", &RBX::PVInstance::getSizeExternal, &RBX::PVInstance::setSize)(rttr::metadata("Serializable", false))
+         .property("Size", &RBX::PVInstance::getSizeExternal, &RBX::PVInstance::setSize)(rttr::metadata("Nonserializable", false))
          .property("FrontSurface", &RBX::PVInstance::getFrontSurface, &RBX::PVInstance::setFrontSurface)(rttr::metadata("Type", RBX::Surface))
          .property("BackSurface", &RBX::PVInstance::getBackSurface, &RBX::PVInstance::setBackSurface)(rttr::metadata("Type", RBX::Surface))
          .property("TopSurface", &RBX::PVInstance::getTopSurface, &RBX::PVInstance::setTopSurface)(rttr::metadata("Type", RBX::Surface))
          .property("BottomSurface", &RBX::PVInstance::getBottomSurface, &RBX::PVInstance::setBottomSurface)(rttr::metadata("Type", RBX::Surface))
          .property("RightSurface", &RBX::PVInstance::getRightSurface, &RBX::PVInstance::setRightSurface)(rttr::metadata("Type", RBX::Surface))
          .property("LeftSurface", &RBX::PVInstance::getLeftSurface, &RBX::PVInstance::setLeftSurface)(rttr::metadata("Type", RBX::Surface))
-         .property("rawFormFactor", &RBX::PVInstance::getFormFactor, &RBX::PVInstance::setFormFactor)(rttr::metadata("Serializable", false))
-         .property("formFactor", &RBX::PVInstance::getFormFactor, &RBX::PVInstance::setFormFactor)(rttr::metadata("Serializable", false))
+         .property("rawFormFactor", &RBX::PVInstance::getFormFactor, &RBX::PVInstance::setFormFactor)(rttr::metadata("Nonserializable", false))
+         .property("formFactor", &RBX::PVInstance::getFormFactor, &RBX::PVInstance::setFormFactor)(rttr::metadata("Nonserializable", false))
          .property("FormFactor", &RBX::PVInstance::getFormFactor, &RBX::PVInstance::setFormFactor)
          //.property("FormFactor", &RBX::PVInstance::getFormFactor, &RBX::PVInstance::setFormFactor)
          .property("Transparency", &RBX::PVInstance::getFauxTransparency, &RBX::PVInstance::setTransparency)(rttr::metadata("Type", RBX::Appearance));
@@ -114,7 +114,7 @@ void RBX::PVInstance::edit()
     }
 }
 
-void RBX::PVInstance::onMeshAdded(Instance* child)
+void RBX::PVInstance::onMeshAdded(Instance* _this, Instance* child)
 {
     if (child && IsA<Render::SpecialMesh>(child))
     {
@@ -133,7 +133,7 @@ void RBX::PVInstance::onMeshAdded(Instance* child)
     }
 }
 
-void RBX::PVInstance::onMeshRemoved(Instance* child)
+void RBX::PVInstance::onMeshRemoved(Instance* _this, Instance* child)
 {
     if (child && IsA<Render::SpecialMesh>(child))
     {

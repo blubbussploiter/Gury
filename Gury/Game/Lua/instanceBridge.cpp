@@ -41,56 +41,62 @@ int funcProxy(lua_State* L)
 	return 0;
 }
 
-int RBX::Lua::SharedPtrBridge<RBX::Instance>::on_tostring(RBX::Instance* object, lua_State* L)
+int RBX::Lua::Bridge<RBX::Instance>::on_tostring(RBX::Instance* object, lua_State* L)
 {
-	RBX::StandardOut::print(RBX::MESSAGE_WARNING, "Tostring Instance ");
-	lua_pushstring(L, object->getName().c_str());
-	return 1;
-}
-
-int RBX::Lua::SharedPtrBridge<RBX::Instance>::on_index(RBX::Instance* object, const char* name, lua_State* L)
-{
-
-	rttr::type base = rttr::detail::get_type_from_instance(object);
-	rttr::type type = rttr::type::get_by_name(object->getClassName());
-
-	if (!type)
+	if (object)
 	{
-		type = base;
-	}
-
-	if (type)
-	{
-		rttr::property prop = type.get_property(name);
-
-		if (prop)
-		{
-			pushLuaValue(L, object, prop);
-			return 1;
-		}
-
-		rttr::method method = type.get_method(name);
-		if (method)
-		{
-			lua_pushvalue(L, 2);
-			lua_pushcclosure(L, funcProxy, 1);
-			return 1;
-		}
-	}
-
-	Instance* child;
-	child = object->findFirstChild(name);
-
-	if (child)
-	{
-		RBX::Lua::SharedPtrBridge<RBX::Instance>::pushObject(L, child);
+		lua_pushstring(L, object->getName().c_str());
 		return 1;
 	}
-
-	return luaL_error(L, "'%s' not valid member of %s", name, object->getName().c_str());
+	return 0;
 }
 
-int RBX::Lua::SharedPtrBridge<RBX::Instance>::on_newindex(RBX::Instance* object, const char* name, lua_State* L)
+int RBX::Lua::Bridge<RBX::Instance>::on_index(RBX::Instance* object, const char* name, lua_State* L)
+{
+
+	if (object)
+	{
+		rttr::type base = rttr::detail::get_type_from_instance(object);
+		rttr::type type = rttr::type::get_by_name(object->getClassName());
+
+		if (!type)
+		{
+			type = base;
+		}
+
+		if (type)
+		{
+			rttr::property prop = type.get_property(name);
+
+			if (prop)
+			{
+				pushLuaValue(L, object, prop);
+				return 1;
+			}
+
+			rttr::method method = type.get_method(name);
+			if (method)
+			{
+				lua_pushvalue(L, 2);
+				lua_pushcclosure(L, funcProxy, 1);
+				return 1;
+			}
+		}
+
+		Instance* child;
+		child = object->findFirstChild(name);
+
+		if (child)
+		{
+			RBX::Lua::SharedPtrBridge<RBX::Instance>::pushObject(L, child);
+			return 1;
+		}
+
+		return luaL_error(L, "'%s' not valid member of %s", name, object->getName().c_str());
+	}
+}
+
+int RBX::Lua::Bridge<RBX::Instance>::on_newindex(RBX::Instance* object, const char* name, lua_State* L)
 {
 	rttr::type base = rttr::detail::get_type_from_instance(object);
 	rttr::type type = rttr::type::get_by_name(object->getClassName());

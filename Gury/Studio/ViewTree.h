@@ -12,8 +12,14 @@ class CViewTree : public CTreeCtrl
 private:
 	RBX::Instance* lastSelected;
 	std::vector<RBX::Instance*> selection;
+
+	bool m_isDraggingItem;
+	HTREEITEM hDraggedItem;
 // Construction
 public:
+
+	CImageList m_ClassViewImages;
+
 	CViewTree() noexcept;
 
 	void DeselectAll();
@@ -40,4 +46,7 @@ public:
 	afx_msg void OnTvnSelchanged(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnKillFocus(CWnd* pNewWnd);
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
+	afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);
+	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
+	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 };

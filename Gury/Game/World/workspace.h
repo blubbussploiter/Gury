@@ -29,8 +29,8 @@ namespace RBX
 
 		void playAllSounds();
 
-		static void workspaceDescendentAdded(RBX::Instance* descendent);
-		static void workspaceDescendentRemoved(RBX::Instance* descendent);
+		static void workspaceDescendentAdded(Instance* _this, Instance* descendent);
+		static void workspaceDescendentRemoved(Instance* _this, Instance* descendent);
 
 		static void getPVInstances(RBX::Instances* instances, RBX::Instances* pvs);
 		static void getAllInstancesOfClass(RBX::Instances* instances, std::string className);

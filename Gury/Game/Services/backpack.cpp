@@ -10,7 +10,7 @@ RTTR_REGISTRATION
 		.constructor<>();
 }
 
-void RBX::Backpack::doOnChildAdded(Instance* child)
+void RBX::Backpack::doOnChildAdded(Instance* _this, Instance* child)
 {
 	RBX::HopperBin* bin = toInstance<RBX::HopperBin>(child);
 
@@ -20,7 +20,7 @@ void RBX::Backpack::doOnChildAdded(Instance* child)
 	}
 }
 
-void RBX::Backpack::doOnChildRemoved(Instance* child)
+void RBX::Backpack::doOnChildRemoved(Instance* _this, Instance* child)
 {
 	RBX::HopperBin* bin = toInstance<RBX::HopperBin>(child);
 

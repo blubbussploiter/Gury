@@ -50,7 +50,6 @@ void RBX::Datamodel::loadContent(std::string contentId)
     RBX::Serializer::load(contentId);
 
     JointsService::get()->buildGlobalJoints();
-
 }
 
 void RBX::Datamodel::saveContent(std::string contentId)
@@ -62,14 +61,14 @@ void RBX::Datamodel::saveContent(std::string contentId)
 void RBX::Datamodel::close()
 {
     RBX::StandardOut::print(MESSAGE_INFO, "DataModel::close()");
-    RBX::ScriptContext::get()->close();
+    RBX::ScriptContext::get()->closeState();
     RBX::Scene::get()->close();
     Gurnel::get()->cleanup();
     RBX::Log::cleanup();
     emptyExplorerWindow();
 }
 
-void RBX::Datamodel::descendentAdded(RBX::Instance* i)
+void RBX::Datamodel::descendentAdded(Instance* _this, Instance* i)
 {
     if (i->parent != get())
     {
@@ -77,7 +76,7 @@ void RBX::Datamodel::descendentAdded(RBX::Instance* i)
     }
 }
 
-void RBX::Datamodel::descendentRemoved(RBX::Instance* i)
+void RBX::Datamodel::descendentRemoved(Instance* _this, Instance* i)
 {
     get()->removeFromExplorerWindow(i);
 }
@@ -137,6 +136,8 @@ void RBX::Datamodel::open()
     yieldingThreads = new Lua::YieldingThreads(scriptContext);
     physicsKernel = new Gurnel();
     globalMesh = new Render::Mesh();
+
+    onOpened();
 
     fillExplorerWindow();
 }

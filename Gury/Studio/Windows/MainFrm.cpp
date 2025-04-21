@@ -398,9 +398,11 @@ void CMainFrame::OnUpdateFrameTitle(BOOL bAddToTitle)
 		}
 		else
 		{
-			char* buff = new char[256];
-			frame->GetWindowTextA(buff, 256);
-			text = buff;
+			CDocument* document = GetActiveDocument();
+			if (document)
+			{
+				text = document->GetTitle();
+			}
 		}
 
 		std::string concat = RBX::Format("%s - [%s]", GURY_WNDTEXT, text.c_str());

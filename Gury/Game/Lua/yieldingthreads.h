@@ -56,6 +56,18 @@ namespace RBX
 				}
 			}
 
+			bool isYielding(lua_State* L)
+			{
+				for (WaitingThread* t : waitingThreads)
+				{
+					if (t->thread == L)
+					{
+						return 1;
+					}
+				}
+				return 0;
+			}
+
 			YieldingThreads(RBX::ScriptContext* context) : context(context) {}
 		};
 	}

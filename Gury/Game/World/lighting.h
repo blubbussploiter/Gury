@@ -87,7 +87,7 @@ namespace RBX
 		Color3 getTopAmbient() { return ambientTop; }
 		Color3 getBottomAmbient() { return ambientBottom; }
 		Color3 getClearColor() { return clear_color; }
-		Color3 getAmbient() { return ambient; }
+		Color3 getAmbient() { return params->ambient; }
 
 		float getGeoLatitude() { return latitude; }
 

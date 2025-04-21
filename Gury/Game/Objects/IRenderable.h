@@ -34,7 +34,7 @@ namespace RBX
 			IRenderable* specialShape;
 
 			void editMeshPosition(CoordinateFrame newPosition);
-			void removeFromRenderEnvironment();
+			virtual void removeFromRenderEnvironment();
 
 			virtual void write() {};
 			virtual void edit() {};

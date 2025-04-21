@@ -5,7 +5,7 @@
 
 #include "vector3bridge.h"
 
-RBX_LUA_REGISTER_NAME(G3D::Vector3, "Vector3");
+RBX_REGISTERCLASS(G3D::Vector3, "Vector3");
 
 const luaL_reg RBX::Lua::Vector3Bridge::classLibrary[] =
 {

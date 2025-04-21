@@ -59,7 +59,7 @@ namespace RBX
 
 		void translate(CoordinateFrame cframe);
 		
-		static void updatePrimaryPart(Instance* child);
+		static void updatePrimaryPart(Instance* _this, Instance* child);
 		static void translateInstances(Instances i, PVInstance* rootPart, CoordinateFrame cframe);
 		static CoordinateFrame getPVInstancesCentre(Instances pvInstances);
 		static Extents getInstancesExtents(Instances i);

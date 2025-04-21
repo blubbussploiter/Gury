@@ -33,9 +33,9 @@ RTTR_REGISTRATION
 {
 	rttr::registration::class_<RBX::Network::Players>("Players")
 		.constructor<>()
-		.property_readonly("LocalPlayer", &RBX::Network::Players::getLocalPlayer)(rttr::metadata("Serializable", false))
+		.property_readonly("LocalPlayer", &RBX::Network::Players::getLocalPlayer)(rttr::metadata("Nonserializable", 0))
 		.property("maxPlayers", &RBX::Network::Players::getMaxPlayers, &RBX::Network::Players::setMaxPlayers)(rttr::metadata("Type", RBX::Data))
-		.property_readonly("numPlayers", &RBX::Network::Players::getNumPlayers)(rttr::metadata("Type", RBX::Data), rttr::metadata("Serializable", false))
+		.property_readonly("numPlayers", &RBX::Network::Players::getNumPlayers)(rttr::metadata("Type", RBX::Data), rttr::metadata("Nonserializable", 0))
 		.method("createLocalPlayer", &RBX::Network::Players::createLocalPlayer);
 }
 
@@ -113,22 +113,22 @@ Color3 RBX::Network::Players::getPlayerColor(Player* player)
 	return playerList_Colors[rand() % sizeof(playerList_Colors) / sizeof(Color3)];
 }
 
-void RBX::Network::Players::doOnChildAdded(Instance* child)
+void RBX::Network::Players::doOnChildAdded(Instance* _this, Instance* child)
 {
 	Player* player = toInstance<Player>(child);
 	if (player)
 	{
-		Players::get()->onPlayerAdded(player);
+		Players::get()->onPlayerAdded(_this, player);
 	}
 }
 
-void RBX::Network::Players::doOnChildRemoved(Instance* child)
+void RBX::Network::Players::doOnChildRemoved(Instance* _this, Instance* child)
 {
 	Player* player = toInstance<Player>(child);
 	if (player)
 	{
 		player->onRemove();
-		Players::get()->onPlayerRemoving(player);
+		Players::get()->onPlayerRemoving(_this, player);
 	}
 }
 

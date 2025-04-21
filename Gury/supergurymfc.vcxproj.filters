@@ -242,6 +242,7 @@
     <ClCompile Include="Studio\App\GuryChildFrame.cpp" />
     <ClCompile Include="Studio\Documents\htmlDocument.cpp" />
     <ClCompile Include="Studio\Documents\htmlView.cpp" />
+    <ClCompile Include="Game\Lua\luaAllocator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\application.h" />
@@ -370,6 +371,8 @@
     <ClInclude Include="Studio\Documents\htmlView.h" />
     <ClInclude Include="Studio\Documents\scriptEditorView.h" />
     <ClInclude Include="Studio\App\GuryChildFrame.h" />
+    <ClInclude Include="Game\Lua\luaAllocator.h" />
+    <ClInclude Include="Game\Reflection\scriptSlot.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Main\supergurymfc.aps" />

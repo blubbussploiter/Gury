@@ -165,8 +165,28 @@ void scriptEditView::OnInitialUpdate()
 
 	::SendMessage(scintilla, SCI_CREATEDOCUMENT, 0, 0);
 	::SendMessage(scintilla, SCI_STYLECLEARALL, 0, 0);
-	::SendMessage(scintilla, SCI_SETZOOM, 4, 0);
-	::SendMessage(scintilla, SCI_SETMARGINWIDTHN, SC_MARGIN_SYMBOL, 24);
+	::SendMessage(scintilla, SCI_SETZOOM, 2, 0);
+	::SendMessage(scintilla, SCI_SETWRAPMODE, SC_WRAP_WORD, 0);
+	::SendMessage(scintilla, SCI_LINESSPLIT, 1, 0);
+
+	::SendMessage(scintilla, SCI_SETMARGINTYPEN, 0, SC_MARGIN_NUMBER);
+	::SendMessage(scintilla, SCI_SETMARGINLEFT, 0, 12);
+	::SendMessage(scintilla, SCI_SETMARGINWIDTHN, 0 , 48);
+
+	::SendMessage(scintilla, SCI_SETMARGINTYPEN, 1, SC_MARGIN_SYMBOL);
+	::SendMessage(scintilla, SCI_SETMARGINMASKN, 1, SC_MASK_FOLDERS);
+	::SendMessage(scintilla, SCI_SETMARGINWIDTHN, 1, 16);
+	::SendMessage(scintilla, SCI_SETMARGINSENSITIVEN, 1, TRUE);
+	::SendMessage(scintilla, SCI_SETFOLDFLAGS, 16, 0);
+	::SendMessage(scintilla, SCI_SETMODEVENTMASK, SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT, 0);
+
+	::SendMessage(scintilla, SCI_MARKERDEFINE, SC_MARKNUM_FOLDEROPEN, SC_MARK_MINUS);
+	::SendMessage(scintilla, SCI_MARKERDEFINE, SC_MARKNUM_FOLDER, SC_MARK_PLUS);
+	::SendMessage(scintilla, SCI_MARKERDEFINE, SC_MARKNUM_FOLDERSUB, SC_MARK_EMPTY);
+	::SendMessage(scintilla, SCI_MARKERDEFINE, SC_MARKNUM_FOLDERTAIL, SC_MARK_EMPTY);
+	::SendMessage(scintilla, SCI_MARKERDEFINE, SC_MARKNUM_FOLDEREND, SC_MARK_EMPTY);
+	::SendMessage(scintilla, SCI_MARKERDEFINE, SC_MARKNUM_FOLDEROPENMID, SC_MARK_EMPTY);
+	::SendMessage(scintilla, SCI_MARKERDEFINE, SC_MARKNUM_FOLDERMIDTAIL, SC_MARK_EMPTY);
 
 	setAStyle(STYLE_DEFAULT, RGB(0, 0, 0), RGB(255, 255, 255), 11, "Verdana");
 	setAStyle(STYLE_LINENUMBER, RGB(0, 0, 0), RGB(240, 240, 240), 8, "Verdana");

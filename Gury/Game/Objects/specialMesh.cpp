@@ -227,11 +227,25 @@ void RBX::Render::SpecialMesh::onParentChanged(Instance* self, std::string prope
 			if (pvInstance) {
 
 				IRenderable* renderableSelf = toInstance<IRenderable>(self);
+				parent->onChanged.connect(onParentSizeChanged);
 				pvInstance->removeFromRenderEnvironment();
 				pvInstance->specialShape = renderableSelf;
 				renderableSelf->write();
-
 			}
+		}
+	}
+}
+
+void RBX::Render::SpecialMesh::onParentSizeChanged(Instance* self, std::string propertyName)
+{
+	if (self && propertyName == "Size")
+	{
+		PVInstance* pvInstance = toInstance<PVInstance>(self);
+		if (pvInstance->specialShape)
+		{
+			RBX::StandardOut::print(RBX::MESSAGE_INFO, "done with");
+			pvInstance->specialShape->removeFromRenderEnvironment();
+			pvInstance->specialShape->write();
 		}
 	}
 }

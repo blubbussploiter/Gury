@@ -149,11 +149,11 @@ RBX::Extents RBX::ModelInstance::modelExtents()
 	return getInstancesExtents(*getChildren());
 }
 
-void RBX::ModelInstance::updatePrimaryPart(Instance* child)
+void RBX::ModelInstance::updatePrimaryPart(Instance* _this, Instance* child)
 {
 	if (child)
 	{
-		ModelInstance* parent = toInstance<ModelInstance>(child->parent);
+		ModelInstance* parent = toInstance<ModelInstance>(_this);
 		parent->getPrimaryPartInternal();
 	}
 }

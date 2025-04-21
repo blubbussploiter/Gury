@@ -53,6 +53,8 @@ namespace RBX
 		bool uiBrickcount;
 	public:
 
+		boost::signal<void()> onOpened;
+
 		static Datamodel* get();
 
 		void loadContent(std::string contentId);
@@ -78,8 +80,8 @@ namespace RBX
 
 		void step(double deltaTime);
 
-		static void descendentAdded(RBX::Instance* i);
-		static void descendentRemoved(RBX::Instance* i);
+		static void descendentAdded(Instance* _this, Instance* i);
+		static void descendentRemoved(Instance* _this, Instance* i);
 
 		Datamodel()
 		{
