@@ -31,6 +31,11 @@ namespace RBX
 		void executeInNewThread(std::string script);
 		void execute(std::string script); /* try: except wrapper for executeInNewThread */
 
+		int getNumScripts()
+		{
+			return scripts.size();
+		}
+
 		int resume(lua_State* L, int narg);
 		/* resume nested within a try - catch */
 		int resumeProtected(lua_State* L, int narg);

@@ -15,10 +15,10 @@ extern "C"
 #include "..\Services\stdout.h"
 
 #define RBX_LUA_REGISTER(L, c) RBX::Lua::Bridge<c>::open(L)
-#define RBX_PTR_LUA_REGISTER(L, c) RBX::Lua::Bridge<c>::open(L)
+#define RBX_PTR_LUA_REGISTER(L, c) RBX::Lua::Bridge<c*>::open(L)
 
 #define RBX_REGISTERCLASS(c, n) const char* RBX::Lua::Bridge<c>::className = n;
-#define RBX_REGISTERPTRCLASS(c, n) const char* RBX::Lua::Bridge<c>::className = n;
+#define RBX_REGISTERPTRCLASS(c, n) const char* RBX::Lua::Bridge<c*>::className = n;
 
 namespace RBX
 {
@@ -40,21 +40,7 @@ namespace RBX
 			{
 				Class* newObject;
 				newObject = (Class*)lua_newuserdata(L, sizeof(Class));
-				if (newObject)
-					*newObject = object;
-				luaL_getmetatable(L, className);
-				lua_setmetatable(L, -2);
-				return newObject;
-			}
-
-			static Class** pushPointerAsNewObject(lua_State* L, Class* object)
-			{
-				Class** newObject;
-				newObject = (Class**)lua_newuserdata(L, sizeof(Class*));
-				if (newObject)
-				{
-					*newObject = object;
-				}
+				*newObject = object;
 				luaL_getmetatable(L, className);
 				lua_setmetatable(L, -2);
 				return newObject;
@@ -62,35 +48,18 @@ namespace RBX
 
 			static Class* getValue(lua_State* L, int index)
 			{
-				const void* v3;
-				Class* v4;
-
-				v3 = lua_touserdata(L, index);
-				if (v3)
-				{
-					if (lua_getmetatable(L, index))
-					{
-						lua_getfield(L, -10000, className);
-						if (lua_rawequal(L, -1, -2))
-						{
-							lua_settop(L, -3);
-							v4 = (Class*)v3;
-							return v4;
-						}
-					}
-					else
-					{
-						lua_settop(L, -2);
-					}
-				}
-				return 0;
+				return getObject(L, index);
 			}
 
 			static Class* getObject(lua_State* L, int index)
 			{
-				return *(Class**)luaL_checkudata(L, index, className);
+				if (!lua_isnil(L, index))
+				{
+					void* data = luaL_checkudata(L, index, className);
+					return (Class*)data;
+				}
 			}
-
+			
 			/* `reflected` roblox methods */
 
 			static int on_index(Class* object, const char* name, lua_State* L);
@@ -125,6 +94,8 @@ namespace RBX
 			{
 				Class* object;
 				object = getObject(L, 1);
+
+				RBX::StandardOut::print(RBX::MESSAGE_INFO, "object = 0x%08X", object);
 
 				return on_tostring(object, L);
 			}
@@ -200,7 +171,7 @@ namespace RBX
 					if (lua_isnil(L, -1))
 					{
 						lua_pop(L, 1);
-						Class** wrappedPtr = Bridge<Class>::pushPointerAsNewObject(L, object);
+						Bridge<Class*>::pushNewObject(L, object);
 						lua_pushlightuserdata(L, object); /* key */
 						lua_pushvalue(L, -2); /* value */
 						lua_rawset(L, LUA_REGISTRYINDEX);
@@ -214,7 +185,7 @@ namespace RBX
 
 			static Class* getPtr(lua_State* L, int index)
 			{
-				return Bridge<Class>::getObject(L, index);
+				return *Bridge<Class*>::getObject(L, index);
 			}
 
 

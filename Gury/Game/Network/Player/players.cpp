@@ -64,9 +64,11 @@ Player* Players::createLocalPlayer(int userId)
 	return localPlayer;
 }
 
-void RBX::Network::Players::onPlayerNameChanged(Instance* plr, std::string propertyChanged)
+void RBX::Network::Players::onPlayerNameChanged(Instance* plr, rttr::property propertyChanged)
 {
-	if (propertyChanged == "Name") {
+	std::string name = propertyChanged.get_name().to_string();
+
+	if (name == "Name") {
 
 		Player* player = toInstance<Player>(plr);
 		Gui::GuiLabel* lbl = player->getGuiName();

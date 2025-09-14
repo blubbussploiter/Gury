@@ -35,7 +35,7 @@ namespace RBX
 
 			static void buildCircle(float circleRadius, float circleY, int triangles, Array<Vector3>& vertices, Array<Vector3>& normals, bool invertSecondVertex);
 
-			static void getFaceVertices(Vector3 size, NormalId face, Array<Vector3>& vertices, Array<Vector3>& normals);
+			static void getFaceVertices(Vector3 size, NormalId face, Array<Vector3>& vertices, Array<Vector3>& normals, Array<Vector3>& uvs);
 
 		};
 
@@ -75,9 +75,11 @@ namespace RBX
 
 				void setMeshScale(Vector3 scale)
 				{
-					mesh_scale = scale;
-					removeFromRenderEnvironment();
-					write();
+					if (mesh_scale != scale)
+					{
+						mesh_scale = scale;
+						resizeMesh();
+					}
 				}
 				
 				CoordinateFrame getParentCoordinateFrame() {
@@ -88,16 +90,18 @@ namespace RBX
 					return CoordinateFrame();
 				}
 
-				Vector3 getMeshScale() { return mesh_scale; }
-
-				Vector3 getMeshScaleBySize() 
+				Vector3 getParentSize()
 				{
 					PVInstance* pvInstance = toInstance<PVInstance>(parent);
 					if (pvInstance) {
-						return mesh_scale * pvInstance->getSize();
+						return pvInstance->getSize();
 					}
-					return mesh_scale;
+					return Vector3();
 				}
+
+				Vector3 getMeshScale() { return mesh_scale; }
+
+				void resizeMesh();
 
 				void fromFile(std::string path);
 				void fromMeshType(MeshType types);
@@ -109,11 +113,11 @@ namespace RBX
 
 				void edit();
 
-				void writeFace(NormalId Face, Vector2 uv, Vector3 v0, Vector3 v1, Vector3 v2, Vector3 v3, Vector3 v4, Vector3 v5);
-				void writeTriangleFace(NormalId Face, Vector2 uv, Vector3 v0, Vector3 v1, Vector3 v2);
+				void writeFace(NormalId Face, Vector2 xy, Vector2 wh, Vector3 v0, Vector3 v1, Vector3 v2, Vector3 v3, Vector3 v4, Vector3 v5);
+				void writeTriangleFace(NormalId Face, Vector2 xy, Vector2 wh, Vector3 v0, Vector3 v1, Vector3 v2);
 
-				void editFace(NormalId Face, Vector2 uv, Vector3 v0, Vector3 v1, Vector3 v2, Vector3 v3, Vector3 v4, Vector3 v5);
-				void editTriangleFace(NormalId Face, Vector2 uv, Vector3 v0, Vector3 v1, Vector3 v2);
+				void editFace(NormalId Face, Vector2 xy, Vector2 wh, Vector3 v0, Vector3 v1, Vector3 v2, Vector3 v3, Vector3 v4, Vector3 v5);
+				void editTriangleFace(NormalId Face, Vector2 xy, Vector2 wh, Vector3 v0, Vector3 v1, Vector3 v2);
 
 				void writeSpecialMesh();
 				void editSpecialMesh();
@@ -129,8 +133,8 @@ namespace RBX
 
 				void removeFromRenderEnvironment();
 
-				static void onParentChanged(Instance* self, std::string propertyName);
-				static void onParentSizeChanged(Instance* self, std::string propertyName);
+				static void onParentChanged(Instance* self, rttr::property propertyName);
+				static void onParentSizeChanged(Instance* self, rttr::property propertyName);
 
 				SpecialMesh()
 				{

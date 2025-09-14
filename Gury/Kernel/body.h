@@ -87,11 +87,36 @@ namespace RBX
 
 		void applyForceAtRelativePosition(Vector3 force, Vector3 relativePosition);
 
+		bool atRest()
+		{
+			return (getExactLinearVelocity() == Vector3::zero());
+		}
+
 		Vector3 getTorque();
 
 		Vector3 getForce();
 
 		Vector3 getPosition();
+
+		Vector3 getExactLinearVelocity()
+		{
+			if (body)
+			{
+				const dReal* v = dBodyGetLinearVel(body);
+				return Vector3(v[0], v[1], v[2]);
+			}
+			return Vector3::zero();
+		}
+
+		Vector3 getExactRotationalVelocity()
+		{
+			if (body)
+			{
+				const dReal* v = dBodyGetAngularVel(body);
+				return Vector3(v[0], v[1], v[2]);
+			}
+			return Vector3::zero();
+		}
 
 		Matrix3 getMoment();
 

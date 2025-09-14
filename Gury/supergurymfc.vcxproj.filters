@@ -56,7 +56,6 @@
     <ClCompile Include="Game\Objects\part.cpp" />
     <ClCompile Include="Game\Objects\specialMesh.cpp" />
     <ClCompile Include="Game\Objects\wedgemesh.cpp" />
-    <ClCompile Include="Game\Rendering\brickcolor.cpp" />
     <ClCompile Include="Game\Rendering\brickmap.cpp" />
     <ClCompile Include="Game\Rendering\diagnosticsWorldDrawer.cpp" />
     <ClCompile Include="Game\Rendering\drawPrimitives.cpp" />
@@ -98,7 +97,7 @@
     <ClCompile Include="Kernel\body.cpp" />
     <ClCompile Include="Kernel\jointKernel.cpp" />
     <ClCompile Include="Kernel\jointsservice.cpp" />
-    <ClCompile Include="Kernel\kernel.cpp" />
+    <ClCompile Include="Kernel\physicsKernel.cpp" />
     <ClCompile Include="Kernel\primitive.cpp" />
     <ClCompile Include="Studio\Windows\GuryGameFrame.cpp" />
     <ClCompile Include="Studio\Gury Interaction\Studio Tools\DragTool.cpp" />
@@ -243,6 +242,10 @@
     <ClCompile Include="Studio\Documents\htmlDocument.cpp" />
     <ClCompile Include="Studio\Documents\htmlView.cpp" />
     <ClCompile Include="Game\Lua\luaAllocator.cpp" />
+    <ClCompile Include="Game\Rendering\imageMasher.cpp" />
+    <ClCompile Include="Game\Rendering\colorAtlasMap.cpp" />
+    <ClCompile Include="Game\Objects\PVInstance\faceSlicer.cpp" />
+    <ClCompile Include="Game\Rendering\worldManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\application.h" />
@@ -373,6 +376,9 @@
     <ClInclude Include="Studio\App\GuryChildFrame.h" />
     <ClInclude Include="Game\Lua\luaAllocator.h" />
     <ClInclude Include="Game\Reflection\scriptSlot.h" />
+    <ClInclude Include="Game\Rendering\imageMasher.h" />
+    <ClInclude Include="Game\Rendering\worldManager.h" />
+    <ClInclude Include="Game\Objects\PVInstance\Meshes\icosphere.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Main\supergurymfc.aps" />

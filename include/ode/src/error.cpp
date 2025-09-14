@@ -153,7 +153,7 @@ void dDebug (int num, const char *msg, ...)
     _snprintf (title,sizeof(title),"ODE INTERNAL ERROR %d",num);
     _vsnprintf (s,sizeof(s),msg,ap);
     s[sizeof(s)-1] = 0;
-    MessageBox(0, RBX::Format("Physics error %s", s).c_str(), "Gury3D Crash", 0);
+    MessageBox(0, RBX::Format("Physics error %s", s).c_str(), "Gurnel Crash", 0);
   }
   abort();
 }

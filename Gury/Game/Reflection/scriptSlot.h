@@ -53,6 +53,11 @@ namespace RBX
 						Instance* instance = *(Instance**)(&arg);
 						RBX::Lua::SharedPtrBridge<Instance>::pushObject(L, instance);
 					}
+					else if (typeid(arg) == typeid(rttr::property))
+					{
+						RBX::StandardOut::print(RBX::MESSAGE_INFO, "poop");
+						lua_pushnil(L);
+					}
 					else if (typeid(arg) == typeid(const char*))
 					{
 						lua_pushstring(L, *(const char**)(&arg));

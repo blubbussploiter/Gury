@@ -13,13 +13,7 @@ namespace RBX
 	{
 	public:
 
-		BrickColor brickColor;
-
-		void setBrickColor(int bc)
-		{
-			brickColor = BrickColor::BrickMap::get()->brickColorFromNumber(bc);
-			setColor(brickColor.color);
-		}
+		void setBrickColor(int bc);
 
 		int getBrickColor()
 		{
@@ -38,7 +32,7 @@ namespace RBX
 			setName("Part");
 
 			shape = Shape::Block;
-			size = Vector3(2, 1.2f, 4);
+			setSize(Vector3(4, 1.2f, 2));
 
 		}
 

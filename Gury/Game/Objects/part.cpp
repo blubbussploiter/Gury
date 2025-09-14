@@ -12,6 +12,12 @@ RTTR_REGISTRATION
 		 .property("BrickColor", &RBX::PartInstance::getBrickColor, &RBX::PartInstance::setBrickColor);
 }
 
+void RBX::PartInstance::setBrickColor(int bc)
+{
+	brickColor = BrickColor::getBrickMap()->brickColorFromNumber(bc);
+	setColor(brickColor.color);
+}
+
 void RBX::PartInstance::write()
 {
 	PVInstance::write();

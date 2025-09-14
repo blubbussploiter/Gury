@@ -16,6 +16,7 @@
 
 #include "../Gury/Game/Rendering/surfaceFactory.h"
 #include "../Gury/Game/Rendering/textureReserve.h"
+#include "../Gury/Game/Rendering/worldManager.h"
 
 #include "../Gury/Game/Services/stdout.h"
 
@@ -40,15 +41,6 @@ namespace RBX
 		float sphereRadius; /* 2025 you know what this is for :) */
 		float surfaceAlpha;
 
-		unsigned int idFront;
-		unsigned int idBack;
-		unsigned int idRight;
-		unsigned int idLeft;
-		unsigned int idTop;
-		unsigned int idBottom;
-
-		unsigned int brickTexture;
-
 		Vector2 cylinderOriginX, cylinderOriginY,
 			uv0, uv1, uv2;
 
@@ -58,33 +50,48 @@ namespace RBX
 
 		/* Brick Face */
 
-		Array<Vector3> getBrickFaceVertices(NormalId face);
+		Array<Vector3> getBrickFaceVertices(NormalId face, bool asWorldSpace=true);
 
-		void writeBrickFaceGeometry(RBX::NormalId face, Vector2 uv, Vector2 wh, Vector3 v0, Vector3 v1, Vector3 v2, Vector3 v3, Vector3 v4, Vector3 v5, Color4 color, int textureUnit = -1); 
-		void editBrickFaceGeometry(RBX::NormalId face, Vector2 uv, Vector2 wh, Vector3 v0, Vector3 v1, Vector3 v2, Vector3 v3, Vector3 v4, Vector3 v5, Color4 color, int textureUnit = -1);
+		void generateSubdividedFace(Array<Vector3>& out, Array<Vector2>& texCoordsOut, NormalId face);
 
-		void writeBrickFace(NormalId face, int unit, bool repeat = false);
-		void editBrickFace(NormalId face, int unit, bool repeat = false);
+		void writeBrickFaceGeometry(RBX::NormalId face, Vector3 v0, Vector3 v1, Vector3 v2, Vector3 v3, Vector3 v4, Vector3 v5, Color4 color, int textureUnit = -1); 
+		void writeBrickFaceGeometryNew(RBX::NormalId face, Array<Vector3> vertices, Array<Vector2> texCoords, Color4 color);
+		void editBrickFaceGeometry(RBX::NormalId face, Vector3 v0, Vector3 v1, Vector3 v2, Vector3 v3, Vector3 v4, Vector3 v5, Color4 color, int textureUnit = -1);
+
+		void writeBrickFace(NormalId face,bool repeat = false);
 		void editBrickFaces();
+
+		void rbxSubdivide(SurfaceType surface, NormalId face, int w, float y, int h, Vector2 u, Vector2 v, CoordinateFrame cframe, Array<Vector3>& out, Array<Vector2>& texCoordsOut); 
+		
+		void appendTexCoordsXYWH(Array<Vector2>& texCoordsOut, Vector2 ru, Vector2 rv, Vector2 size);
+
+		void updateWholeFace(NormalId face);
+		void updateWholeFaces();
+
+		void regenerateRenderable();
 
 		/* Ball face */
 
-		Array<Vector3> getBallFaceVertices();
-
 		void writeBall();
-		void editBall();
 
 		Render::TextureReserve::TexturePositionalInformation getFaceUv(NormalId face);
 
-		static void onPrimitivePVChanged(Primitive* primitive);
 
 	public:
+
+		static void offsetBrickFaceVertices(Array<Vector3>& vertices, Vector3 offset);
+		static Array<Vector3> calculateBrickFaceVertices(NormalId face, Vector3 size);
+		static Vector2 getSubdivisionNumbers(NormalId face, Vector3 size);
+
+		void step();
 
 		PV* pv;
 		Primitive* primitive;
 
 		Vector3 size;
 		Color4 color;
+
+		BrickColor brickColor;
 
 		SurfaceType front, back, top, bottom, right, left;
 
@@ -189,7 +196,7 @@ namespace RBX
 			{
 				primitive->body->modifyVelocity(pv->velocity);
 			}
-			onChanged(this, "Velocity");
+			onChanged(this, getPropertyByName("Velocity"));
 		}
 
 		void setRotVelocity(Vector3 newVelocity)
@@ -200,7 +207,7 @@ namespace RBX
 			{
 				primitive->body->modifyVelocity(pv->velocity);
 			}
-			onChanged(this, "RotVelocity");
+			onChanged(this, getPropertyByName("RotVelocity"));
 		}
 
 		void setAnchored(bool a)
@@ -217,7 +224,7 @@ namespace RBX
 					primitive->body->attachPrimitive(primitive);
 				}
 			}
-			onChanged(this, "Anchored");
+			onChanged(this, getPropertyByName("Anchored"));
 		}
 
 		void setCanCollide(bool c)
@@ -237,7 +244,7 @@ namespace RBX
 		{
 			formFactor = f;
 			edit();
-			onChanged(this, "formFactor");
+			onChanged(this, getPropertyByName("formFactor"));
 		}
 
 		bool getShowControllerFlag() { return showControllerFlag; }
@@ -253,11 +260,8 @@ namespace RBX
 		static void onMeshAdded(Instance* _this, Instance* child);
 		static void onMeshRemoved(Instance* _this, Instance* child);
 
-		void writeSurfaces();
-		void editSurfaces();
-
-		void editSurface(NormalId face, unsigned int unit);
-		void writeSurface(NormalId face, unsigned int unit);
+		void removeSurfaces();
+		void orderSurfaces();
 
 		Vector3 getSizeExternal()
 		{
@@ -271,7 +275,11 @@ namespace RBX
 
 		void setSize(Vector3 s) {
 
-			size = s;
+			Vector3 oldSize = size;
+
+			size.x = round(s.x);
+			size.y = s.y; /* do form factor here */
+			size.z = round(s.z);
 			size /= 2;
 
 			switch (shape)
@@ -293,8 +301,13 @@ namespace RBX
 			{
 				primitive->body->modifySize(size);
 			}
-			edit();
-			onChanged(this, "Size");
+
+			if (oldSize != size)
+			{
+				Render::WorldManager::get()->makeDirty();
+			}
+
+			onChanged(this, getPropertyByName("Size"));
 		}
 
 		Vector3 getPosition() { return pv->position.translation; }
@@ -316,18 +329,32 @@ namespace RBX
 		{
 			pv->position = cf;
 			primitive->modifyPosition(pv->position);
+			edit();
 		}
 
 		Color4 getColor() { return color; }
+
 		void setColor(Color3 c) {
-			color = c;  
-			color.a = alpha;
-			edit();
+
+			Color4 _color;
+
+			_color = c;
+			_color.a = alpha;
+
+			setColor4(_color);
 		}
+
 		void setColor4(Color4 c) {
+
+			removeSurfaces(); /* remove old color */
 			color = c;
-			edit();
+
+			orderSurfaces();
+
+			Render::WorldManager::get()->makeDirty();
+			//edit();
 		}
+
 		bool getAnchored() { return anchored; }
 		bool getCanCollide() { return canCollide; }
 		bool getLocked() { return locked; }
@@ -348,14 +375,17 @@ namespace RBX
 		void setTransparency(float f)
 		{
 			float oldTransparency = transparency;
+
 			transparency = f;
 
 			alpha = 1 - transparency;
 			fauxTransparency = f;
 
-			color = Color4(color.r, color.g, color.b, alpha);
+			if (oldTransparency != f)
+			{
+				setColor4(Color4(color.r, color.g, color.b, alpha));
+			}
 
-			edit();
 		}
 
 		float getReflectance()

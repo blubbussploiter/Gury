@@ -19,13 +19,13 @@ void RBX::Render::SpecialMesh::writeSpecialMesh()
 
 	for (size_t i = 0; i < num_faces; i++)
 	{
-		Vector3 vertex = vertices[i] * getMeshScaleBySize(), worldVertex;
+		Vector3 vertex = vertices[i], worldVertex;
 		Vector3 uv = uvs[i];
 
 		worldVertex = newPosition.pointToWorldSpace(vertex);
 		Vector3 normal = normalize(worldVertex - newPosition.translation);
 
-		face.indices.push_back(RBX::Render::Mesh::write(vertex, normal, Vector2(uv.x, uv.y), color));
+		face.indices.push_back(RBX::Render::Mesh::write(vertex, normal, Vector2(uv.x, uv.y)));
 	}
 
 	vertexIndices.set(UNDEFINED, face);
@@ -48,13 +48,13 @@ void RBX::Render::SpecialMesh::editSpecialMesh()
 			for (int i = 0; i < num_faces; i++)
 			{
 				int index = face.indices[i];
-				Vector3 vertex = vertices[i] * getMeshScaleBySize(), worldVertex;
+				Vector3 vertex = vertices[i], worldVertex;
 				Vector3 uv = uvs[i];
 
 				worldVertex = newPosition.pointToWorldSpace(vertex);
 				Vector3 normal = normalize(worldVertex - newPosition.translation);
 
-				RBX::Render::Mesh::edit(index, worldVertex, normal, Vector2(uv.x, uv.y), color);
+				RBX::Render::Mesh::edit(index, worldVertex, normal, Vector2(uv.x, uv.y));
 			}
 
 		}

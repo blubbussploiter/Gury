@@ -15,7 +15,7 @@ void removerHelper(uint32 index, Array<T>& array)
 	}
 }
 
-uint32 RBX::Render::Mesh::write(Vector3 vertex, Vector3 normal, Vector2 texCoord, Color4 color, int textureIndex)
+uint32 RBX::Render::Mesh::write(Vector3 vertex, Vector3 normal, Vector2 texCoord)
 {
 	Mesh* global = getGlobalMesh(); /* write to a global mesh to keep 'static' */
 
@@ -23,22 +23,18 @@ uint32 RBX::Render::Mesh::write(Vector3 vertex, Vector3 normal, Vector2 texCoord
 		global->varDirty = 1;
 
 	uint32 index = global->vertexRefCounts.size();
+
 	global->vertexRefCounts.append(index);
+	global->originVertexArray.append(vertex);
 	global->vertexArray.append(vertex);
 	global->normalArray.append(normal);
-	global->colorArray.append(color);
-
-	if (textureIndex == -1)
-	{
-		texCoord = Vector2(0, 0);
-	}
 
 	global->texCoordArray.append(texCoord);
 
 	return index;
 }
 
-void RBX::Render::Mesh::edit(uint32 index, Vector3 vertex, Vector3 normal, Vector2 texCoord, Color4 color, int textureIndex)
+void RBX::Render::Mesh::edit(uint32 index, Vector3 vertex, Vector3 normal, Vector2 texCoord)
 {
 	Mesh* global = getGlobalMesh();
 
@@ -50,13 +46,25 @@ void RBX::Render::Mesh::edit(uint32 index, Vector3 vertex, Vector3 normal, Vecto
 		global->vertexArray[index] = vertex;
 		global->normalArray[index] = normal;
 		global->texCoordArray[index] = texCoord;
-		global->colorArray[index] = color;
 	}
 	else
 	{
-		write(vertex, normal, texCoord, color, textureIndex);
+		write(vertex, normal, texCoord);
 	}
 
+}
+
+void RBX::Render::Mesh::editVertex(uint32 index, Vector3 vertex)
+{
+	Mesh* global = getGlobalMesh();
+
+	if (!global->varDirty)
+		global->varDirty = 1;
+
+	if (global->vertexRefCounts.size() >= index)
+	{
+		global->vertexArray[index] = vertex;
+	}
 }
 
 void RBX::Render::Mesh::erase(uint32 index)
@@ -68,6 +76,7 @@ void RBX::Render::Mesh::erase(uint32 index)
 
 	removerHelper<Color4>(index, global->colorArray);
 	removerHelper<Vector3>(index, global->vertexArray);
+	removerHelper<Vector3>(index, global->originVertexArray);
 	removerHelper<Vector3>(index, global->normalArray);
 	removerHelper<Vector2>(index, global->texCoordArray);
 	removerHelper<uint32>(index, global->vertexRefCounts);
@@ -101,7 +110,7 @@ void RBX::Render::Mesh::makeVAR()
 	Mesh* global = getGlobalMesh();
 	if (global->varDirty)
 	{
-		global->worldVisibleGeometry = VARArea::create(global->size() * 256, VARArea::WRITE_EVERY_FEW_FRAMES);
+		global->worldVisibleGeometry = VARArea::create(global->size() * 256, VARArea::WRITE_EVERY_FRAME);
 
 		global->vertexVAR = VAR(global->vertexArray, global->worldVisibleGeometry);
 		global->normalVAR = VAR(global->normalArray, global->worldVisibleGeometry);
@@ -140,9 +149,10 @@ void RBX::Render::Mesh::beginRender(RenderDevice* renderDevice)
 		//renderDevice->setVertexAttribArray(2, global->normalVAR, false);
 	}
 
+	/* Remove this soon */
 	if (global->colorVAR.valid())
 	{
-		renderDevice->setColorArray(global->colorVAR);
+		//renderDevice->setColorArray(global->colorVAR);
 		//renderDevice->setVertexAttribArray(3, global->colorVAR, false);
 	}
 

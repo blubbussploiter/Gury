@@ -14,6 +14,7 @@ namespace RBX
 
 			static int fromEulerAnglesXYZ(lua_State* L);
 			static int fromAxisAngle(lua_State* L);
+			static int toEulerAnglesXYZ(lua_State* L);
 
 			static int newCoordinateFrame(lua_State* L);
 

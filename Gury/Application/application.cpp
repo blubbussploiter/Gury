@@ -41,7 +41,7 @@ BOOL CALLBACK documentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 		}
 
 		if (app->wndProc)
-		{
+		{/* put gury in the view instead of the frame, so much bullshit happening cos of it in the frame window */
 			return CallWindowProcA(app->wndProc, hwnd, uMsg, wParam, lParam);
 		}
 	}

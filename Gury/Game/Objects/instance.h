@@ -54,10 +54,10 @@ namespace RBX
 		boost::signal<void(Instance*, Instance*)> onDescendentAdded;
 		boost::signal<void(Instance*, Instance*)> onDescendentRemoved;
 
-		boost::signal<void(Instance*, std::string)> onChanged;
+		boost::signal<void(Instance*, rttr::property)> onChanged;
 		boost::signal<void(Instance*, Instance*)> onAncestorChanged;
 
-		SignalDesc<void(Instance*, std::string)>* desc_onChanged;
+		SignalDesc<void(Instance*, rttr::property)>* desc_onChanged;
 		SignalDesc<void(Instance*, Instance*)>* desc_onAncestryChanged; /* this is never used, change that. */
 		SignalDesc<void(Instance*, Instance*)>* desc_onChildAdded;
 		SignalDesc<void(Instance*, Instance*)>* desc_onChildRemoved;
@@ -164,7 +164,7 @@ namespace RBX
 		void setName(std::string newName) 
 		{ 
 			name = newName;
-			onChanged(this, "Name");
+			onChanged(this, getPropertyByName("Name"));
 		}
 		std::string getName() { return name; }
 
@@ -177,7 +177,7 @@ namespace RBX
 		void setArchivable(bool narchivable) 
 		{
 			archivable = narchivable;
-			onChanged(this, "archivable");
+			onChanged(this, getPropertyByName("archivable"));
 		}
 
 		void remove();
@@ -197,7 +197,9 @@ namespace RBX
 
 		Instance* findFirstChild(std::string name);
 
-		static void onInstanceUpdateStudioView(RBX::Instance* instance, std::string property);
+		rttr::property getPropertyByName(std::string propertyName);
+
+		static void onInstanceUpdateStudioView(RBX::Instance* instance, rttr::property property);
 		
 		Instance() : name("Instance"), className("Instance"), parent(NULL), isParentLocked(false)
 		{
@@ -206,7 +208,7 @@ namespace RBX
 
 			onChanged.connect(onInstanceUpdateStudioView);
 
-			desc_onChanged = new SignalDesc<void(Instance*, std::string)>(&onChanged, "Changed");
+			desc_onChanged = new SignalDesc<void(Instance*, rttr::property)>(&onChanged, "Changed");
 			desc_onChildAdded = new SignalDesc<void(Instance*, Instance*)>(&onChildAdded, "ChildAdded");
 			desc_onChildRemoved = new SignalDesc<void(Instance*, Instance*)>(&onChildRemoved, "ChildRemoved");
 			desc_onDescendentAdded = new SignalDesc<void(Instance*, Instance*)>(&onDescendentAdded, "DescendentAdded");
@@ -227,14 +229,14 @@ namespace RBX
 	}
 
 	template <class TypeA, class TypeB>
-	static bool typeCompareAny(TypeA* i)
-	{
-		return (i && dynamic_cast<TypeB*>(i) != 0);
+	static TypeB* toAny(TypeA* i) {
+		return dynamic_cast<TypeB*>(i);
 	}
 
 	template <class TypeA, class TypeB>
-	static TypeB* toAny(TypeA* i) {
-		return dynamic_cast<TypeB*>(i);
+	static bool typeCompareAny(TypeA* i)
+	{
+		return (toAny<TypeA, TypeB>(i) != 0);
 	}
 
 	template <class Type>

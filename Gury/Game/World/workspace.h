@@ -32,8 +32,15 @@ namespace RBX
 		static void workspaceDescendentAdded(Instance* _this, Instance* descendent);
 		static void workspaceDescendentRemoved(Instance* _this, Instance* descendent);
 
+		static RBX::Instances* getPVInstancesArray();
+
 		static void getPVInstances(RBX::Instances* instances, RBX::Instances* pvs);
-		static void getAllInstancesOfClass(RBX::Instances* instances, std::string className);
+		static void getAllInstancesOfClass(RBX::Instances* instances, RBX::Instances* instancesOut, std::string className);
+
+		int getNumBricks()
+		{
+			return getPVInstancesArray()->size();
+		}
 
 		void createCurrentCamera();
 		Camera* getCurrentCamera();

@@ -62,29 +62,31 @@ void RBX::Camera::characterFade()
     RBX::ModelInstance* character = player->character;
     RBX::Humanoid* humanoid = Humanoid::modelIsCharacter(character);
 
-    if (!humanoid) return;
-
-    Vector3 pos = cframe.translation;
-    Vector3 ppos = cameraSubject->getPosition();
-
-    float dist = (ppos - pos).magnitude();
-
-    /* semi deep */
-
-    if (dist <= 5)
+    if (humanoid)
     {
-        humanoid->setLocalTransparency(0.5f);
 
-        /* deeper */
+        Vector3 pos = cframe.translation;
+        Vector3 ppos = cameraSubject->getPosition();
 
-        if (dist <= 2.5)
+        float dist = (ppos - pos).magnitude();
+
+        /* semi deep */
+
+        if (dist <= 5)
         {
-            humanoid->setLocalTransparency(1.0f);
+            humanoid->setLocalTransparency(0.5f);
+
+            /* deeper */
+
+            if (dist <= 2.5)
+            {
+                humanoid->setLocalTransparency(1.0f);
+            }
         }
-    }
-    else
-    {
-        humanoid->setLocalTransparency(0.0f);
+        else
+        {
+            humanoid->setLocalTransparency(0.0f);
+        }
     }
 }
 
@@ -117,13 +119,15 @@ void RBX::Camera::follow()
 
 void RBX::Camera::update(bool rightMouseDown)
 {
-    Vector3 pos;
-    float smoothness;
-
-    panning = rightMouseDown;
-    
-    switch (cameraType)
+    if (camera)
     {
+        Vector3 pos;
+        float smoothness;
+
+        panning = rightMouseDown;
+
+        switch (cameraType)
+        {
         case Follow:
         {
             smoothness = 0.9f;
@@ -131,29 +135,30 @@ void RBX::Camera::update(bool rightMouseDown)
             follow();
             break;
         }
-        default: 
+        default:
         {
             smoothness = 0.45f;
             break;
         }
-    }
-
-    if (rightMouseDown)
-    {
-        if (oldMouse.x != 0 && oldMouse.y != 0)
-        {
-            GetCursorPos(&mouse);
-            SetCursorPos(oldMouse.x, oldMouse.y);
-            pan(&cframe, (mouse.x - oldMouse.x) / 100.f, (mouse.y - oldMouse.y) / 100.f);
         }
-    }
 
-    GetCursorPos(&oldMouse);
+        if (rightMouseDown)
+        {
+            if (oldMouse.x != 0 && oldMouse.y != 0)
+            {
+                GetCursorPos(&mouse);
+                SetCursorPos(oldMouse.x, oldMouse.y);
+                pan(&cframe, (mouse.x - oldMouse.x) / 100.f, (mouse.y - oldMouse.y) / 100.f);
+            }
+        }
 
-    CoordinateFrame current = camera->getCoordinateFrame();
-    if (cframe != current)
-    {
-        camera->setCoordinateFrame(current.lerp(cframe, smoothness));
+        GetCursorPos(&oldMouse);
+
+        CoordinateFrame current = camera->getCoordinateFrame();
+        if (cframe != current)
+        {
+            camera->setCoordinateFrame(current.lerp(cframe, smoothness));
+        }
     }
 
 }

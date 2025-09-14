@@ -76,7 +76,7 @@ void scriptEditView::doCommand(int id)
 	};
 }
 
-void scriptEditView::onNotify(int notification)
+void scriptEditView::onNotify(int notification, LPARAM lParam)
 {
 	switch (notification)
 	{
@@ -97,6 +97,14 @@ void scriptEditView::onNotify(int notification)
 			}
 
 			break;
+		}
+		case SCN_MARGINCLICK:
+		{
+			SCNotification* scn = (SCNotification*)lParam;
+			if (scn->margin == 1) {
+				int line = ::SendMessageA(scintilla, SCI_LINEFROMPOSITION, scn->position, 0);
+				::SendMessage(scintilla, SCI_TOGGLEFOLD, line, 0);
+			}
 		}
 	}
 }
@@ -173,9 +181,13 @@ void scriptEditView::OnInitialUpdate()
 	::SendMessage(scintilla, SCI_SETMARGINLEFT, 0, 12);
 	::SendMessage(scintilla, SCI_SETMARGINWIDTHN, 0 , 48);
 
+	::SendMessage(scintilla, SCI_SETPROPERTY, (WPARAM)"fold", (LPARAM)"1");
+	::SendMessage(scintilla, SCI_SETPROPERTY, (WPARAM)"fold.compact", (LPARAM)"1");
+
 	::SendMessage(scintilla, SCI_SETMARGINTYPEN, 1, SC_MARGIN_SYMBOL);
-	::SendMessage(scintilla, SCI_SETMARGINMASKN, 1, SC_MASK_FOLDERS);
 	::SendMessage(scintilla, SCI_SETMARGINWIDTHN, 1, 16);
+	::SendMessage(scintilla, SCI_SETMARGINMASKN, 1, SC_MASK_FOLDERS);
+
 	::SendMessage(scintilla, SCI_SETMARGINSENSITIVEN, 1, TRUE);
 	::SendMessage(scintilla, SCI_SETFOLDFLAGS, 16, 0);
 	::SendMessage(scintilla, SCI_SETMODEVENTMASK, SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT, 0);
@@ -244,7 +256,7 @@ BOOL scriptEditView::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 	// TODO: Add your specialized code here and/or call the base class
 
 	NMHDR* notification = (NMHDR*)(lParam);
-	onNotify(notification->code);
+	onNotify(notification->code, lParam);
 
 	return CView::OnNotify(wParam, lParam, pResult);
 }

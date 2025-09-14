@@ -1,4 +1,4 @@
-#include <G3DAll.h>
+ #include <G3DAll.h>
 #include "GLG3D/ToneMap.h"
 
 #include "../Gury/Game/Objects/instance.h"
@@ -24,7 +24,6 @@ namespace RBX
 
 		void adjust() /* same color for top and front(maybe) sides */
 		{
-			params->lightDirection.x = -params->lightDirection.y;
 			params->lightColor = spotLight;
 		}
 

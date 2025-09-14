@@ -44,9 +44,9 @@ RTTR_REGISTRATION
          .property("rawFormFactor", &RBX::PVInstance::getFormFactor, &RBX::PVInstance::setFormFactor)(rttr::metadata("Nonserializable", false))
          .property("formFactor", &RBX::PVInstance::getFormFactor, &RBX::PVInstance::setFormFactor)(rttr::metadata("Nonserializable", false))
          .property("FormFactor", &RBX::PVInstance::getFormFactor, &RBX::PVInstance::setFormFactor)
-         //.property("FormFactor", &RBX::PVInstance::getFormFactor, &RBX::PVInstance::setFormFactor)
          .property("Transparency", &RBX::PVInstance::getFauxTransparency, &RBX::PVInstance::setTransparency)(rttr::metadata("Type", RBX::Appearance));
 }
+
 void RBX::PVInstance::write()
 {
     if (specialShape)
@@ -55,8 +55,11 @@ void RBX::PVInstance::write()
     }
     else
     {
+        orderSurfaces();
+
         switch (shape)
         {
+        case Cylinder:
         case Block:
         {
             /* in order 0 - 5*/
@@ -68,8 +71,6 @@ void RBX::PVInstance::write()
             writeBrickFace(Bottom, -1);
             writeBrickFace(Front, -1);
 
-            writeSurfaces();
-
             break;
         }
         case Ball:
@@ -78,12 +79,8 @@ void RBX::PVInstance::write()
             writeBall();
             break;
         }
-        case Cylinder:
-        {
-            //RBX::Primitives::drawCylinder(d, this);
-            break;
         }
-        }
+
         editGlobalProxyLocation();
     }
 }
@@ -98,6 +95,7 @@ void RBX::PVInstance::edit()
     {
         switch (shape)
         {
+        case Cylinder:
         case Block:
         {
             editBrickFaces();
@@ -106,7 +104,7 @@ void RBX::PVInstance::edit()
         case Ball:
         {
             sphereRadius = size.y;
-            editBall();
+            editBrickFaces();
             break;
         }
         }
@@ -123,8 +121,6 @@ void RBX::PVInstance::onMeshAdded(Instance* _this, Instance* child)
 
         if (parent)
         {
-            RBX::StandardOut::print(RBX::MESSAGE_INFO,
-                "Write new %s to %s", child->name.c_str(), parent->name.c_str());
             parent->removeFromRenderEnvironment();
             parent->specialShape = mesh;
             mesh->removeFromRenderEnvironment();
@@ -137,15 +133,11 @@ void RBX::PVInstance::onMeshRemoved(Instance* _this, Instance* child)
 {
     if (child && IsA<Render::SpecialMesh>(child))
     {
-        RBX::StandardOut::print(RBX::MESSAGE_INFO,
-            "Remove old %s", child->name.c_str());
         Render::SpecialMesh* mesh = toInstance<Render::SpecialMesh>(child);
         Render::IRenderable* parent = toInstance<Render::IRenderable>(child->parent);
 
         if (parent)
         {
-            RBX::StandardOut::print(RBX::MESSAGE_INFO,
-                "Remove %s from %s", child->name.c_str(), parent->name.c_str());
             mesh->removeFromRenderEnvironment();
             parent->specialShape = 0;
             parent->removeFromRenderEnvironment();
@@ -154,42 +146,58 @@ void RBX::PVInstance::onMeshRemoved(Instance* _this, Instance* child)
     }
 }
 
-
 void RBX::PVInstance::setFace(NormalId f, SurfaceType s)
 {
+    SurfaceType oldSurfaceType = Smooth;
+
     switch (f)
     {
-    case NormalId::Top:
+        case NormalId::Top:
+        {
+            oldSurfaceType = top;
+            top = s;
+            break;
+        }
+        case NormalId::Bottom:
+        {
+            oldSurfaceType = bottom;
+            bottom = s;
+            break;
+        }
+        case NormalId::Left:
+        {
+            oldSurfaceType = left;
+            left = s;
+            break;
+        }
+        case NormalId::Right:
+        {
+            oldSurfaceType = right;
+            right = s;
+            break;
+        }
+        case NormalId::Front:
+        {
+            oldSurfaceType = front;
+            front = s;
+            break;
+        }
+        case NormalId::Back:
+        {
+            oldSurfaceType = back;
+            back = s;
+            break;
+        }
+    }
+
+    if (s != oldSurfaceType)
     {
-        top = s;
-        break;
+        BrickColor::getColorMap()->tryRemove(color, oldSurfaceType);
+        BrickColor::getColorMap()->orderInAtlas(color, s);
+        Render::WorldManager::get()->makeDirty();
     }
-    case NormalId::Bottom:
-    {
-        bottom = s;
-        break;
-    }
-    case NormalId::Left:
-    {
-        left = s;
-        break;
-    }
-    case NormalId::Right:
-    {
-        right = s;
-        break;
-    }
-    case NormalId::Front:
-    {
-        front = s;
-        break;
-    }
-    case NormalId::Back:
-    {
-        back = s;
-        break;
-    }
-    }
+
+    edit();
 }
 
 float RBX::getAffectedFormFactor(RBX::PVInstance* pv)
@@ -279,17 +287,20 @@ void RBX::PVInstance::onRemove()
         {
             primitive->body->destroyBody();
         }
+
         Connector* connecting = JointsService::get()->getConnecting(primitive);
         if (connecting)
         {
             connecting->remove();
         }
     }
+
+    removeSurfaces();
 }
+
 
 RBX::PVInstance::PVInstance()
 {
-    size = Vector3(4.f, 1.2f, 2.f);
     color = Color3(0.639216f, 0.635294f, 0.643137f);
 
     setClassName("PVInstance");
@@ -307,7 +318,6 @@ RBX::PVInstance::PVInstance()
     shape = Block;
 
     primitive = new Primitive(new Body());
-    primitive->onPVChanged.connect(onPrimitivePVChanged);
 
    // onChildAdded.connect(onMeshAdded);
     onChildRemoved.connect(onMeshRemoved);

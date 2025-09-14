@@ -228,7 +228,7 @@ void SurfaceFactory::pasteSurface(NormalId face, SurfaceType surface, Color4 col
 
 	if (surface != Smooth)
 	{
-
+			
 		cimg_library::CImg<float> background(fixedWidth, fixedHeight, 1, 4);
 		cimg_library::CImg<float> foreground(width, height, 1, 4);
 

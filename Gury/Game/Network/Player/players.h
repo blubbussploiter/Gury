@@ -36,7 +36,7 @@ namespace RBX
 
 			Player* createLocalPlayer(int userId);
 
-			static void onPlayerNameChanged(Instance* player, std::string propertyChanged);
+			static void onPlayerNameChanged(Instance* player, rttr::property propertyChanged);
 
 			void setPlayerList(RBX::Gui::GuiList* playerList);
 
@@ -59,7 +59,7 @@ namespace RBX
 			void setMaxPlayers(int newMaxPlayers) 
 			{ 
 				maxPlayers = newMaxPlayers;
-				onChanged(this, "maxPlayers");
+				onChanged(this, getPropertyByName("maxPlayers"));
 			}
 			int getMaxPlayers()
 			{

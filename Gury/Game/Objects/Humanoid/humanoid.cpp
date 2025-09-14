@@ -168,6 +168,7 @@ void RBX::Humanoid::snap(PVInstance* p0, PVInstance* p1)
     if (!p0 || !p1) return;
     SnapConnector* snap = new SnapConnector(p0->primitive, p1->primitive, UNDEFINED);
     snap->build();
+    snap->link();
 }
 
 void RBX::Humanoid::onDied()

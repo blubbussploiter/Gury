@@ -20,7 +20,7 @@ namespace RBX
 
 	namespace Network { class Players; }
 	namespace Lua { class YieldingThreads; }
-	namespace Render { class RenderScene; }
+	namespace Render { class RenderScene; class TextureReserve; }
 
 	class Datamodel : 
 		public RBX::Instance
@@ -40,6 +40,7 @@ namespace RBX
 		Scene* scene;
 		RBX::Render::Mesh* globalMesh;
 		RBX::Render::RenderScene* renderScene;
+		RBX::Render::TextureReserve* textureReserve;
 		RBX::Gurnel* physicsKernel;
 
 		Gui::GuiHint* gameHint;

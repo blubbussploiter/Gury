@@ -23,6 +23,7 @@ namespace RBX
 
 			Array<uint32> vertexRefCounts;
 
+			Array<Vector3> originVertexArray; /* Origin of vertices */
 			Array<Vector3> vertexArray;
 			Array<Vector3> normalArray;
 			Array<Vector2> texCoordArray;
@@ -66,8 +67,9 @@ namespace RBX
 			}
 
 
-			static uint32 write(Vector3 vertex, Vector3 normal, Vector2 texCoord, Color4 color, int textureIndex=-1);
-			static void edit(uint32 index, Vector3 vertex, Vector3 normal, Vector2 texCoord, Color4 color, int textureIndex = -1);
+			static uint32 write(Vector3 vertex, Vector3 normal, Vector2 texCoord);
+			static void edit(uint32 index, Vector3 vertex, Vector3 normal, Vector2 texCoord);
+			static void editVertex(uint32 index, Vector3 vertex);
 			static void erase(uint32 index);
 
 			static void applyTextureUnits(RenderDevice* renderDevice);

@@ -271,7 +271,7 @@ void RBX::Humanoid::onStrafe()
                     onTurn();
                 }
 
-                //onMovement();
+                onMovement();
 
                 break;
             }

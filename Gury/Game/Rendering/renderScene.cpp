@@ -29,6 +29,11 @@ void RBX::Render::RenderScene::onWorkspaceDescendentRemoved(RBX::Instance* desce
 
 void RBX::Render::RenderScene::presetLighting()
 {
+	RBX::Lighting* RBXLighting = RBX::Lighting::get();
+
+	lighting = RBXLighting->lighting;
+	params = *RBXLighting->params;
+
 	if (!readyForToneMap)
 	{
 		params = getEffectSettings()->toneMap->prepareLightingParameters(params);
@@ -39,9 +44,8 @@ void RBX::Render::RenderScene::presetLighting()
 
 void RBX::Render::RenderScene::turnOnLights(RenderDevice* device)
 {
-	float spotDamper = 0.35f;
+	float spotDamper = 0.89f;
 	float ambientDamper = 0.5f;
-	float damper = 0.6f;
 
 	int n = 1;
 
@@ -50,25 +54,13 @@ void RBX::Render::RenderScene::turnOnLights(RenderDevice* device)
 
 	presetLighting();
 
-	/* 2006 ambient color */
-	Lighting* RBXlighting = Lighting::get();
-	if (RBXlighting->usesAmbient)
-	{
-		spotDamper = 1;
-		damper = 1;
-
-		ambientColor = RBXlighting->getAmbient();
-		effectSettings->_hemisphereLighting = false;
-	}
-	else
-	{
-		effectSettings->_hemisphereLighting = true;
-		ambientColor = (lighting->ambientBottom + lighting->ambientTop) * ambientDamper;
-	}
+	effectSettings->_hemisphereLighting = true;
+	ambientColor = (lighting->ambientBottom + lighting->ambientTop) * 0.5f;
 	
 	device->setColorClearValue(colorClearValue);
+	device->setColor(Color3::white());
 
-	device->setLight(0, GLight::directional(params.lightDirection, params.lightColor * spotDamper));
+	device->setLight(0, GLight::directional(params.lightDirection, params.lightColor * 0.9f));
 
 	for (int i = 0; i < lighting->lightArray.size(); i++)
 	{
@@ -87,13 +79,13 @@ void RBX::Render::RenderScene::turnOnLights(RenderDevice* device)
 		if (lighting->ambientBottom != ambientColor)
 		{
 			Color3 ambient = lighting->ambientBottom - ambientColor;
-			device->setLight(n++, GLight::directional(Vector3(0.4f, -1.0f, 0.1f), ambient * damper, 0, 1));
+			device->setLight(n++, GLight::directional(Vector3(0.4f, -1.0f, 0.1f), ambient, 0, 1));
 		}
 
 		if (lighting->ambientTop != ambientColor)
 		{
 			Color3 ambient = lighting->ambientTop - ambientColor;
-			device->setLight(n++, GLight::directional(Vector3::unitY(), ambient * damper, 0, 1));
+			device->setLight(n++, GLight::directional(Vector3::unitY(), ambient, 0, 1));
 		}
 	}
 }
@@ -112,6 +104,8 @@ void RBX::Render::RenderScene::renderWorldLevels(RenderDevice* renderDevice)
 {
 	/// Send opaque proxy
 
+	renderDevice->setTexture(0, TextureReserve::get()->getSuperTexture());
+
 	sendProxyGeometry(renderDevice, proxy);
 
 	/// TODO: Write reflection stuff
@@ -122,6 +116,8 @@ void RBX::Render::RenderScene::renderWorldLevels(RenderDevice* renderDevice)
 	renderDevice->pushState();
 
 	renderDevice->setBlendFunc(RenderDevice::BLEND_SRC_ALPHA, RenderDevice::BLEND_ONE_MINUS_SRC_ALPHA);
+
+		renderDevice->setTexture(0, TextureReserve::get()->getSuperTexture());
 
 		sendProxyGeometry(renderDevice, transparentProxy);
 
@@ -173,6 +169,9 @@ void RBX::Render::RenderScene::oneFrame(RenderDevice* renderDevice, Camera* proj
 	Datamodel* datamodel = RBX::Datamodel::get();
 
 	//presetLighting();
+
+	TextureReserve::get()->generateSuperTexture();
+	WorldManager::get()->step();
 
 	renderDevice->beginFrame();
 

@@ -40,16 +40,16 @@ namespace RBX
 						t->elapsedTime += step;
 						if (t->requestedDelay <= t->elapsedTime)
 						{
+							if (std::find(waitingThreads.begin(), waitingThreads.end(), t) != waitingThreads.end())
+							{
+								waitingThreads.erase(std::remove(waitingThreads.begin(), waitingThreads.end(), t));
+							}
+
 							int oldTop = lua_gettop(t->thread);
 
 							lua_pushnumber(t->thread, t->elapsedTime);
 							context->resumeProtected(t->thread, 0);
 							lua_settop(t->thread, oldTop);
-
-							if (std::find(waitingThreads.begin(), waitingThreads.end(), t) != waitingThreads.end())
-							{
-								waitingThreads.erase(std::remove(waitingThreads.begin(), waitingThreads.end(), t));
-							}
 
 						}
 					}

@@ -50,6 +50,8 @@ void RBX::Datamodel::loadContent(std::string contentId)
     RBX::Serializer::load(contentId);
 
     JointsService::get()->buildGlobalJoints();
+
+    RBX::StandardOut::print(MESSAGE_INFO, "DataModel::loadContent diagnostic splash: %d scripts, %d bricks, %d joints, %d primitives, %d bodies, %d textures", scriptContext->getNumScripts(), workspace->getNumBricks(), jointService->getNumConnectors(), Gurnel::get()->getPrimitivesInWorld(), Gurnel::get()->getBodiesInWorld(), Render::TextureReserve::get()->getNumTextures());
 }
 
 void RBX::Datamodel::saveContent(std::string contentId)
@@ -111,13 +113,14 @@ void RBX::Datamodel::render(RenderDevice* renderDevice)
         gameHint->render(renderDevice);
     }
 
-    if (!gameMessage->text.empty()) {
-        gameMessage->render(renderDevice);
-    }
+    //if (!gameMessage->text.empty()) {
+    //    gameMessage->render(renderDevice);
+    //}
 }
 
 void RBX::Datamodel::open()
 {
+    textureReserve = new Render::TextureReserve();
     guiRoot = new Gui::GuiRoot();
     players = new RBX::Network::Players();
     hopper = new Hopper();

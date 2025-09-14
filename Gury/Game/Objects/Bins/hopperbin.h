@@ -66,7 +66,7 @@ namespace RBX
 				break;
 			}
 			}
-			onChanged(this, "BinType");
+			onChanged(this, getPropertyByName("BinType"));
 		}
 
 		BinType getBinType() {
@@ -75,7 +75,7 @@ namespace RBX
 
 		void setTextureId(Content content) {
 			textureId = content;
-			onChanged(this, "TextureId");
+			onChanged(this, getPropertyByName("TextureId"));
 		}
 
 		Content getTextureId() {

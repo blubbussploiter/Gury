@@ -64,15 +64,17 @@ void RBX::Primitive::modifyPosition(CoordinateFrame position)
 	if (geom[0])
 	{
 
-		Vector3 translation = position.translation;
-		Matrix3 rotation = position.rotation;
+		if (position != getPosition())
+		{
+			Vector3 translation = position.translation;
+			Matrix3 rotation = position.rotation;
 
-		float dRotation[12] = { rotation[0][0], rotation[0][1], rotation[0][2], 0, rotation[1][0], rotation[1][1], rotation[1][2], 0, rotation[2][0], rotation[2][1], rotation[2][2], 0 };
+			float dRotation[12] = { rotation[0][0], rotation[0][1], rotation[0][2], 0, rotation[1][0], rotation[1][1], rotation[1][2], 0, rotation[2][0], rotation[2][1], rotation[2][2], 0 };
 
-		dGeomSetPosition(geom[0], translation.x, translation.y, translation.z);
-		dGeomSetRotation(geom[0], dRotation);
+			dGeomSetPosition(geom[0], translation.x, translation.y, translation.z);
+			dGeomSetRotation(geom[0], dRotation);
 
-		onPVChanged(this);
+		}
 	}
 }
 
@@ -81,11 +83,11 @@ void RBX::Primitive::modifyCollisions(bool canCollide)
 	if (!geom[0]) return;
 	if (!canCollide)
 	{
-		dGeomDisable(geom[0]);
+		destroyPrimitive();
 	}
 	else
 	{
-		dGeomEnable(geom[0]);
+		createPrimitive(shape, size);
 	}
 }
 
@@ -123,15 +125,24 @@ CoordinateFrame RBX::Primitive::getPosition()
 
 void RBX::Primitive::modifyOffsetWorldCoordinateFrame(CoordinateFrame offset)
 {
-	if (!geom[0]) return;
+	if (body)
+	{
 
-	Vector3 position = offset.translation;
-	Matrix3 rotation = offset.rotation;
+		if (!geom[0]) return;
 
-	float dRotation[12] = { rotation[0][0], rotation[0][1], rotation[0][2], 0, rotation[1][0], rotation[1][1], rotation[1][2], 0, rotation[2][0], rotation[2][1], rotation[2][2], 0 };
+		Vector3 position = offset.translation;
+		Matrix3 rotation = offset.rotation;
 
-	dGeomSetOffsetWorldPosition(geom[0], position.x, position.y, position.z);
-	dGeomSetOffsetWorldRotation(geom[0], dRotation);
+		float dRotation[12] = { rotation[0][0], rotation[0][1], rotation[0][2], 0, rotation[1][0], rotation[1][1], rotation[1][2], 0, rotation[2][0], rotation[2][1], rotation[2][2], 0 };
+
+		if (dGeomGetBody(geom[0]))
+		{
+			dGeomSetOffsetWorldPosition(geom[0], position.x, position.y, position.z);
+			dGeomSetOffsetWorldRotation(geom[0], dRotation);
+		}
+
+
+	}
 }
 
 void RBX::Primitive::setDisabled(bool disabled)
@@ -207,11 +218,22 @@ void RBX::Primitive::step()
 			body->step();
 			pv->velocity = body->pv->velocity;
 		}
+
+		CoordinateFrame position = getPosition();
+
+		if (!body->atRest())
+		{
+			if (position != pv->position)
+			{
+				PVInstance* pi = (PVInstance*)ud;
+				pv->position = getPosition();
+				if (pi)
+				{
+					pi->step();
+				}
+			}
+		}
 	}
-
-	pv->position = getPosition();
-	onPVChanged(this);
-
 }
 
 RBX::Primitive::Primitive(Body* body)

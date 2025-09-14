@@ -1,7 +1,16 @@
 
 #include "PVInstance/pvinstance.h"
+#include "../World/lighting.h"
 
 #include "mesh.h"
+
+Vector3 getNormal(Vector3 v0, Vector3 v1, Vector3 v2)
+{
+	Vector3 x0 = v0 - v2;
+	Vector3 x1 = v1 - v2;
+	Vector3 n = cross(x0, x1);
+	return normalize(n);
+}
 
 void RBX::Render::HeadMesh::buildTube(Vector3 from, Vector3 to, int slices, Array<Vector3>& vertices, Array<Vector3>& normals)
 {
@@ -26,17 +35,10 @@ void RBX::Render::HeadMesh::buildTube(Vector3 from, Vector3 to, int slices, Arra
 		vertices.push_back(v1);
 		vertices.push_back(v2);
 
-		vertices.push_back(v0);
 		vertices.push_back(v2);
 		vertices.push_back(v3);
+		vertices.push_back(v0);
 
-		normals.push_back(normalize(v0));
-		normals.push_back(normalize(v1));
-		normals.push_back(normalize(v2));
-
-		normals.push_back(normalize(v0));
-		normals.push_back(normalize(v2));
-		normals.push_back(normalize(v3));
 	}
 }
 
@@ -44,7 +46,7 @@ void RBX::Render::HeadMesh::buildCircle(float circleRadius, float circleY, int t
 {
 	Array<Vector3> circleVertices;
 
-	/* allocate top circle */
+	/* allocate circle */
 
 	for (int i = 0; i < triangles; i++) {
 		float angle = (360.0f / triangles) * i;
@@ -53,23 +55,27 @@ void RBX::Render::HeadMesh::buildCircle(float circleRadius, float circleY, int t
 		circleVertices.push_back(Vector3(x, circleY, z));
 	}
 
-	/* add top circle */
+	/* add circle */
 
 	for (int i = 0; i < triangles - 2; i++) {
-		vertices.push_back(circleVertices[0]);
-		vertices.push_back(circleVertices[i + 1+invertSecondVertex]);
-		vertices.push_back(circleVertices[i + 2-invertSecondVertex]);
 
-		normals.push_back(normalize(circleVertices[0]));
-		normals.push_back(normalize(circleVertices[i + 1 + invertSecondVertex]));
-		normals.push_back(normalize(circleVertices[i + 2 - invertSecondVertex]));
+		Vector3 v0 = circleVertices[0];
+		Vector3 v1 = circleVertices[i + 1 + invertSecondVertex];
+		Vector3 v2 = circleVertices[i + 2 - invertSecondVertex];
+
+		vertices.push_back(v0);
+		vertices.push_back(v1);
+		vertices.push_back(v2);
 	}
+
 
 }
 
-void RBX::Render::HeadMesh::getFaceVertices(Vector3 size, NormalId face, Array<Vector3>& vertices, Array<Vector3>& normals)
+void RBX::Render::HeadMesh::getFaceVertices(Vector3 size, NormalId face, Array<Vector3>& vertices, Array<Vector3>& normals, Array<Vector3>& uvs)
 {
-	int triangles = 32;
+	/* Change this - still morphs weirdly, see how headmeshes look at y 2 and how they look taller than that */
+
+	int triangles = 64;
 
 	float radius = std::min(size.x, size.z);
 	float circleRadius = radius * 0.5f;
@@ -81,28 +87,30 @@ void RBX::Render::HeadMesh::getFaceVertices(Vector3 size, NormalId face, Array<V
 	/* Bevels leading on */
 
 	/* Curve 1 */
+
 	buildTube(
 		Vector3(circleRadius, size.y, circleRadius),
-		Vector3(radius * 0.675f, size.y*0.98f, radius * 0.675f),
+		Vector3(radius * 0.675f, size.y * 0.95f, radius * 0.675f),
 		triangles, vertices, normals);
 
 	/* Curve 2 */
 	buildTube(
-		Vector3(radius * 0.675f, size.y*0.98f, radius * 0.675f),
-		Vector3(radius * 0.85f, size.y*0.9f, radius * 0.85f),
+		Vector3(radius * 0.675f, size.y * 0.95f, radius * 0.675f),
+		Vector3(radius * 0.85f, size.y * 0.85f, radius * 0.85f),
 		triangles, vertices, normals);
 
 	/* Curve 3 */
+
 	buildTube(
-		Vector3(radius * 0.85f, size.y * 0.9f, radius * 0.85f),
-		Vector3(radius, size.y * 0.7f, radius),
+		Vector3(radius * 0.85f, size.y * 0.85f, radius * 0.85f),
+		Vector3(radius * 0.98f, size.y * 0.7f, radius*0.98f),
 		triangles, vertices, normals);
 
 	/* Center */
 
 	buildTube(
-		Vector3(radius, size.y * 0.7f, radius),
-		Vector3(radius * 1.025f, -size.y * 0.5f, radius*1.025f),
+		Vector3(radius * 0.98f, size.y * 0.7f, radius * 0.98f),
+		Vector3(radius * 1.025f, -size.y * 0.5f, radius * 1.025f),
 		triangles, vertices, normals);
 
 	/* Bevels leading off */
@@ -127,7 +135,7 @@ void RBX::Render::HeadMesh::getFaceVertices(Vector3 size, NormalId face, Array<V
 		Vector3(radius * 0.925f, -size.y * 0.85f, radius * 0.925f),
 		Vector3(radius * 0.68f, -size.y * 0.98f, radius * 0.68f),
 		triangles, vertices, normals);
-	
+
 	/* Curve 4 */
 
 	buildTube(
@@ -138,7 +146,25 @@ void RBX::Render::HeadMesh::getFaceVertices(Vector3 size, NormalId face, Array<V
 	/* Build bottom circle */
 
 	buildCircle(circleRadius, -size.y, triangles, vertices, normals, false);
+	
+	/* Get normals */
 
+	normals.resize(vertices.size());
+
+	for (int i = 0; i < vertices.size(); i++)
+	{
+		Vector3 v = vertices[i];
+		normals[i] = normalize(v);
+	}
+
+	/* Get UVS */
+
+	uvs.resize(vertices.size());
+
+	for (int i = 0; i < vertices.size(); i++)
+	{
+
+	}
 }
 
 void RBX::Render::SpecialMesh::writeHead()
@@ -152,15 +178,17 @@ void RBX::Render::SpecialMesh::writeHead()
 		{
 			Face newFace;
 
-			HeadMesh::getFaceVertices(getMeshScaleBySize(), UNDEFINED, vertices, normals);
+			HeadMesh::getFaceVertices(getParentSize(), UNDEFINED, vertices, normals, uvs);
 
 			for (int i = 0; i < vertices.size(); i++)
 			{
 				Vector3 vertex = vertices[i];
 				Vector3 normal = normals[i];
+				Vector3 uv = uvs[i];
 
 				Vector3 newVertex = position.pointToWorldSpace(vertex);
-				newFace.indices.push_back(RBX::Render::Mesh::write(newVertex, normal, Vector2(), color));
+
+				newFace.indices.push_back(RBX::Render::Mesh::write(newVertex, normal, Vector2(uv.x, uv.y)));
 			}
 
 			vertexIndices.set(UNDEFINED, newFace);
@@ -189,9 +217,11 @@ void RBX::Render::SpecialMesh::editHead()
 
 					Vector3 vertex = vertices[i];
 					Vector3 normal = normals[i];
+					Vector3 uv = uvs[i];
 
 					Vector3 newVertex = position.pointToWorldSpace(vertex);
-					RBX::Render::Mesh::edit(index, newVertex, normal, Vector2(), color);
+
+					RBX::Render::Mesh::edit(index, newVertex, normal, Vector2(uv.x, uv.y));
 
 				}
 

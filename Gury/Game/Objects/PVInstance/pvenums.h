@@ -43,7 +43,8 @@ namespace RBX
 		Hinge,
 		Motor,
 		SteppingMotor,
-		NumSurfaces
+		NumSurfaces,
+		UNDEFINED_SURFACE
 	};
 
 	enum Shape

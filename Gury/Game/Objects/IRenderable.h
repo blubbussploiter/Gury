@@ -13,6 +13,7 @@ namespace RBX
 
 	namespace Render
 	{
+
 		class IRenderable : 
 			public RBX::Instance
 		{
@@ -26,6 +27,8 @@ namespace RBX
 			struct Face
 			{
 				Array<int> indices;
+				Array<int> originIndices;
+				Vector2 u, v;
 				bool textured;
 			};
 
@@ -49,10 +52,15 @@ namespace RBX
 			virtual void render2D(RenderDevice* renderDevice) {} /* for rendering 2dly */
 			virtual void renderAdornee(RenderDevice* renderDevice) {} /* for other world rendered things */
 
+			virtual void regenerateRenderable() {} /* uhh */
+
 			/* levels */
 
 			void addVertexIndicesToProxy(Render::Mesh* proxy, Table<NormalId, Face> vIndices);
 			void removeVertexIndicesFromProxy(Render::Mesh* proxy, Table<NormalId, Face> vIndices);
+
+			void removeFaceFromProxy(Render::Mesh* proxy, Face face);
+			void addFaceToProxy(Render::Mesh* proxy, Face face);
 
 			void addToProxy(Render::Mesh* proxy);
 			void removeFromProxy(Render::Mesh* proxy);

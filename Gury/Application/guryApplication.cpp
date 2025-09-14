@@ -72,7 +72,7 @@ void RBX::Experimental::Application::onSimulation(RealTime rdt, SimTime sdt, Sim
 
 void RBX::Experimental::Application::onLogic()
 {
-	if (datamodel != nullptr)
+	if (Datamodel::get() != nullptr)
 	{
 
 		if (userInput->keyPressed(SDLK_o))
@@ -94,7 +94,11 @@ void RBX::Experimental::Application::onLogic()
 
 		Mouse::get()->doUserInput(userInput);
 
-		getCamera()->update(inGuryWindow() && userInput->keyDown(SDL_RIGHT_MOUSE_KEY));
+		Camera* cam = getCamera();
+		if (cam)
+		{
+			cam->update(inGuryWindow() && userInput->keyDown(SDL_RIGHT_MOUSE_KEY));
+		}
 
 		bool overGui = Gui::get()->doButtonLogic(userInput, renderDevice);
 		if (overGui) {
@@ -138,11 +142,10 @@ void RBX::Experimental::Application::onGraphics()
 
 void RBX::Experimental::Application::onInit()
 {
-	Diagnostics::get_Renderer()->diagnostics_enabled = false;
+	Diagnostics::get_Renderer()->diagnostics_enabled = true;
 
 	updateAppName();
 
-	RBX::StandardOut::print(RBX::MESSAGE_INFO, "Application::onInit()");
 	RBX::RBXManager::get()->initOneTimeAppliances();
 
 	setWindowLong();

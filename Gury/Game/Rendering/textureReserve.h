@@ -2,15 +2,20 @@
 
 #include <G3DAll.h>
 
+#include "../Gury/Game/Reflection/signal.h"
+
 #include "../Gury/Game/Services/stdout.h"
 #include "../Gury/Game/Lua/singletonType.h"
+
+#include "../Gury/Game/Objects/PVInstance/pvenums.h"
+#include "../Gury/Game/Rendering/brickcolor.h"
 
 namespace RBX
 {
 	namespace Render
 	{
 
-		class TextureReserve : public Singleton<TextureReserve>
+		class TextureReserve
 		{
 		public:
 
@@ -26,15 +31,38 @@ namespace RBX
 					this->cy += other.cy;
 					return *this;
 				}
+				TexturePositionalInformation(Vector2 xy, Vector2 wh)
+				{
+					x = xy.x;
+					y = xy.y;
+					cx = wh.x;
+					cy = wh.y;
+				}
+				TexturePositionalInformation(float x, float y, float cx, float cy)
+				{
+					this->x = x;
+					this->y = y;
+					this->cx = cx;
+					this->cy = cy;
+				}
+				TexturePositionalInformation()
+				{
+					x = 0;
+					y = 0;
+					cx = 0;
+					cy = 0;
+				}
 			};
 
 		private:
 
-			int lastSize;
-
+			bool dirty;
+			Vector2 dimensions;
 			Table<int, GImage*> bindedTextures;
 			Table<int, TexturePositionalInformation> superTexturePositions;
 			TextureRef guryWorldTexture; GImage superTextureData;
+
+			BrickColor::BrickAtlasMap* colorAtlasMap;
 
 		public:
 
@@ -43,10 +71,31 @@ namespace RBX
 				return bindedTextures;
 			}
 
+			int getNumTextures()
+			{
+				return bindedTextures.size();
+			}
+
+			void regenWorld();
+
+			/* Remove all attached texCoords from this textureUnit */
+
+			void unbindTexture(int texture)
+			{
+				if (bindedTextures.containsKey(texture))
+				{
+					bindedTextures.remove(texture);
+					dirty = 1;
+				}
+			}
+
 			int bindTexture(GImage texture)
 			{
 				int idx = bindedTextures.size();
+
 				bindedTextures.set(idx, new GImage(texture));
+				dirty = 1;
+
 				return idx;
 			}
 
@@ -81,18 +130,11 @@ namespace RBX
 
 			TexturePositionalInformation getTexturePosition(int index)
 			{
-				TexturePositionalInformation position = TexturePositionalInformation();
 				if (superTexturePositions.containsKey(index))
 				{
 					return superTexturePositions[index];
 				}
-			}
-
-			/* Remove all attached texCoords from this textureUnit */
-
-			void unbindTexture(int texture)
-			{
-				//bindedTextures.erase(bindedTextures.begin() + texture);
+				return TexturePositionalInformation(0, 0, 0, 0);
 			}
 
 			TextureRef getSuperTexture()
@@ -105,11 +147,28 @@ namespace RBX
 				return superTextureData;
 			}
 
+			TexturePositionalInformation getSurfaceUV(Color4 brickColor, SurfaceType surface, NormalId normalId, Vector2 sizeTile);
+
+			void getSurfaceXXYY(Color4 brickColor, SurfaceType surface, NormalId normalId, Vector2 sizeTile, Vector2& u, Vector2& v);
+
 			Vector2 calculateSuperTextureDimensions();
 
-			Array<Vector2> calculateTextureUV(int textureIndex);
-
 			void generateSuperTexture();
+
+			BrickColor::BrickAtlasMap* getColorAtlas()
+			{
+				return colorAtlasMap;
+			}
+
+			static TextureReserve* get();
+
+			TextureReserve()
+			{
+				dirty = false;
+				dimensions = Vector2::zero();
+				colorAtlasMap = new BrickColor::BrickAtlasMap();
+			}
+
 
 		};
 	}

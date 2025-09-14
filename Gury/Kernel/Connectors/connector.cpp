@@ -34,6 +34,8 @@ void RBX::Connector::diagRender(RenderDevice* rd)
 	Draw::sphere(s_p0, rd, color, Color4::clear());
 	Draw::sphere(s_p1, rd, color, Color4::clear());
 
+	
+
 }
 
 void RBX::Connector::diagRenderPrimitiveOutlines(RenderDevice* rd)

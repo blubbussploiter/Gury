@@ -33,6 +33,8 @@ void RBX::RunService::run()
         Scene::get()->saveStartPVs();
         Gurnel::get()->spawnWorld();
 
+        RBX::StandardOut::print(RBX::MESSAGE_INFO, "RunService::run() diagnostic splash: %d primitives and %d bodies in world", Gurnel::get()->getPrimitivesInWorld(), Gurnel::get()->getBodiesInWorld());
+
         if (!hasStarted)
         {
             reset();
@@ -99,7 +101,7 @@ void RBX::RunService::update()
 
         for (int i = 0; i < 4; i++)
         {
-            Gurnel::get()->step(0.03f, 4);
+            Gurnel::get()->step(0.02f, 2);
         }
 
         Gurnel::get()->afterStep();

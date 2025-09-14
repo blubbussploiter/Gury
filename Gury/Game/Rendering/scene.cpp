@@ -119,6 +119,13 @@ void RBX::Scene::onWorkspaceDescendentRemoved(RBX::Render::IRenderable* instance
 			sceneObjects.begin(),
 			sceneObjects.end(),
 			instance));
+
+		PVInstance* pv = toInstance<PVInstance>(instance);
+		if (pv)
+		{
+			//pv->removeSurfaces(); /* Clear out surfaces */
+		}
+
 		instance->onRemove();
 		instance->removeFromRenderEnvironment();
 	}

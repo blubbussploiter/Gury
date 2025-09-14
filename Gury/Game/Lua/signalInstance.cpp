@@ -29,14 +29,10 @@ int RBX::SignalInstance::pushLuaFunction(lua_State* L) {
 int RBX::SignalInstance::connect(lua_State* L)
 {
 	SignalInstance* signal = Lua::SharedPtrBridge<SignalInstance>::getPtr(L, 1);
-	rttr::type base = rttr::detail::get_type_from_instance(signal);
 
-	if (typeCompareAny<SignalInstance, SignalDesc<void(RBX::Instance*, std::string)>>(signal)) {
-		toAny<SignalInstance, SignalDesc<void(RBX::Instance*, std::string)>>(signal)->connectGeneric(L);
-	}
+	if (signal)
+	{
 
-	if (typeCompareAny<SignalInstance, SignalDesc<void(RBX::Instance*, RBX::Instance*)>>(signal)) {
-		 toAny<SignalInstance, SignalDesc<void(RBX::Instance*, RBX::Instance*)>>(signal)->connectGeneric(L);
 	}
 
 	return 0;

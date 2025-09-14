@@ -186,15 +186,17 @@
     <ClCompile Include="Game\Objects\PVInstance\pvinstanceAppearance.cpp" />
     <ClCompile Include="Game\Objects\PVInstance\pvinstanceAppearanceEdit.cpp" />
     <ClCompile Include="Game\Objects\PVInstance\pvinstanceAppearanceWrite.cpp" />
+    <ClCompile Include="Game\Objects\PVInstance\faceSlicer.cpp" />
     <ClCompile Include="Game\Objects\specialMesh.cpp" />
     <ClCompile Include="Game\Objects\wedgemesh.cpp" />
     <ClCompile Include="Game\Objects\World\hint.cpp" />
     <ClCompile Include="Game\Objects\World\message.cpp" />
-    <ClCompile Include="Game\Rendering\brickcolor.cpp" />
     <ClCompile Include="Game\Rendering\brickmap.cpp" />
+    <ClCompile Include="Game\Rendering\colorAtlasMap.cpp" />
     <ClCompile Include="Game\Rendering\diagnosticsWorldDrawer.cpp" />
     <ClCompile Include="Game\Rendering\drawPrimitives.cpp" />
     <ClCompile Include="Game\Rendering\effectsetting.cpp" />
+    <ClCompile Include="Game\Rendering\imageMasher.cpp" />
     <ClCompile Include="Game\Rendering\material.cpp" />
     <ClCompile Include="Game\Rendering\materialFactory.cpp" />
     <ClCompile Include="Game\Rendering\renderMesh.cpp" />
@@ -206,6 +208,7 @@
     <ClCompile Include="Game\Rendering\texture.cpp" />
     <ClCompile Include="Game\Rendering\textureReserve.cpp" />
     <ClCompile Include="Game\Rendering\ToneMap.cpp" />
+    <ClCompile Include="Game\Rendering\worldManager.cpp" />
     <ClCompile Include="Game\Serializer\deserializer.cpp" />
     <ClCompile Include="Game\Serializer\serializer.cpp" />
     <ClCompile Include="Game\Services\backpack.cpp" />
@@ -233,7 +236,7 @@
     <ClCompile Include="Kernel\Connectors\snap.cpp" />
     <ClCompile Include="Kernel\jointKernel.cpp" />
     <ClCompile Include="Kernel\jointsservice.cpp" />
-    <ClCompile Include="Kernel\kernel.cpp" />
+    <ClCompile Include="Kernel\physicsKernel.cpp" />
     <ClCompile Include="Kernel\primitive.cpp" />
     <ClCompile Include="Main\main.cpp" />
     <ClCompile Include="Studio\App\GuryChildFrame.cpp" />
@@ -271,9 +274,12 @@
     <ClInclude Include="Game\Lua\luaAllocator.h" />
     <ClInclude Include="Game\Lua\signaldescriptor.h" />
     <ClInclude Include="Game\Lua\signalInstance.h" />
+    <ClInclude Include="Game\Objects\PVInstance\Meshes\icosphere.hpp" />
     <ClInclude Include="Game\Objects\World\hint.h" />
     <ClInclude Include="Game\Objects\World\message.h" />
     <ClInclude Include="Game\Reflection\scriptSlot.h" />
+    <ClInclude Include="Game\Rendering\imageMasher.h" />
+    <ClInclude Include="Game\Rendering\worldManager.h" />
     <ClInclude Include="Game\Services\Hopper.h" />
     <ClInclude Include="Main\framework.h" />
     <ClInclude Include="Game\classes.h" />
@@ -432,7 +438,7 @@
     <ProjectGuid>{CF8EA185-0F2A-474A-A66B-8E3825E2F907}</ProjectGuid>
     <Keyword>MFCProj</Keyword>
     <RootNamespace>supergurymfc</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.22000.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

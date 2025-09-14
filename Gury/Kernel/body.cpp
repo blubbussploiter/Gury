@@ -232,7 +232,7 @@ void RBX::Body::createBody(Vector3 size)
 
 void RBX::Body::destroyBody()
 {
-	if (body != NULL)
+	if (body)
 	{
 		dBodyEnable(body);
 

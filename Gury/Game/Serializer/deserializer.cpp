@@ -169,7 +169,10 @@ void setProperty(rapidxml::xml_node<>* node, RBX::Instance* instance, std::strin
 					int i = std::stoi(propertyValue);
 					property.set_value(instance, i);
 				}
-				catch (...) {}
+				catch (...) 
+				{
+					RBX::StandardOut::print(RBX::MESSAGE_WARNING, "::setProperty (%s), Failed to deserialize int %s, skipping...", instance->getFullName().c_str(), propertyName.c_str());
+				}
 				break;
 			}
 			case 7:

@@ -4,6 +4,8 @@
 #include <map>
 #include <G3DAll.h>
 
+#include "../Objects/PVInstance/pvenums.h"
+
 namespace RBX
 {
 	class BrickColor
@@ -14,6 +16,38 @@ namespace RBX
 		public:
 			std::string name;
 			int number;
+		};
+
+		class AtlasInfo
+		{
+		public:
+
+			Color4 brickColor;
+			SurfaceType surface;
+
+			int references;
+
+			AtlasInfo()
+			{
+				surface = SurfaceType::UNDEFINED_SURFACE;
+				references = 0;
+			}
+		};
+
+		class BrickAtlasMap
+		{
+		public:
+
+			Table<int, AtlasInfo> atlasColors;
+
+			void orderInAtlas(Color4 brickColor, SurfaceType surface);
+
+			bool isInAtlas(Color4 brickColor, SurfaceType surface)  const;
+			uint32_t getInAtlas(Color4 brickColor, SurfaceType surface) const;
+
+			void tryRemove(Color4 brickColor, SurfaceType surface);
+
+			static BrickAtlasMap* get();
 		};
 
 		class BrickMap
@@ -38,6 +72,15 @@ namespace RBX
 
 		Number number;
 		Color3 color;
+
+		static BrickMap* getBrickMap()
+		{
+			return BrickMap::get();
+		}
+		static BrickAtlasMap* getColorMap()
+		{
+			return BrickAtlasMap::get();
+		}
 
 		BrickColor() {}
 	};

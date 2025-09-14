@@ -32,6 +32,20 @@ int RBX::Lua::CoordinateFrameBridge::fromAxisAngle(lua_State* L)
 	return 1;
 }
 
+int RBX::Lua::CoordinateFrameBridge::toEulerAnglesXYZ(lua_State* L)
+{
+	float y = 0, z = 0, rfZAngle = 0;
+	G3D::CoordinateFrame* object = RBX::Lua::Bridge<G3D::CoordinateFrame>::getObject(L, 1);
+
+	object->rotation.toEulerAnglesXYZ(y, z, rfZAngle);
+
+	lua_pushnumber(L, y);
+	lua_pushnumber(L, z);
+	lua_pushnumber(L, rfZAngle);
+
+	return 3;
+}
+
 int RBX::Lua::CoordinateFrameBridge::fromEulerAnglesXYZ(lua_State* L)
 {
 	float x, y, z;
@@ -346,6 +360,12 @@ int RBX::Lua::Bridge<G3D::CoordinateFrame>::on_index(G3D::CoordinateFrame* objec
 	if (!strcmp(name, "toObjectSpace"))
 	{
 		lua_pushcfunction(L, CoordinateFrameBridge::on_toObjectSpace);
+		return 1;
+	}
+
+	if (!strcmp(name, "toEulerAnglesXYZ"))
+	{
+		lua_pushcfunction(L, CoordinateFrameBridge::toEulerAnglesXYZ);
 		return 1;
 	}
 

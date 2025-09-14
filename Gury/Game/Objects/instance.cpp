@@ -23,12 +23,12 @@ RTTR_REGISTRATION
 		 .property("archivable", &RBX::Instance::getArchivable, &RBX::Instance::setArchivable)(rttr::metadata("Type", RBX::Behavior))
 		 .property("Parent", &RBX::Instance::getParent,
 			 &RBX::Instance::setParent)(rttr::metadata("Nonserializable", 0))
-		.property_readonly("Changed", &RBX::Instance::desc_onChanged)
-		.property_readonly("ChildAdded", &RBX::Instance::desc_onChildAdded)
-		.property_readonly("ChildRemoved", &RBX::Instance::desc_onChildRemoved)
-		.property_readonly("DescendentRemoving", &RBX::Instance::desc_onDescendentRemoved)
-		.property_readonly("DescendentAdded", &RBX::Instance::desc_onDescendentAdded)
-		.property_readonly("AncestryChanged", &RBX::Instance::desc_onAncestryChanged)
+		.property_readonly("Changed", &RBX::Instance::desc_onChanged)(rttr::metadata("Nonserializable", 0))
+		.property_readonly("ChildAdded", &RBX::Instance::desc_onChildAdded)(rttr::metadata("Nonserializable", 0))
+		.property_readonly("ChildRemoved", &RBX::Instance::desc_onChildRemoved)(rttr::metadata("Nonserializable", 0))
+		.property_readonly("DescendentRemoving", &RBX::Instance::desc_onDescendentRemoved)(rttr::metadata("Nonserializable", 0))
+		.property_readonly("DescendentAdded", &RBX::Instance::desc_onDescendentAdded)(rttr::metadata("Nonserializable", 0))
+		.property_readonly("AncestryChanged", &RBX::Instance::desc_onAncestryChanged)(rttr::metadata("Nonserializable", 0))
 		.method("remove", &RBX::Instance::remove)
 		.method("clone", &RBX::Instance::clone)
 		.method("children", &RBX::Instance::getChildren)
@@ -145,7 +145,7 @@ void RBX::Instance::setParent(Instance* instance)
 
 	}
 	
-	onChanged(this, "Parent");
+	onChanged(this, getPropertyByName("Parent"));
 }
 
 void RBX::Instance::remove()
@@ -179,28 +179,48 @@ RBX::Instance* RBX::Instance::getParent()
 RBX::Instance* RBX::Instance::findFirstChild(std::string name)
 {
 	Instance* child;
-	RBX::Instances* children = getChildren();
 	for (unsigned int i = 0; i < children->size(); i++)
 	{
 		child = children->at(i);
-		if (child && child->getName() == name)
-			return child;
+		if (child)
+		{
+			if (child->getName() == name)
+			{
+				return child;
+			}
+		}
 	}
 	return 0;
 }
 
-void RBX::Instance::onInstanceUpdateStudioView(RBX::Instance* instance, std::string property)
+rttr::property RBX::Instance::getPropertyByName(std::string propertyName)
+{
+
+	rttr::type base = rttr::detail::get_type_from_instance(this);
+	rttr::type type = rttr::type::get_by_name(getClassName());
+
+	if (!type)
+	{
+		type = base;
+	}
+
+	return type.get_property(propertyName);
+}
+
+void RBX::Instance::onInstanceUpdateStudioView(RBX::Instance* instance, rttr::property property)
 {
 	ExplorerTreeView* classView = &CMainFrame::mainFrame->m_wndClassView;
 
-	if (property == "Name")
+	std::string name = property.get_name().to_string();
+
+	if (name == "Name")
 	{
 		std::string newName = instance->getName();
 		HTREEITEM item = classView->GetInstance(instance);
 		classView->m_wndClassView.SetItemText(item, newName.c_str());
 	}
 
-	if (property == "Parent")
+	if (name == "Parent")
 	{
 		classView->MoveInstanceParent(instance);
 	}

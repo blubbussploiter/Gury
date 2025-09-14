@@ -14,9 +14,6 @@
 
 #include "scriptcontext.h"
 
-RBX_REGISTERPTRCLASS(RBX::Instance, "Instance");
-RBX_REGISTERPTRCLASS(RBX::SignalInstance, "SignalInstance");
-
 int RBX::ScriptContext::instanceNew(lua_State* L)
 {
 	int nargs = lua_gettop(L);
@@ -105,14 +102,7 @@ void RBX::ScriptContext::executeInNewThread(std::string script)
 
 void RBX::ScriptContext::execute(std::string script)
 {
-	try
-	{
-		executeInNewThread(script);
-	}
-	catch (std::runtime_error e)
-	{
-		RBX::StandardOut::print(RBX::MESSAGE_ERROR, e.what());
-	}
+	executeInNewThread(script);
 
 }
 
@@ -129,9 +119,7 @@ int RBX::ScriptContext::resume(lua_State* L, int narg)
 	if (status)
 	{
 		const char* string = lua_tostring(L, -1);
-		lua_settop(L, 0);
-
-		throw std::runtime_error(string);
+		lua_pop(L, 1);
 	}
 
 	return 0;
@@ -234,15 +222,18 @@ void RBX::ScriptContext::runScript(RBX::BaseScript* script)
 
 void RBX::ScriptContext::resetScriptThreads()
 {
-	for (size_t i = 0; i < scripts.size(); i++)
+	if (scripts.size() > 0)
 	{
-		BaseScript* script = scripts.at(i);
-		if (script)
+		for (size_t i = 0; i < scripts.size(); i++)
 		{
-			script->resetScriptThread(globalState);
+			BaseScript* script = scripts.at(i);
+			if (script)
+			{
+				script->resetScriptThread(globalState);
+			}
 		}
+		splashAllocatorStats();
 	}
-	splashAllocatorStats();
 }
 
 void RBX::ScriptContext::closeState()

@@ -15,9 +15,8 @@ void doConnect(lua_State* L, boost::signal<signalType>* ourSignal)
 	ourSignal->connect(slot);
 }
 
-void SignalDesc<void(Instance*, std::string)>::connectGeneric(lua_State* L)
-{
-	doConnect<void(Instance*, std::string)>(L, ourSignal);
+void SignalDesc<void(Instance*, rttr::property)>::connectGeneric(lua_State* L) {
+	doConnect<void(Instance*, rttr::property)>(L, ourSignal);
 }
 
 void SignalDesc<void(Instance*, Instance*)>::connectGeneric(lua_State* L)

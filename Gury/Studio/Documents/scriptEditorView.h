@@ -57,7 +57,7 @@ public:
 
 	void doUpdate(std::string scriptContent);
 	void doCommand(int id);
-	void onNotify(int notification);
+	void onNotify(int notification, LPARAM lParam);
 	void setAStyle(int style, COLORREF fore, COLORREF back = RGB(0xff, 0xff, 0xff), int size = -1, const char* face = 0);
 
 	// Overrides

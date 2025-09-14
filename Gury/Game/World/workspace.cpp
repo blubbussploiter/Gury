@@ -43,7 +43,7 @@ void RBX::Workspace::wakeUpModels()
 void RBX::Workspace::playAllSounds()
 {
     Instances* sounds = new Instances();
-    getAllInstancesOfClass(sounds, "Sound");
+    getAllInstancesOfClass(getChildren(), sounds, "Sound");
 
     for (size_t i = 0; i < sounds->size(); i++)
     {
@@ -54,7 +54,6 @@ void RBX::Workspace::playAllSounds()
         }
     }
 }
-
 
 void RBX::Workspace::getPVInstances(RBX::Instances* instances, RBX::Instances* pvs)
 {
@@ -69,17 +68,16 @@ void RBX::Workspace::getPVInstances(RBX::Instances* instances, RBX::Instances* p
     }
 }
 
-void RBX::Workspace::getAllInstancesOfClass(RBX::Instances* instances, std::string className)
+void RBX::Workspace::getAllInstancesOfClass(RBX::Instances* instances, RBX::Instances* instancesOut, std::string className)
 {
-    Instances* children = Workspace::get()->children;
-    for (unsigned int i = 0; i < children->size(); i++)
+    for (unsigned int i = 0; i < instances->size(); i++)
     {
-        RBX::Instance* child = children->at(i);
+        RBX::Instance* child = instances->at(i);
 
         if (child->className == className)
             instances->push_back(child);
 
-        getPVInstances(child->getChildren(), instances);
+        getAllInstancesOfClass(child->getChildren(), instancesOut, className);
     }
 }
 
@@ -95,6 +93,13 @@ void RBX::Workspace::workspaceDescendentRemoved(Instance* _this, Instance* desce
     RBX::Render::RenderScene::get()->onWorkspaceDescendentRemoved(descendent);
     RBX::ScriptContext::get()->onWorkspaceDescendentRemoved(descendent);
     RBX::SelectionService::get()->deselect(descendent);
+}
+
+RBX::Instances* RBX::Workspace::getPVInstancesArray()
+{
+    RBX::Instances* instances = new RBX::Instances();
+    getPVInstances(Workspace::get()->children, instances);
+    return instances;
 }
 
 bool RBX::Workspace::setImageServerView()

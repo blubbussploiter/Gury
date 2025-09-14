@@ -44,7 +44,7 @@ namespace RBX
 
 		void doUpdateGridPosition(int backpackIndex);
 
-		static void doOnChanged(Instance* hopperBin, std::string propertyName);
+		static void doOnChanged(Instance* hopperBin, rttr::property propertyName);
 		static void onClickFn(RBX::Gui::GuiButton* b);
 		void handleMouse(G3D::UserInput* ui);
 		

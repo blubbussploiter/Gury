@@ -107,7 +107,7 @@ BOOL GuryGameFrame::OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext
 {
 
 	createApplication(this);
-	SetTimer(1, (UINT)(application->fps), NULL);
+	SetTimer(1, (UINT)(application->fps-5), NULL);
 
 	return 1;
 }

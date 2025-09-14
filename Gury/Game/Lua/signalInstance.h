@@ -18,6 +18,8 @@ namespace RBX
 
 		static int connect(lua_State* L);
 
+		virtual ~SignalInstance() {};
+
 	public:
 
 		std::string name;

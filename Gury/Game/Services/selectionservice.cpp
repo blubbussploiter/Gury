@@ -144,26 +144,32 @@ RBX::Instance* RBX::SelectionService::getPossibleSelectedItem()
 	{
 		RBX::Instance* instance = instances->at(i);
 		RBX::ISelectable* selectable = toInstance<ISelectable>(instance);
-		Render::Geometry geom;
 
 		if (selectable)
 		{
-			geom = selectable->getBoundingBox();
+			Render::Geometry geom = selectable->getBoundingBox();
 
-			if (IsA<PVInstance>(instance)) /* Check if locked */
+			if (instance)
 			{
-				PVInstance* pvInstance = toInstance<PVInstance>(instance);
-				if (pvInstance->getLocked()) {
-					continue;
-				}
-			}
 
-			if (IsA<ModelInstance>(instance)) /* Check if model locked */
-			{
-				ModelInstance* modelInstance = toInstance<ModelInstance>(instance);
-				if (modelInstance->isLocked()) {
-					continue;
+				if (IsA<PVInstance>(instance)) /* Check if locked */
+				{
+					PVInstance* pvInstance = toInstance<PVInstance>(instance);
+					if (pvInstance->getLocked()) {
+						continue;
+					}
 				}
+
+				/* Comment this out if you want just by part selection */
+
+				if (IsA<ModelInstance>(instance)) /* Check if model locked */
+				{
+					ModelInstance* modelInstance = toInstance<ModelInstance>(instance);
+					if (modelInstance->isLocked()) {
+						continue;
+					}
+				}
+
 			}
 
 			if (geom.size == Vector3::zero()) {
@@ -188,51 +194,54 @@ RBX::Instance* RBX::SelectionService::getPossibleSelectedItem()
 
 void RBX::SelectionService::update(UserInput* ui)
 {
-
-	bool ctrlShift = ui->keyDown(SDLK_RSHIFT) || ui->keyDown(SDLK_LSHIFT)
-		|| ui->keyDown(SDLK_RCTRL) || ui->keyDown(SDLK_LCTRL);
-
-	clicked = ui->keyPressed(SDL_LEFT_MOUSE_KEY);
-	down = ui->keyDown(SDL_LEFT_MOUSE_KEY);
-
-	multiSelect = (down && !clicked || ctrlShift);
-
-	if (selectionAllowed) 
+	if (Camera::get())
 	{
-		CoordinateFrame cframe;
 
-		Studio::StudioTool* currentTool;
-		currentTool = Studio::current_Tool;
+		bool ctrlShift = ui->keyDown(SDLK_RSHIFT) || ui->keyDown(SDLK_LSHIFT)
+			|| ui->keyDown(SDLK_RCTRL) || ui->keyDown(SDLK_LCTRL);
 
-		Instance* target = getPossibleSelectedItem();
-		cframe = Camera::get()->getCoordinateFrame();
+		clicked = ui->keyPressed(SDL_LEFT_MOUSE_KEY);
+		down = ui->keyDown(SDL_LEFT_MOUSE_KEY);
 
-		if (down)
+		multiSelect = (down && !clicked || ctrlShift);
+
+		if (selectionAllowed)
 		{
-			Vector3 rel = cframe.pointToObjectSpace(Mouse::get()->getHit());
-			worldSelectEnd = Vector2(rel.x / -rel.z, rel.y / -rel.z);
-			selectionDragBoxEnd = ui->getMouseXY();
-		}
-		if (clicked)
-		{
-			Vector3 rel = cframe.pointToObjectSpace(Mouse::get()->getHit());
-			worldSelectStart = Vector2(rel.x / -rel.z, rel.y / -rel.z);
-			selectionDragBoxStart = ui->getMouseXY();
-		}
+			CoordinateFrame cframe;
 
-		if (!currentTool || (currentTool && !currentTool->isUsing))
-		{
-			//dragSelect();
-		}
+			Studio::StudioTool* currentTool;
+			currentTool = Studio::current_Tool;
 
-		if (clicked)
-		{
-			if (doSelect(target, multiSelect))
+			Instance* target = getPossibleSelectedItem();
+			cframe = Camera::get()->getCoordinateFrame();
+
+			if (down)
 			{
-				return;
+				Vector3 rel = cframe.pointToObjectSpace(Mouse::get()->getHit());
+				worldSelectEnd = Vector2(rel.x / -rel.z, rel.y / -rel.z);
+				selectionDragBoxEnd = ui->getMouseXY();
 			}
-			CMainFrame::mainFrame->m_wndClassView.SelectInstance(0);
-			selection.clear();
+			if (clicked)
+			{
+				Vector3 rel = cframe.pointToObjectSpace(Mouse::get()->getHit());
+				worldSelectStart = Vector2(rel.x / -rel.z, rel.y / -rel.z);
+				selectionDragBoxStart = ui->getMouseXY();
+			}
+
+			if (!currentTool || (currentTool && !currentTool->isUsing))
+			{
+				//dragSelect();
+			}
+
+			if (clicked)
+			{
+				if (doSelect(target, multiSelect))
+				{
+					return;
+				}
+				CMainFrame::mainFrame->m_wndClassView.SelectInstance(0);
+				selection.clear();
+			}
 		}
 	}
 

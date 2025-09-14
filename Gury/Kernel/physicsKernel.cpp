@@ -1,5 +1,6 @@
 
 #include "../Gury/Game/Objects/instance.h"
+#include "../Gury/Game/Objects/model.h"
 #include "../Gury/Game/Rendering/renderScene.h"
 #include "../Game/globalSounds.h"
 
@@ -82,7 +83,6 @@ bool RBX::Gurnel::outOfBoundCheck(Primitive* object)
 		if (instance)
 		{
 			instance->remove();
-			GlobalSounds::pageTurn->play();
 		}
 
 		removePrimitive(object);
@@ -93,7 +93,16 @@ bool RBX::Gurnel::outOfBoundCheck(Primitive* object)
 
 int RBX::Gurnel::getPrimitivesInWorld()
 {
-	return objects.size();
+	int hasGeom = 0;
+	for (unsigned int i = 0; i < objects.size(); i++)
+	{
+		Primitive* primitive = objects[i];
+		if (primitive && primitive->geom[0])
+		{
+			hasGeom++;
+		}
+	}
+	return hasGeom;
 }
 
 int RBX::Gurnel::getBodiesInWorld()
@@ -102,7 +111,7 @@ int RBX::Gurnel::getBodiesInWorld()
 	for (unsigned int i = 0; i < objects.size(); i++)
 	{
 		Primitive* primitive = objects[i];
-		if (primitive && primitive->body)
+		if (primitive && primitive->body && primitive->body->body)
 		{
 			hasAttachedBody++;
 		}

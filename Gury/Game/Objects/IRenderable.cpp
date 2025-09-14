@@ -42,6 +42,28 @@ void RBX::Render::IRenderable::removeVertexIndicesFromProxy(Render::Mesh* mesh, 
     }
 }
 
+void RBX::Render::IRenderable::removeFaceFromProxy(Render::Mesh* mesh, Face face)
+{
+    Render::Mesh::Level* thisProxy = mesh->getLevel();
+
+    for (int f = 0; f < face.indices.size(); f++)
+    {
+        uint32 index = face.indices[f];
+        thisProxy->removeIndex(index);
+    }
+}
+
+void RBX::Render::IRenderable::addFaceToProxy(Render::Mesh* proxy, Face face)
+{
+    Render::Mesh::Level* thisProxy = proxy->getLevel();
+
+    for (int f = 0; f < face.indices.size(); f++)
+    {
+        uint32 index = face.indices[f];
+        thisProxy->addIndex(index);
+    }
+}
+
 void RBX::Render::IRenderable::addToProxy(Render::Mesh* proxy)
 {
     addVertexIndicesToProxy(proxy, vertexIndices);
@@ -77,7 +99,7 @@ void RBX::Render::IRenderable::editMeshPosition(CoordinateFrame newPosition)
 
             color = mesh->colorArray[index];
 
-            Render::Mesh::edit(index, newVertex, normal, uv, color);
+            Render::Mesh::edit(index, newVertex, normal, uv);
         }
     }
 }

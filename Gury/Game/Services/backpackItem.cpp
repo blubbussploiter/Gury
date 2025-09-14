@@ -224,10 +224,12 @@ void RBX::BackpackItem::doUpdateGridPosition(int backpackIndex)
 	origin = Vector2(backpackIndex * 100, 95);
 }
 
-void RBX::BackpackItem::doOnChanged(Instance* hopperBin, std::string propertyName)
+void RBX::BackpackItem::doOnChanged(Instance* hopperBin, rttr::property property)
 {
 	HopperBin* bin = toInstance<HopperBin>(hopperBin);
 	if (bin) {
+
+		std::string propertyName = property.get_name().to_string();
 
 		if (propertyName == "TextureId") {
 

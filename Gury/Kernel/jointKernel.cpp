@@ -21,6 +21,11 @@ void RBX::JointsService::Experiment::buildInstancesJoints(Instances instances)
 			if (pvInstance1 == 0 || pvInstance2 == 0) continue;
 			if (pvInstance1 == pvInstance2) continue;
 
+			if (pvInstance1->anchored && pvInstance2->anchored)
+			{
+				continue;
+			}
+
 			CoordinateFrame pvInstance1CFrame, pvInstance2CFrame;
 			pvInstance1CFrame = pvInstance1->getCFrame();
 			pvInstance2CFrame = pvInstance2->getCFrame();
@@ -55,7 +60,9 @@ void RBX::JointsService::Experiment::buildInstancesJoints(Instances instances)
 
 				if (link != NotLinked)
 				{
-					JointsService::get()->addConnector(fromLinkageAndPrimitives(link, pvInstance1->primitive, pvInstance2->primitive, n0));
+					Connector* connector = fromLinkageAndPrimitives(link, pvInstance1->primitive, pvInstance2->primitive, n0);
+					connector->build();
+					JointsService::get()->addConnector(connector);
 				}
 			}
 

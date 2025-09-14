@@ -18,8 +18,6 @@ namespace RBX
 
 		RBX::Shape shape;
 
-		boost::signal<void(Primitive* primitive)> onPVChanged;
-
 		dGeomID geom[1];
 
 		Body* body;

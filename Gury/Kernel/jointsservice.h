@@ -27,8 +27,14 @@ namespace RBX
 
 	class Connector : public Instance
 	{
+		friend class JointsService;
 		friend class SnapConnector;
 	private:
+
+		Array<Primitive*>* primitives;
+		Array<Body*>* bodys;
+
+		SnapConnector* master;
 
 		CoordinateFrame center; // for debug
 
@@ -40,6 +46,7 @@ namespace RBX
 		NormalId connectedAt;
 
 		virtual void build() {};
+		virtual void link() {};
 		virtual void unlink() {};
 
 		void onRemove() {
@@ -90,6 +97,11 @@ namespace RBX
 			return buildTime;
 		}
 
+		int getNumConnectors()
+		{
+			return getChildren()->size(); /* inaccurate lol */
+		}
+
 		Connector* getConnecting(Primitive* primitive);
 
 		void addConnector(Connector* connector);
@@ -97,6 +109,8 @@ namespace RBX
 		void buildConnectors();
 
 		void buildGlobalJoints();
+
+		void doLink(Connector* connector);
 
 		/* before build() version, looks through children */
 

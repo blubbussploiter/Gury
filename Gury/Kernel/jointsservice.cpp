@@ -147,7 +147,7 @@ void RBX::JointsService::buildConnectors()
 			Connector* connector = toInstance<Connector>(children->at(i));
 			if (connector && !connector->connected())
 			{
-				connector->build();
+				connector->link();
 				connectorsBuilt++;
 			}
 		}
@@ -174,6 +174,11 @@ void RBX::JointsService::buildGlobalJoints()
 	{
 		Experiment::buildGlobalJoints();
 	}
+}
+
+void RBX::JointsService::doLink(Connector* connector)
+{
+	RBX::StandardOut::print(RBX::MESSAGE_INFO, "master connector = 0x%08X", connector->master);
 }
 
 RBX::JointsService* RBX::JointsService::get()
