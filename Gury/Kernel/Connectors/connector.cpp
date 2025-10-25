@@ -62,3 +62,94 @@ bool RBX::Connector::connected()
 	}
 	return 0;
 }
+
+RBX::Connector* RBX::Connector::getConnectingConnector(RBX::Primitive* prim)
+{
+	if (prim->body)
+	{
+
+		void* rawData = prim->getUserdata();
+		if (rawData)
+		{
+			RBX::Instance* instance = static_cast<Instance*>(rawData);
+
+			if (RBX::IsA<Connector>(instance))
+				return (Connector*)instance;
+
+		}
+	}
+	return 0;
+}
+
+RBX::ConnectorNode* RBX::Connector::getParentNode(RBX::Primitive* prim0, RBX::Primitive* prim1)
+{
+	Array<Connector*> connectorArray;
+
+	/* get from array recursively (hopefully) */
+	getConnectingConnectorsByPrim(prim0, connectorArray);
+	getConnectingConnectorsByPrim(prim1, connectorArray);
+
+	for (int i = 0; i < connectorArray.size(); i++)
+	{
+		Connector* connector = connectorArray[i];
+		if (connector)
+		{
+			if (connector->parentNode)
+			{
+				return connector->parentNode;
+			}
+		}
+	}
+
+	return 0;
+}
+
+void RBX::Connector::getConnectingConnectorsByPrim(RBX::Primitive* prim, Array<Connector*>& finalArray)
+{
+	Connector* connectingPrim = getConnectingConnector(prim);
+
+	if (connectingPrim)
+	{
+		getConnectingConnectorsByConnector(connectingPrim, finalArray);
+	}
+}
+
+void RBX::Connector::getConnectingConnectorsByConnector(RBX::Connector* connector, Array<Connector*>& finalArray)
+{
+	Primitive* prim0 = connector->prim0;
+	Primitive* prim1 = connector->prim1;
+
+	if (prim0 && prim1)
+	{
+		Connector* connectingPrim0 = getConnectingConnector(prim0);
+		Connector* connectingPrim1 = getConnectingConnector(prim1);
+
+		if (connectingPrim0)
+		{
+			if (!finalArray.contains(connectingPrim0))
+			{
+				finalArray.push_back(connectingPrim0);
+			}
+		}
+
+		if (connectingPrim1)
+		{
+			if (!finalArray.contains(connectingPrim1))
+			{
+				finalArray.push_back(connectingPrim1);
+			}
+		}
+	}
+}
+
+void RBX::Connector::build()
+{
+
+	if (prim0 && prim1)
+	{
+
+		ConnectorNode* parentNode = getParentNode(prim0, prim1);
+
+	}
+
+}

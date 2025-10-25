@@ -3,9 +3,7 @@
 
 #include "../Gury/Game/Rendering/renderScene.h"
 
-using namespace RBX;
-
-Vector3 RBX::PVInstance::getQuadFaceNormal(RBX::NormalId face, Vector3 v0, Vector3 v1, Vector3 v2, Vector3 v3, Vector3 v4, Vector3 v5)
+Vector3 RBX::PVInstance::getQuadFaceNormal(NormalId face, Vector3 v0, Vector3 v1, Vector3 v2, Vector3 v3, Vector3 v4, Vector3 v5)
 {
     Vector3 v0v1 = v0 - v2;
     Vector3 v0v2 = v1 - v2;
@@ -20,7 +18,7 @@ Vector3 RBX::PVInstance::getQuadFaceNormal(RBX::NormalId face, Vector3 v0, Vecto
     else
     {
         return Vector3(-normal.x, normal.y, normal.z);
-    }
+   }
 }
 
 Array<Vector3> RBX::PVInstance::calculateBrickFaceVertices(NormalId face, Vector3 size)
@@ -98,20 +96,7 @@ Array<Vector3> RBX::PVInstance::calculateBrickFaceVertices(NormalId face, Vector
     return vertices;
 }
 
-void RBX::PVInstance::offsetBrickFaceVertices(Array<Vector3>& vertices, Vector3 offset)
-{
-    if (vertices.size() == 6)
-    {
-        vertices[0] = vertices[0] + offset;
-        vertices[1] = vertices[1] + offset;
-        vertices[2] = vertices[2] + offset;
-        vertices[3] = vertices[3] + offset;
-        vertices[4] = vertices[4] + offset;
-        vertices[5] = vertices[5] + offset;
-    }
-}
-
-Array<Vector3> PVInstance::getBrickFaceVertices(NormalId face, bool asWorldSpace)
+Array<Vector3> RBX::PVInstance::getBrickFaceVertices(NormalId face, bool asWorldSpace)
 {
     Array<Vector3> vertices = calculateBrickFaceVertices(face, size);
 
@@ -153,146 +138,105 @@ Vector2 RBX::PVInstance::getSubdivisionNumbers(NormalId face, Vector3 size)
 void RBX::PVInstance::generateSubdividedFace(Array<Vector3>& out, Array<Vector2>& texCoordsOut, NormalId face)
 {
 
-    //SurfaceType surface = getSurface(face);
-    SurfaceType surface = Smooth;
+    Render::TextureReserve* textureReserve = Render::TextureReserve::get();
+    SurfaceType surface = getSurface(face);
 
-    Vector3 sSize = size * 2;
-    Vector2 subdivisions = getSubdivisionNumbers(face, sSize);
-
-    Vector2 u, v; /* get Base UV */
-
-    Render::TextureReserve::TexturePositionalInformation faceUV = getFaceUv(face);
-
-    u = Vector2(faceUV.x, faceUV.y);
-    v = Vector2(faceUV.cx, faceUV.cy);
+    Vector3 worldSize = size * 2;
 
     Array<Vector3> vertices = getBrickFaceVertices(face, false);
-    CoordinateFrame cframe = getCenter();
+    Vector2 subdivisions = getSubdivisionNumbers(face, worldSize);
+
+    Render::TextureReserve::TexturePositionalInformation faceUV = textureReserve->getSurfaceUV(color, surface, face, subdivisions);
+    
+    /* get Base UV */
+
+    Vector2 u = Vector2(faceUV.x, faceUV.y);
+    Vector2 v = Vector2(faceUV.cx, faceUV.cy);
     
     if (surface != Smooth)
     {
-        if (subdivisions.x <= 2 && subdivisions.y <= 4 || 
-            subdivisions.x <= 4 && subdivisions.y <= 2)
+
+        /* Subdivided medium sized brick */
+
+        if (subdivisions.x < 30 && subdivisions.y < 30) 
         {
-            goto final;
+            int subDivisionWidth = 2;
+            int subDivisionHeight = 4;
+
+            float width = subdivisions.y;
+            float height = subdivisions.x;
+
+            rbxSubdivide(surface, face, subDivisionWidth, subDivisionHeight, width, worldSize.y, height, u, v, getCenter(), out, texCoordsOut);
         }
-
-        if (subdivisions.x > 30 || subdivisions.y > 30)
-        {
-            /* Mega texture */
-
-            faceUV = Render::TextureReserve::get()->getSurfaceUV(color, Smooth, face, getSubdivisionNumbers(face, size * 2));
-
-            u = Vector2(faceUV.x, faceUV.y);
-            v = Vector2(faceUV.cx, faceUV.cy);
-
-            goto final;
-
-            Vector3 v0 = vertices[0];
-            Vector3 v1 = vertices[1];
-            Vector3 v2 = vertices[2];
-            Vector3 v3 = vertices[5]; /* as a quad - skip two */
-
-            int n = ceil(subdivisions.x) / 2;
-
-            rbxSubdivide(surface, face, n, sSize.y, 1, u, v, cframe, out, texCoordsOut);
-
-            return;
-        }
-        else
+        else /* Mega texture */
         {
 
-            Vector3 v0 = vertices[0];
-            Vector3 v1 = vertices[1];
-            Vector3 v2 = vertices[2];
-            Vector3 v3 = vertices[5]; /* as a quad - skip two */
+            float width = subdivisions.y;
+            float height = subdivisions.x;
 
-            int n0 = subdivisions.y;
-            int n1 = subdivisions.x;
+            float subDivisionWidth = width;
+            float subDivisionHeight = 4;
 
-            rbxSubdivide(surface, face, n0, sSize.y, n1, u, v, cframe, out, texCoordsOut);
+            int iWidth = floorf(subDivisionWidth);
+            int iHeight = floorf(subDivisionHeight);
 
-            return;
+            rbxSubdivide(Smooth, face, iWidth, iHeight, width, worldSize.y, height, u, v, getCenter(), out, texCoordsOut);
         }
     }
     else
     {
-final:
-
+        /* Smooth brick */
         out = vertices;
-
-        appendTexCoordsXYWH(texCoordsOut, u, v, subdivisions);
-
-        return;
+        appendTexCoordsXYWH(texCoordsOut, u, v, subdivisions, 4, 2);
     }
 }
 
-Render::TextureReserve::TexturePositionalInformation RBX::PVInstance::getFaceUv(NormalId face)
+void RBX::PVInstance::removeSurfaces(Color4 surfaceColor)
 {
-    /* do getSurface for actual surfaces */
-    return Render::TextureReserve::get()->getSurfaceUV(color, Smooth, face, getSubdivisionNumbers(face, size * 2));
+    removeSurface(surfaceColor, front);
+    removeSurface(surfaceColor, back);
+    removeSurface(surfaceColor, top);
+    removeSurface(surfaceColor, bottom);
+    removeSurface(surfaceColor, left);
+    removeSurface(surfaceColor, right);
 }
 
-void RBX::PVInstance::removeSurfaces()
+void RBX::PVInstance::orderSurfaces(Color4 surfaceColor)
 {
-    BrickColor::getColorMap()->tryRemove(color, getFrontSurface());
-    BrickColor::getColorMap()->tryRemove(color, getBackSurface());
-    BrickColor::getColorMap()->tryRemove(color, getTopSurface());
-    BrickColor::getColorMap()->tryRemove(color, getBottomSurface());
-    BrickColor::getColorMap()->tryRemove(color, getLeftSurface());
-    BrickColor::getColorMap()->tryRemove(color, getRightSurface());
+    orderSurface(surfaceColor, front);
+    orderSurface(surfaceColor, back);
+    orderSurface(surfaceColor, top);
+    orderSurface(surfaceColor, bottom);
+    orderSurface(surfaceColor, left);
+    orderSurface(surfaceColor, right);
 }
 
-void RBX::PVInstance::orderSurfaces()
+void RBX::PVInstance::orderSurface(Color4 surfaceColor, SurfaceType surfaceType)
 {
-    BrickColor::getColorMap()->orderInAtlas(color, getFrontSurface());
-    BrickColor::getColorMap()->orderInAtlas(color, getBackSurface());
-    BrickColor::getColorMap()->orderInAtlas(color, getTopSurface());
-    BrickColor::getColorMap()->orderInAtlas(color, getBottomSurface());
-    BrickColor::getColorMap()->orderInAtlas(color, getLeftSurface());
-    BrickColor::getColorMap()->orderInAtlas(color, getRightSurface());
+    BrickColor::getColorMap()->orderInAtlas(surfaceColor, surfaceType);
 }
 
-void RBX::PVInstance::updateWholeFace(NormalId normalId)
+void RBX::PVInstance::removeSurface(Color4 surfaceColor, SurfaceType surfaceType)
 {
-    if (vertexIndices.containsKey(normalId))
-    {
-        Face storedFace = vertexIndices.get(normalId);
-
-        removeFaceFromProxy(currentProxy, storedFace);
-        vertexIndices.remove(normalId);
-
-        writeBrickFace(normalId);
-
-        addFaceToProxy(currentProxy, vertexIndices.get(normalId));
-    }
+    BrickColor::getColorMap()->tryRemove(surfaceColor, surfaceType);
 }
 
-void RBX::PVInstance::updateWholeFaces()
+void RBX::PVInstance::reorderSurfaces(Color4 oldColor)
 {
-    Array<NormalId> faces = vertexIndices.getKeys();
-    for (int i = 0; i < faces.size(); i++)
-    {
-        NormalId face = faces[i];
-        updateWholeFace(face);
-    }
+    /* Reorder surfaces */
+    removeSurfaces(oldColor);
+    orderSurfaces(color);
 }
 
 void RBX::PVInstance::regenerateRenderable()
 {
     if(shape == Block)
     {
-        updateWholeFaces();
-        edit();
-    }
-    else
-    {
-        removeFromRenderEnvironment();
-        if (specialShape)
+        if (meshIndices.size() > 0)
         {
-            specialShape->removeFromRenderEnvironment();
+            removeFromRenderEnvironment();
         }
-        write();
+        doWrite(true);
         edit();
     }
 }
@@ -305,20 +249,6 @@ void RBX::PVInstance::step()
     }
     else
     {
-        switch (shape)
-        {
-        case Cylinder:
-        case Block:
-        {
-            editBrickFaces();
-            break;
-        }
-        case Ball:
-        {
-            sphereRadius = size.y;
-            editBrickFaces();
-            break;
-        }
-        }
+        editMeshPositition();
     }
 }

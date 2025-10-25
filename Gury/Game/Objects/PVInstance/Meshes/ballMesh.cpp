@@ -19,21 +19,15 @@ void RBX::PVInstance::writeBall()
 
 	Render::TextureReserve::get()->getSurfaceXXYY(color, Smooth, UNDEFINED, Vector2(1, 1), ru, rv);
 
-	if (!vertexIndices.containsKey(UNDEFINED))
+	RBX::StandardOut::print(RBX::MESSAGE_INFO, "vertice Size = %d", vertices.size());
+
+	for (int i = 0; i < vertices.size(); i++)
 	{
-		Face newFace;
+		Vector3 vertex = vertices[i];
+		Vector2 uv = (ru);
 
-		for (int i = 0; i < vertices.size(); i++)
-		{
-			Vector3 vertex = vertices[i];
-			Vector2 uv = (ru);
+		Vector3 n = normalize(vertex);
 
-			Vector3 n = normalize(vertex);
-
-			newFace.indices.push_back(RBX::Render::Mesh::write(vertex, n, uv));
-		}
-
-		vertexIndices.set(UNDEFINED, newFace);
+		meshIndices.push_back(RBX::Render::Mesh::write(vertex, n, uv));
 	}
-
 }

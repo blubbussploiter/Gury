@@ -39,7 +39,7 @@ namespace RBX
 
 			SkyRef sky;
 
-			bool isThinking;
+			bool applicationThinking;
 			bool justReceivedFocus;
 			bool inEditMode;
 
@@ -99,11 +99,11 @@ namespace RBX
 			void updateAppName();
 
 			void suspend() {
-				isThinking = false;
+				applicationThinking = false;
 			}
 
 			void resume() {
-				isThinking = true;
+				applicationThinking = true;
 			}
 
 			bool initialized() { return isInitialized; }

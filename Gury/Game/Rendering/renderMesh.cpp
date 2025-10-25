@@ -22,7 +22,7 @@ uint32 RBX::Render::Mesh::write(Vector3 vertex, Vector3 normal, Vector2 texCoord
 	if (!global->varDirty)
 		global->varDirty = 1;
 
-	uint32 index = global->vertexRefCounts.size();
+	uint32 index = global->vertexRefCount++;
 
 	global->vertexRefCounts.append(index);
 	global->originVertexArray.append(vertex);
@@ -67,19 +67,19 @@ void RBX::Render::Mesh::editVertex(uint32 index, Vector3 vertex)
 	}
 }
 
-void RBX::Render::Mesh::erase(uint32 index)
+void RBX::Render::Mesh::freeVertex(uint32 index)
 {
 	Mesh* global = getGlobalMesh();
 
 	if (!global->varDirty)
 		global->varDirty = 1;
 
-	removerHelper<Color4>(index, global->colorArray);
-	removerHelper<Vector3>(index, global->vertexArray);
-	removerHelper<Vector3>(index, global->originVertexArray);
-	removerHelper<Vector3>(index, global->normalArray);
-	removerHelper<Vector2>(index, global->texCoordArray);
-	removerHelper<uint32>(index, global->vertexRefCounts);
+	//removerHelper<Vector3>(index, global->vertexArray);
+	////removerHelper<Vector3>(index, global->originVertexArray);
+	//removerHelper<Vector3>(index, global->normalArray);
+	//removerHelper<Vector2>(index, global->texCoordArray);
+	//removerHelper<uint32>(index, global->vertexRefCounts);
+	//global->vertexRefCount--;
 
 }
 

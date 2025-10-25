@@ -142,7 +142,8 @@ void RBX::Experimental::Application::onGraphics()
 
 void RBX::Experimental::Application::onInit()
 {
-	Diagnostics::get_Renderer()->diagnostics_enabled = true;
+	/* Change to true if you want to enable diagnostics */
+	Diagnostics::get_Renderer()->diagnostics_enabled = false;
 
 	updateAppName();
 
@@ -205,31 +206,33 @@ void RBX::Experimental::Application::exitEditMode(bool _inEditMode)
 void RBX::Experimental::Application::mainProcessStep()
 {
 
-	if (datamodel != nullptr 
-		&& isThinking)
+	if (datamodel != nullptr && datamodel->loaded)
 	{
-		RealTime desiredFrameDuration = 1.0 / fps;
-		RealTime now = System::time();
+		if (applicationThinking)
+		{
+			RealTime desiredFrameDuration = 1.0 / fps;
+			RealTime now = System::time();
 
-		lastTime = now;
-		RealTime timeStep = now - lastTime;
-		
-		doUserInput();
+			lastTime = now;
+			RealTime timeStep = now - lastTime;
 
-		onLogic();
+			doUserInput();
 
-		onGraphics();
+			onLogic();
 
-		double rate = simTimeRate;
-		RealTime rdt = timeStep;
-		SimTime  sdt = timeStep * rate;
-		SimTime  idt = desiredFrameDuration * rate;
+			onGraphics();
 
-		onSimulation(rdt, sdt, idt);
+			double rate = simTimeRate;
+			RealTime rdt = timeStep;
+			SimTime  sdt = timeStep * rate;
+			SimTime  idt = desiredFrameDuration * rate;
 
-		now = System::time();
+			onSimulation(rdt, sdt, idt);
 
-		lastWaitTime = System::time();
+			now = System::time();
+
+			lastWaitTime = System::time();
+		}
 	}
 
 }
@@ -241,7 +244,7 @@ void RBX::Experimental::Application::start()
 		RBX::StandardOut::print(RBX::MESSAGE_INFO, "Application::start()");
 
 		isInitialized = true;
-		isThinking = true;
+		applicationThinking = true;
 
 		onInit();
 	}

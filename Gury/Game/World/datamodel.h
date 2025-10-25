@@ -12,7 +12,7 @@ namespace RBX
 	class ThumbnailGenerator;
 	class ScriptContext;
 	class Lighting;
-	class Scene;
+	class WorldScene;
 	class SoundService;
 	class SelectionService;
 	class JointsService;
@@ -37,7 +37,7 @@ namespace RBX
 		SoundService* soundService;
 		SelectionService* selectionService;
 		Lighting* lighting;
-		Scene* scene;
+		WorldScene* scene;
 		RBX::Render::Mesh* globalMesh;
 		RBX::Render::RenderScene* renderScene;
 		RBX::Render::TextureReserve* textureReserve;
@@ -51,7 +51,9 @@ namespace RBX
 		RBX::Network::Players* players;
 		Lua::YieldingThreads* yieldingThreads;
 
-		bool uiBrickcount;
+		bool uiShowBrickCount;
+		bool loaded;
+
 	public:
 
 		boost::signal<void()> onOpened;
@@ -64,9 +66,9 @@ namespace RBX
 		void setMessage(std::string msg) { gameMessage->text = msg; }
 		void setHint(std::string msg) { gameHint->text = msg; }
 
-		void setMessageBrickCount() { uiBrickcount = !uiBrickcount; }
+		void setMessageBrickCount() { uiShowBrickCount = !uiShowBrickCount; }
 
-		bool messageBrickCount() { return uiBrickcount; }
+		bool messageBrickCount() { return uiShowBrickCount; }
 
 		void fillExplorerWindow();
 		void emptyExplorerWindow();
@@ -96,6 +98,7 @@ namespace RBX
 			gameHint = new Gui::GuiHint();
 
 			isParentLocked = 1;
+			loaded = false;
 		}
 
 		RTTR_ENABLE(RBX::Instance)

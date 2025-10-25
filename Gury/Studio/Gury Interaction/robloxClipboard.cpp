@@ -11,7 +11,10 @@ void RBX::StudioClipboard::clearContent()
     for (size_t i = 0; i < content->size(); i++)
     {
         Instance* what = content->at(i);
-        what->remove();
+        if (what)
+        {
+            what->remove();
+        }
     }
     content->clear();
 }

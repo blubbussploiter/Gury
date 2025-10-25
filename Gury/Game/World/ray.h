@@ -40,7 +40,7 @@ namespace RBX
 
 			float nearest = inf();
 
-			instances = RBX::Scene::get()->getArrayOfObjects();
+			instances = RBX::WorldScene::get()->getArrayOfObjects();
 
 			for (unsigned int i = 0; i < instances.size(); i++)
 			{
@@ -83,7 +83,7 @@ namespace RBX
 
 			float nearest = inf();
 
-			instances = RBX::Scene::get()->sceneModels;
+			instances = RBX::WorldScene::get()->sceneModels;
 
 			for (unsigned int i = 0; i < instances.size(); i++)
 			{

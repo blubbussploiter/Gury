@@ -14,9 +14,6 @@
 #include "camera.h"
 #include "sounds.h"
 
-POINT oldMouse;
-POINT mouse;
-
 RBX::Sound* RBX::Camera::switch3 = RBX::Sound::fromFile("rbxasset://sounds\\SWITCH3.wav");
 
 RTTR_REGISTRATION
@@ -56,38 +53,42 @@ void RBX::Camera::characterFade()
     RBX::Network::Player* player;
     player = RBX::Network::Players::get()->localPlayer;
 
-    if (!cameraSubject) return;
-    if (!player || player && !player->character) return;
-
-    RBX::ModelInstance* character = player->character;
-    RBX::Humanoid* humanoid = Humanoid::modelIsCharacter(character);
-
-    if (humanoid)
+    if (cameraSubject)
     {
-
-        Vector3 pos = cframe.translation;
-        Vector3 ppos = cameraSubject->getPosition();
-
-        float dist = (ppos - pos).magnitude();
-
-        /* semi deep */
-
-        if (dist <= 5)
+        if (player && player && player->character)
         {
-            humanoid->setLocalTransparency(0.5f);
+            RBX::ModelInstance* character = player->character;
+            RBX::Humanoid* humanoid = Humanoid::modelIsCharacter(character);
 
-            /* deeper */
-
-            if (dist <= 2.5)
+            if (humanoid)
             {
-                humanoid->setLocalTransparency(1.0f);
+
+                Vector3 pos = cframe.translation;
+                Vector3 ppos = cameraSubject->getPosition();
+
+                float dist = (ppos - pos).magnitude();
+
+                /* semi deep */
+
+                if (dist <= 5)
+                {
+                    humanoid->setLocalTransparency(0.5f);
+
+                    /* deeper */
+
+                    if (dist <= 2.5)
+                    {
+                        humanoid->setLocalTransparency(1.0f);
+                    }
+                }
+                else
+                {
+                    humanoid->setLocalTransparency(0.0f);
+                }
             }
         }
-        else
-        {
-            humanoid->setLocalTransparency(0.0f);
-        }
     }
+
 }
 
 

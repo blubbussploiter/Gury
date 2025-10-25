@@ -244,7 +244,7 @@
     <ClCompile Include="Game\Lua\luaAllocator.cpp" />
     <ClCompile Include="Game\Rendering\imageMasher.cpp" />
     <ClCompile Include="Game\Rendering\colorAtlasMap.cpp" />
-    <ClCompile Include="Game\Objects\PVInstance\faceSlicer.cpp" />
+    <ClCompile Include="Game\Objects\PVInstance\faceTiling.cpp" />
     <ClCompile Include="Game\Rendering\worldManager.cpp" />
   </ItemGroup>
   <ItemGroup>

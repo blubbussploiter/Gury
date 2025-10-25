@@ -129,7 +129,7 @@ void RBX::Network::Players::doOnChildRemoved(Instance* _this, Instance* child)
 	Player* player = toInstance<Player>(child);
 	if (player)
 	{
-		player->onRemove();
+		player->PlayerRemoveFromGui();
 		Players::get()->onPlayerRemoving(_this, player);
 	}
 }

@@ -8,6 +8,7 @@ namespace RBX
 	{
 		class WorldManager
 		{
+			friend class TextureReserve;
 		private:
 			bool dirty;
 		public:

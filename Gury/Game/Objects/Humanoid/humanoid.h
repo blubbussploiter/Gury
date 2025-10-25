@@ -78,7 +78,6 @@ namespace RBX
 			hipHeight = 4.20f;
 			canJump = 1;
 			currentlyJumping = 0;
-			renderedLast = 1;
 			walkSpeed = 6;
 			setClassName("Humanoid");
 			setName("Humanoid");

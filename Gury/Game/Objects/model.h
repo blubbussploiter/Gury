@@ -83,7 +83,6 @@ namespace RBX
 			controllerType = ControllerTypes::None;
 			controller = nullptr;
 			primaryPart = nullptr;
-			unaffectedByLight = true;
 			onChildAdded.connect(updatePrimaryPart);
 			setClassName("Model");
 			setName("Model");

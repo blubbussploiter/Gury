@@ -186,7 +186,7 @@
     <ClCompile Include="Game\Objects\PVInstance\pvinstanceAppearance.cpp" />
     <ClCompile Include="Game\Objects\PVInstance\pvinstanceAppearanceEdit.cpp" />
     <ClCompile Include="Game\Objects\PVInstance\pvinstanceAppearanceWrite.cpp" />
-    <ClCompile Include="Game\Objects\PVInstance\faceSlicer.cpp" />
+    <ClCompile Include="Game\Objects\PVInstance\faceTiling.cpp" />
     <ClCompile Include="Game\Objects\specialMesh.cpp" />
     <ClCompile Include="Game\Objects\wedgemesh.cpp" />
     <ClCompile Include="Game\Objects\World\hint.cpp" />

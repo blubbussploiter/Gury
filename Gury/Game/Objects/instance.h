@@ -182,7 +182,6 @@ namespace RBX
 
 		void remove();
 
-		virtual void onRemove() {};
 		virtual void onStep() {};
 
 		bool contains(const RBX::Instance* child);
@@ -216,11 +215,17 @@ namespace RBX
 			desc_onAncestryChanged = new SignalDesc<void(Instance*, Instance*)>(&onAncestorChanged, "AncestryChanged"); 
 		}
 
-		virtual ~Instance() { }
+		~Instance() {}
 
 		RBX_CLONE_DEF(Instance)
 		RTTR_ENABLE()
 	};
+
+	template <class TypeA, class TypeB>
+	static bool typeCompareAny(TypeA* i)
+	{
+		return (toAny<TypeA, TypeB>(i) != 0);
+	}
 
 	template <class Type>
 	static bool IsA(RBX::Instance* i)
@@ -231,12 +236,6 @@ namespace RBX
 	template <class TypeA, class TypeB>
 	static TypeB* toAny(TypeA* i) {
 		return dynamic_cast<TypeB*>(i);
-	}
-
-	template <class TypeA, class TypeB>
-	static bool typeCompareAny(TypeA* i)
-	{
-		return (toAny<TypeA, TypeB>(i) != 0);
 	}
 
 	template <class Type>

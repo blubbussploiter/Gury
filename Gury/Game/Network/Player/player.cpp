@@ -100,7 +100,16 @@ void Player::disposeActiveBin()
 	activeBin = 0;
 }
 
-void RBX::Network::Player::onRemove()
+void Player::setAsController()
+{
+	if (character)
+	{
+		RBX::ControllerService::get()->addController(controller);
+		RBX::Camera::get()->disable(true);
+	}
+}
+
+void RBX::Network::Player::PlayerRemoveFromGui()
 {
 	Players* players = Players::get();
 	Camera* camera = Camera::get();
@@ -121,27 +130,25 @@ void RBX::Network::Player::onRemove()
 		camera->cameraSubject = 0;
 		camera->cameraType = Fixed;
 	}
-}
 
-void Player::setAsController()
-{
-	if (character)
-	{
-		RBX::ControllerService::get()->addController(controller);
-		RBX::Camera::get()->disable(true);
-	}
 }
 
 void RBX::Network::Player::onPlayerMessageAdded(Instance* _this, Instance* playerMsg)
 {
 	if (IsA<Render::IRenderable>(playerMsg)) {
-		Scene::get()->onWorkspaceDescendentAdded(toInstance<Render::IRenderable>(playerMsg));
+		WorldScene::get()->onWorkspaceDescendentAdded(toInstance<Render::IRenderable>(playerMsg));
 	}
 }
 
 void RBX::Network::Player::onPlayerMessageRemoved(Instance* _this, Instance* playerMsg)
 {
 	if (IsA<Render::IRenderable>(playerMsg)) {
-		Scene::get()->onWorkspaceDescendentRemoved(toInstance<Render::IRenderable>(playerMsg));
+		WorldScene::get()->onWorkspaceDescendentRemoved(toInstance<Render::IRenderable>(playerMsg));
 	}
+}
+
+RBX::Network::Player::~Player()
+{
+	PlayerRemoveFromGui();
+	Players::get()->destroyPlayer(this);
 }

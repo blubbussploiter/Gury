@@ -12,7 +12,7 @@ void RBX::Studio::StudioNavigator::bindAction(SDLKey hotKey, std::function<void(
 void RBX::Studio::StudioNavigator::doActions(UserInput* userInput)
 {
 	Experimental::Application* application = RBXManager::get()->getApplication();
-	if (application->isThinking) {
+	if (application->applicationThinking) {
 
 	}
 }

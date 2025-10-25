@@ -46,40 +46,41 @@ namespace RBX
 
 		PV* startPV;
 
-		Vector3 getQuadFaceNormal(RBX::NormalId face, Vector3 v0, Vector3 v1, Vector3 v2, Vector3 v3, Vector3 v4, Vector3 v5);
+		/* Face stuff + texturing */
+
+		Vector3 getQuadFaceNormal(NormalId face, Vector3 v0, Vector3 v1, Vector3 v2, Vector3 v3, Vector3 v4, Vector3 v5);
 
 		/* Brick Face */
 
 		Array<Vector3> getBrickFaceVertices(NormalId face, bool asWorldSpace=true);
 
+		void reorderSurfaces(Color4 oldColor);
+
 		void generateSubdividedFace(Array<Vector3>& out, Array<Vector2>& texCoordsOut, NormalId face);
+		void writeBrickGeometry(NormalId face, Array<Vector3> vertices, Array<Vector2> texCoords);
 
-		void writeBrickFaceGeometry(RBX::NormalId face, Vector3 v0, Vector3 v1, Vector3 v2, Vector3 v3, Vector3 v4, Vector3 v5, Color4 color, int textureUnit = -1); 
-		void writeBrickFaceGeometryNew(RBX::NormalId face, Array<Vector3> vertices, Array<Vector2> texCoords, Color4 color);
-		void editBrickFaceGeometry(RBX::NormalId face, Vector3 v0, Vector3 v1, Vector3 v2, Vector3 v3, Vector3 v4, Vector3 v5, Color4 color, int textureUnit = -1);
+		void writeBrickFace(NormalId face);
+		void editMeshPositition();
 
-		void writeBrickFace(NormalId face,bool repeat = false);
-		void editBrickFaces();
-
-		void rbxSubdivide(SurfaceType surface, NormalId face, int w, float y, int h, Vector2 u, Vector2 v, CoordinateFrame cframe, Array<Vector3>& out, Array<Vector2>& texCoordsOut); 
+		void getSliceInformation(NormalId face, SurfaceType surface, Vector3 realSize, Vector2& sliceSize, Vector2& u, Vector2& v);
 		
-		void appendTexCoordsXYWH(Array<Vector2>& texCoordsOut, Vector2 ru, Vector2 rv, Vector2 size);
-
-		void updateWholeFace(NormalId face);
-		void updateWholeFaces();
+		void appendTexCoordsXYWH(Array<Vector2>& texCoordsOut, Vector2 ru, Vector2 rv, Vector2 size, float width, float height);
+		void appendHelpedTexCoords(Array<Vector2>& texCoordsOut, Vector2 ru, Vector2 rv, Vector2 size, float w, float h, bool drawHorizontal);
 
 		void regenerateRenderable();
+
+		void rbxAppendProductSlice(NormalId face, SurfaceType surface, Vector2 sliceSize, Vector2 u, Vector2 v, float cx, float cy, float xw, float yh, float worldY, float width, float height, Array<Vector3>& out, Array<Vector2>& texCoordsOut);
+		void rbxAppendRemainderSlice(NormalId face, SurfaceType surface, Vector2 sliceSize, float rn0, float rn1, float rn2, float x, float y, float cx, float cy, float xw, float yh, float worldX, float worldY, float sliceW, float sliceH, float width, float height, Array<Vector3>& out, Array<Vector2>& texCoordsOut);
+
+		void rbxSubdivide(SurfaceType surface, NormalId face, int width, int height, float w, float y, float h, Vector2 u, Vector2 v, CoordinateFrame cframe, Array<Vector3>& out, Array<Vector2>& texCoordsOut);
 
 		/* Ball face */
 
 		void writeBall();
 
-		Render::TextureReserve::TexturePositionalInformation getFaceUv(NormalId face);
-
 
 	public:
 
-		static void offsetBrickFaceVertices(Array<Vector3>& vertices, Vector3 offset);
 		static Array<Vector3> calculateBrickFaceVertices(NormalId face, Vector3 size);
 		static Vector2 getSubdivisionNumbers(NormalId face, Vector3 size);
 
@@ -147,8 +148,9 @@ namespace RBX
 
 			if (oldShape != s) /* Remove old shape */
 			{
-				removeFromRenderEnvironment();
-				write();
+				//removeFromRenderEnvironment();
+				//write();
+				Render::WorldManager::get()->makeDirty();
 			}
 
 			primitive->modifyShape(shape);
@@ -252,16 +254,17 @@ namespace RBX
 
 		void setFace(NormalId f, SurfaceType s);
 
-		void onRemove();
-
 		void edit();
 		void write();
+		void doWrite(bool orderNewSurfaces);
 
 		static void onMeshAdded(Instance* _this, Instance* child);
 		static void onMeshRemoved(Instance* _this, Instance* child);
 
-		void removeSurfaces();
-		void orderSurfaces();
+		void removeSurfaces(Color4 surfaceColor);
+		void orderSurfaces(Color4 surfaceColor);
+		void orderSurface(Color4 surfaceColor, SurfaceType surfaceType);
+		void removeSurface(Color4 surfaceColor, SurfaceType surfaceType);
 
 		Vector3 getSizeExternal()
 		{
@@ -344,16 +347,7 @@ namespace RBX
 			setColor4(_color);
 		}
 
-		void setColor4(Color4 c) {
-
-			removeSurfaces(); /* remove old color */
-			color = c;
-
-			orderSurfaces();
-
-			Render::WorldManager::get()->makeDirty();
-			//edit();
-		}
+		void setColor4(Color4 newColor);
 
 		bool getAnchored() { return anchored; }
 		bool getCanCollide() { return canCollide; }
@@ -443,6 +437,8 @@ namespace RBX
 			return localExtents.toWorldSpace(getCFrame());
 		}
 
+		void RemovePhysicalPresence();
+
 		float getElasticity() { return elasticity; }
 		void setElasticity(float el) { elasticity = el; }
 		float getFriction() { return friction; }
@@ -468,7 +464,6 @@ namespace RBX
 		}
 
 		~PVInstance();
-
 		PVInstance();
 
 		RTTR_ENABLE(RBX::Render::IRenderable)

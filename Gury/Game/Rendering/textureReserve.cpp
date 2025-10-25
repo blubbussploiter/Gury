@@ -11,15 +11,12 @@ using namespace RBX;
 
 void RBX::Render::TextureReserve::regenWorld()
 {
-    Instances instances = Scene::get()->sceneObjects;
+    Instances instances = WorldScene::get()->sceneObjects;
 
     for (size_t i = 0; i < instances.size(); i++)
     {
         IRenderable* renderable = toInstance<IRenderable>(instances.at(i));
-        if (renderable)
-        {
-            renderable->regenerateRenderable();
-        }
+        renderable->regenerateRenderable();
     }
 }
 
@@ -45,22 +42,24 @@ RBX::Render::TextureReserve::TexturePositionalInformation RBX::Render::TextureRe
                 float sx = sizeTile.x;
                 float sy = sizeTile.y;
 
-                if (sx == 2 && sy == 4)
-                {
-                }
-                else
+                if (sx != 2 || sy != 4)
                 {
                     position.cx = sy * 32;
                     position.cy = sx * 32;
                 }
 
+                if (sx > 30 || sy > 30) /* Mega texture, reset */
+                {
+                    position.cx = 32;
+                    position.cy = 64;
+                }
             }
 
-            position.x = (position.x / dimensions.x);
-            position.y = (position.y / dimensions.y);
+            position.x = position.x / dimensions.x;
+            position.y = position.y / dimensions.y;
 
-            position.cx = (position.cx) / dimensions.x;
-            position.cy = (position.cy) / dimensions.y;
+            position.cx = position.cx / dimensions.x;
+            position.cy = position.cy / dimensions.y;
 
             return position;
         }
@@ -124,9 +123,11 @@ void Render::TextureReserve::generateSuperTexture()
 
     if (dirty) /* check if textures added / removed */
     {
+        StandardOut::print(RBX::MESSAGE_INFO, "Dirty, regenerating supertexture...");
+
         dimensions = calculateSuperTextureDimensions();
 
-        dirty = 0;
+        dirty = false;
         superTextureData.resize(dimensions.x, dimensions.y, 4);
 
         int currentX = 0,
@@ -184,8 +185,12 @@ void Render::TextureReserve::generateSuperTexture()
 
         guryWorldTexture = Texture::fromGImage("guryWorldTexture", superTextureData, TextureFormat::AUTO, Texture::Dimension::DIM_2D_NPOT, params);
 
-        regenWorld();
+        //superTextureData.save("D:\\gury test stuff\\gurySuperImage.png");
 
+        if (!WorldManager::get()->dirty)
+        {
+            regenWorld();
+        }
     }
 
 }

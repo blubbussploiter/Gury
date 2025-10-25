@@ -18,6 +18,7 @@
 #include "../robloxClipboard.h"
 #include "../supergurymfcView.h"
 #include "../App/GuryChildFrame.h"
+#include "../Documents/scriptEditorDocument.h"
 
 
 #ifdef _DEBUG
@@ -398,11 +399,12 @@ void CMainFrame::OnUpdateFrameTitle(BOOL bAddToTitle)
 		}
 		else
 		{
-			CDocument* document = GetActiveDocument();
-			if (document)
-			{
-				text = document->GetTitle();
-			}
+		}
+
+		CDocument* document = frame->GetActiveDocument();
+		if (document)
+		{
+			text = document->GetTitle();
 		}
 
 		std::string concat = RBX::Format("%s - [%s]", GURY_WNDTEXT, text.c_str());

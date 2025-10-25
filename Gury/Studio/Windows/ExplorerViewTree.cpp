@@ -118,7 +118,11 @@ void CViewTree::TryDoubleClick(HTREEITEM item)
 
         /* then open in ide... */
 
-        CDocument* document = theApp.pScriptDocTemplate->OpenDocumentFile(0);
+        CMultiDocTemplate* docTemplate = theApp.pScriptDocTemplate;
+
+        CDocument* document = docTemplate->OpenDocumentFile(0);
+        document->SetTitle(script->name.c_str());
+
         scriptEditDoc* ideDocument = dynamic_cast<scriptEditDoc*>(document);
 
         if (ideDocument) {
@@ -334,7 +338,7 @@ void CViewTree::OnLButtonDown(UINT nFlags, CPoint point)
                     // Then select the clicked item
                     treeCtrl.SelectItem(hClickedItem);
                     treeCtrl.SetItemState(hClickedItem, TVIS_SELECTED, TVIS_SELECTED);
-                    SelectWorldItem(hClickedItem, 0);
+                    SelectWorldItem(hClickedItem, 0); 
 
                     m_isDraggingItem = true;
                     hDraggedItem = hClickedItem;

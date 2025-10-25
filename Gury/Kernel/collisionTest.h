@@ -8,7 +8,7 @@ namespace RBX
 	static RBX::PVInstance* getColliding(PVInstance* pvi)
 	{
 		Box box = Box(-pvi->getSize() * 1.1f, pvi->getSize() * 1.1f);
-		Instances instances = Scene::get()->getArrayOfObjects();
+		Instances instances = WorldScene::get()->getArrayOfObjects();
 
 		for (RBX::Instance* instance : instances)
 		{
@@ -33,7 +33,7 @@ namespace RBX
 
 	static bool collidingIgnoringAxis(PVInstance* pvi, Box box, Vector3 normAxis)
 	{
-		Instances instances = Scene::get()->getArrayOfObjects();
+		Instances instances = WorldScene::get()->getArrayOfObjects();
 
 		for (RBX::Instance* instance : instances)
 		{
@@ -67,7 +67,7 @@ namespace RBX
 
 	static bool colliding(PVInstance* pvi, Box box)
 	{
-		Instances instances = Scene::get()->getArrayOfObjects();
+		Instances instances = WorldScene::get()->getArrayOfObjects();
 
 		for (RBX::Instance* instance : instances)
 		{

@@ -19,21 +19,10 @@ namespace RBX
 		{
 		public:
 
-			bool unaffectedByLight, renderedLast;
 			float alpha, transparency, reflectance;
+			Array<uint32> meshIndices;
 
 			Render::Mesh* currentProxy;
-
-			struct Face
-			{
-				Array<int> indices;
-				Array<int> originIndices;
-				Vector2 u, v;
-				bool textured;
-			};
-
-			Table<NormalId, Face> vertexIndices;
-
 			IRenderable* specialShape;
 
 			void editMeshPosition(CoordinateFrame newPosition);
@@ -56,12 +45,6 @@ namespace RBX
 
 			/* levels */
 
-			void addVertexIndicesToProxy(Render::Mesh* proxy, Table<NormalId, Face> vIndices);
-			void removeVertexIndicesFromProxy(Render::Mesh* proxy, Table<NormalId, Face> vIndices);
-
-			void removeFaceFromProxy(Render::Mesh* proxy, Face face);
-			void addFaceToProxy(Render::Mesh* proxy, Face face);
-
 			void addToProxy(Render::Mesh* proxy);
 			void removeFromProxy(Render::Mesh* proxy);
 
@@ -73,9 +56,18 @@ namespace RBX
 			virtual void renderFaceFitForDecal(RenderDevice* rd, NormalId face) {};
 			virtual void renderFaceFitForTexture(RenderDevice* rd, NormalId face, Vector2 StudsUV) {};
 
-			virtual ~IRenderable() {}
+			~IRenderable() {
+				meshIndices.clear();
+				delete &meshIndices;
+			}
 			IRenderable() 
 			{
+				meshIndices = Array<uint32>();
+				alpha = 0.0f;
+				transparency = 0.0f;
+				reflectance = 0.0f;
+				currentProxy = 0;
+				specialShape = 0;
 			}
 			RTTR_ENABLE(RBX::Instance);
 		};

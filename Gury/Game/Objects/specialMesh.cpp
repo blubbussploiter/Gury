@@ -29,42 +29,41 @@ RTTR_REGISTRATION
 
 void RBX::Render::SpecialMesh::writeFace(NormalId face, Vector2 xy, Vector2 wh, Vector3 v0, Vector3 v1, Vector3 v2, Vector3 v3, Vector3 v4, Vector3 v5)
 {
+	/* 10/19 outdated
 	Vector3 normal = normalize((v0 - v2).cross(v1 - v3).direction());
 
-	if (!vertexIndices.containsKey(face))
-	{
-		Face newFace;
+	meshIndices.push_back(RBX::Render::Mesh::write(v0, normal, xy));
+	meshIndices.push_back(RBX::Render::Mesh::write(v1, normal, Vector2(xy.x, xy.y + wh.y)));
+	meshIndices.push_back(RBX::Render::Mesh::write(v2, normal, xy + wh));
+	meshIndices.push_back(RBX::Render::Mesh::write(v3, normal, xy));
+	meshIndices.push_back(RBX::Render::Mesh::write(v4, normal, xy + wh));
+	meshIndices.push_back(RBX::Render::Mesh::write(v5, normal, Vector2(xy.x + wh.x, xy.y)));
+	*/
 
-		newFace.indices.push_back(RBX::Render::Mesh::write(v0, normal, xy));
-		newFace.indices.push_back(RBX::Render::Mesh::write(v1, normal, Vector2(xy.x, xy.y + wh.y)));
-		newFace.indices.push_back(RBX::Render::Mesh::write(v2, normal, xy + wh));
-		newFace.indices.push_back(RBX::Render::Mesh::write(v3, normal, xy));
-		newFace.indices.push_back(RBX::Render::Mesh::write(v4, normal, xy + wh));
-		newFace.indices.push_back(RBX::Render::Mesh::write(v5, normal, Vector2(xy.x + wh.x, xy.y)));
-
-		vertexIndices.set(face, newFace);
-	}
 }
 
 void RBX::Render::SpecialMesh::editFace(NormalId face, Vector2 xy, Vector2 wh, Vector3 v0, Vector3 v1, Vector3 v2, Vector3 v3, Vector3 v4, Vector3 v5)
 {
+	/* 10/19 outdated 
 	Vector3 normal = normalize((v0 - v2).cross(v1 - v3).direction());
 
 	if (vertexIndices.containsKey(face))
 	{
 		Face _face = vertexIndices[face];
 
-		RBX::Render::Mesh::edit(_face.indices[0], v0, normal, xy);
+		RBX::Render::Mesh::edit(meshIndices[0], v0, normal, xy);
 		RBX::Render::Mesh::edit(_face.indices[1], v1, normal, Vector2(xy.x, xy.y + wh.y));
 		RBX::Render::Mesh::edit(_face.indices[2], v2, normal, xy + wh);
 		RBX::Render::Mesh::edit(_face.indices[3], v3, normal, xy);
 		RBX::Render::Mesh::edit(_face.indices[4], v4, normal, xy + wh);
 		RBX::Render::Mesh::edit(_face.indices[5], v5, normal, Vector2(xy.x + wh.x, xy.y));
 	}
+	*/
 }
 
 void RBX::Render::SpecialMesh::writeTriangleFace(NormalId face, Vector2 xy, Vector2 wh, Vector3 v0, Vector3 v1, Vector3 v2)
 {
+	/* 10/19 outdated
 	Vector3 normal = normalize((v0 - v1).cross(v1 - v2).direction());
 
 	if (!vertexIndices.containsKey(face))
@@ -77,10 +76,12 @@ void RBX::Render::SpecialMesh::writeTriangleFace(NormalId face, Vector2 xy, Vect
 
 		vertexIndices.set(face, newFace);
 	}
+	*/
 }
 
 void RBX::Render::SpecialMesh::editTriangleFace(NormalId face, Vector2 xy, Vector2 wh, Vector3 v0, Vector3 v1, Vector3 v2)
 {
+	/* 10/19 outdated
 	Vector3 normal = normalize((v0 - v1).cross(v1 - v2).direction());
 
 	if (vertexIndices.containsKey(face))
@@ -91,6 +92,7 @@ void RBX::Render::SpecialMesh::editTriangleFace(NormalId face, Vector2 xy, Vecto
 		RBX::Render::Mesh::edit(_face.indices[1], v1, normal, Vector2(xy.x, xy.y + wh.y));
 		RBX::Render::Mesh::edit(_face.indices[2], v2, normal, xy + wh);
 	}
+	*/
 }
 
 void RBX::Render::SpecialMesh::fromMeshType(MeshType types)

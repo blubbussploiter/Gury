@@ -14,7 +14,7 @@ namespace RBX
 	class Log
 	{
 	public:
-		static void cleanup();
+		static void close();
 		static void writeEntry(const char* message, bool writeToUi=false);
 	};
 }

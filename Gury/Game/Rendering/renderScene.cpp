@@ -19,12 +19,12 @@ static TextureRef texture;
 
 void RBX::Render::RenderScene::onWorkspaceDescendentAdded(RBX::Instance* descendent)
 {
-	RBX::Scene::get()->onWorkspaceDescendentAdded((RBX::Render::IRenderable*)descendent);
+	RBX::WorldScene::get()->onWorkspaceDescendentAdded((RBX::Render::IRenderable*)descendent);
 }
 
 void RBX::Render::RenderScene::onWorkspaceDescendentRemoved(RBX::Instance* descendent)
 {
-	RBX::Scene::get()->onWorkspaceDescendentRemoved((RBX::Render::IRenderable*)descendent);
+	RBX::WorldScene::get()->onWorkspaceDescendentRemoved((RBX::Render::IRenderable*)descendent);
 }
 
 void RBX::Render::RenderScene::presetLighting()
@@ -146,7 +146,7 @@ void RBX::Render::RenderScene::renderScene(RenderDevice* renderDevice)
 
 void RBX::Render::RenderScene::renderNonGeometricInstances(RenderDevice* renderDevice)
 {
-	Instances sceneObjects = Scene::get()->sceneObjects;
+	Instances sceneObjects = WorldScene::get()->sceneObjects;
 	for (unsigned int i = 0; i < sceneObjects.size(); i++)
 	{
 		IRenderable* iRenderable = toInstance<IRenderable>(sceneObjects.at(i));
@@ -156,7 +156,7 @@ void RBX::Render::RenderScene::renderNonGeometricInstances(RenderDevice* renderD
 
 void RBX::Render::RenderScene::render2DInstances(RenderDevice* renderDevice)
 {
-	Instances sceneObjects = Scene::get()->sceneObjects;
+	Instances sceneObjects = WorldScene::get()->sceneObjects;
 	for (unsigned int i = 0; i < sceneObjects.size(); i++)
 	{
 		IRenderable* iRenderable = toInstance<IRenderable>(sceneObjects.at(i));
@@ -166,81 +166,86 @@ void RBX::Render::RenderScene::render2DInstances(RenderDevice* renderDevice)
 
 void RBX::Render::RenderScene::oneFrame(RenderDevice* renderDevice, Camera* projection, SkyRef sky)
 {
+
 	Datamodel* datamodel = RBX::Datamodel::get();
 
-	//presetLighting();
-
-	TextureReserve::get()->generateSuperTexture();
-	WorldManager::get()->step();
-
-	renderDevice->beginFrame();
-
-	renderDevice->clear();
-
-	renderDevice->setColorClearValue(datamodel->lighting->getClearColor());
-
-	renderDevice->setCullFace(RenderDevice::CULL_BACK);
-	renderDevice->setAlphaTest(RenderDevice::ALPHA_GREATER, 0.1);
-
-	renderDevice->setDepthWrite(true);
-	renderDevice->setDepthTest((RenderDevice::DepthTest)(RenderDevice::DEPTH_LESS));
-
-	renderDevice->setStencilConstant(0);
-	renderDevice->setStencilClearValue(0);
-
-	renderDevice->setShadeMode(RenderDevice::ShadeMode::SHADE_SMOOTH);
-
-	renderDevice->setProjectionAndCameraMatrix(*projection->getCamera());
-
-	renderDevice->pushState();
-	
-	if (!sky.isNull())
+	if (datamodel->loaded)
 	{
-		sky->render(params);
+		/* Generate / regenerate world */
+
+		TextureReserve::get()->generateSuperTexture();
+		WorldManager::get()->step();
+
+		renderDevice->beginFrame();
+
+		renderDevice->clear();
+
+		renderDevice->setColorClearValue(datamodel->lighting->getClearColor());
+
+		renderDevice->setCullFace(RenderDevice::CULL_BACK);
+		renderDevice->setAlphaTest(RenderDevice::ALPHA_GREATER, 0.1);
+
+		renderDevice->setDepthWrite(true);
+		renderDevice->setDepthTest((RenderDevice::DepthTest)(RenderDevice::DEPTH_LESS));
+
+		renderDevice->setStencilConstant(0);
+		renderDevice->setStencilClearValue(0);
+
+		renderDevice->setShadeMode(RenderDevice::ShadeMode::SHADE_SMOOTH);
+
+		renderDevice->setProjectionAndCameraMatrix(*projection->getCamera());
+
+		renderDevice->pushState();
+
+		if (!sky.isNull())
+		{
+			sky->render(params);
+		}
+
+		renderScene(renderDevice);
+
+		SelectionService::get()->renderSelection(renderDevice);
+
+		if (RBX::Studio::current_Tool)
+		{
+			RBX::Studio::current_Tool->doGraphics(renderDevice);
+		}
+
+		RBX::Diagnostics::get_Renderer()->render(renderDevice);
+
+		renderDevice->popState();
+
+		/* render other things */
+
+		renderNonGeometricInstances(renderDevice);
+
+		if (!effectSettings->toneMap.isNull())
+		{
+			effectSettings->toneMap->endFrame(renderDevice);
+		}
+
+		if (!sky.isNull())
+		{
+			sky->renderLensFlare(params);
+		}
+
+		renderDevice->push2D();
+
+		render2DInstances(renderDevice);
+
+		datamodel->render(renderDevice);
+		datamodel->guiRoot->render(renderDevice);
+
+		SelectionService::get()->renderDragBox(renderDevice);
+		Diagnostics::get_Renderer()->render2D(renderDevice);
+
+		Mouse::get()->render(renderDevice);
+
+		renderDevice->pop2D();
+
+		renderDevice->endFrame();
+
 	}
-
-	renderScene(renderDevice);
-
-	SelectionService::get()->renderSelection(renderDevice);
-
-	if (RBX::Studio::current_Tool)
-	{
-		RBX::Studio::current_Tool->doGraphics(renderDevice);
-	}
-
-	RBX::Diagnostics::get_Renderer()->render(renderDevice);
-
-	renderDevice->popState();
-
-	/* render other things */
-
-	renderNonGeometricInstances(renderDevice);
-
-	if (!effectSettings->toneMap.isNull())
-	{
-		effectSettings->toneMap->endFrame(renderDevice);
-	}
-
-	if (!sky.isNull())
-	{
-		sky->renderLensFlare(params);
-	}
-
-	renderDevice->push2D();
-
-	render2DInstances(renderDevice);
-
-	datamodel->render(renderDevice);
-	datamodel->guiRoot->render(renderDevice);
-
-	SelectionService::get()->renderDragBox(renderDevice);
-	Diagnostics::get_Renderer()->render2D(renderDevice);
-
-	Mouse::get()->render(renderDevice);
-
-	renderDevice->pop2D();
-
-	renderDevice->endFrame();
 
 }
 

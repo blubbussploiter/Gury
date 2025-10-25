@@ -55,11 +55,23 @@ void RBX::Gurnel::afterStep()
 	}
 }
 
+void RBX::Gurnel::markForReset(bool shouldReset)
+{
+	for (int i = 0; i < objects.size(); i++)
+	{
+		Primitive* prim = objects[i];
+		if (prim->body)
+		{
+			prim->body->wantsReset = shouldReset;
+		}
+	}
+}
+
 void RBX::Gurnel::spawnWorld()
 {
 	/* not going by very inconsistent primitives anymore, going by pvinstances in scene */
 
-	RBX::Instances instances = Scene::get()->getArrayOfObjects();
+	RBX::Instances instances = WorldScene::get()->getArrayOfObjects();
 	for (unsigned int i = 0; i < instances.size(); i++)
 	{
 		PVInstance* pv = toInstance<PVInstance>(instances.at(i));
@@ -174,7 +186,7 @@ void RBX::Gurnel::collisionCallback(void* data, dGeomID o1, dGeomID o2)
 	}
 }
 
-void RBX::Gurnel::cleanup()
+void RBX::Gurnel::close()
 {
 	RBX::StandardOut::print(RBX::MESSAGE_INFO, "Gurnel::cleanup() closing Gurnel");
 	dCloseODE();

@@ -24,7 +24,7 @@ namespace RBX
 		dSpaceID space;
 		dJointGroupID contacts;
 
-		void cleanup();
+		void close();
 
 		void diag_renderObjects(RenderDevice* rd);
 
@@ -37,6 +37,7 @@ namespace RBX
 		void step(float stepInS=0.02f, int iterations=64);
 
 		void afterStep();
+		void markForReset(bool shouldReset);
 
 		void spawnWorld();
 

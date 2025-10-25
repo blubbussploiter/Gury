@@ -3,112 +3,54 @@
 
 #include "../Gury/Game/Rendering/renderScene.h"
 
-void RBX::Render::IRenderable::addVertexIndicesToProxy(Render::Mesh* mesh, Table<NormalId, Face> vIndices)
-{
-    auto& keys = vIndices.getKeys();
-
-    for (int i = 0; i < keys.size(); i++)
-    {
-        NormalId key = keys[i];
-        Face face = vIndices[key];
-
-        bool textured = face.textured;
-
-        Render::Mesh::Level* thisProxy = mesh->getLevel();
-
-        for (int f = 0; f < face.indices.size(); f++)
-        {
-            uint32 index = face.indices[f];
-            thisProxy->addIndex(index);
-        }
-    }
-}
-
-void RBX::Render::IRenderable::removeVertexIndicesFromProxy(Render::Mesh* mesh, Table<NormalId, Face> vIndices)
-{
-    auto& keys = vIndices.getKeys();
-    for (int i = 0; i < keys.size(); i++)
-    {
-        NormalId key = keys[i];
-        auto& face = vIndices[key];
-
-        Render::Mesh::Level* thisProxy = mesh->getLevel();
-
-        for (int f = 0; f < face.indices.size(); f++)
-        {
-            uint32 index = face.indices[f];
-            thisProxy->removeIndex(index);
-        }
-    }
-}
-
-void RBX::Render::IRenderable::removeFaceFromProxy(Render::Mesh* mesh, Face face)
+void RBX::Render::IRenderable::addToProxy(Render::Mesh* mesh)
 {
     Render::Mesh::Level* thisProxy = mesh->getLevel();
 
-    for (int f = 0; f < face.indices.size(); f++)
+    for (int f = 0; f < meshIndices.size(); f++)
     {
-        uint32 index = face.indices[f];
-        thisProxy->removeIndex(index);
-    }
-}
-
-void RBX::Render::IRenderable::addFaceToProxy(Render::Mesh* proxy, Face face)
-{
-    Render::Mesh::Level* thisProxy = proxy->getLevel();
-
-    for (int f = 0; f < face.indices.size(); f++)
-    {
-        uint32 index = face.indices[f];
+        uint32 index = meshIndices[f];
         thisProxy->addIndex(index);
     }
 }
 
-void RBX::Render::IRenderable::addToProxy(Render::Mesh* proxy)
+void RBX::Render::IRenderable::removeFromProxy(Render::Mesh* mesh)
 {
-    addVertexIndicesToProxy(proxy, vertexIndices);
-}
+    Render::Mesh::Level* thisProxy = mesh->getLevel();
 
-void RBX::Render::IRenderable::removeFromProxy(Render::Mesh* proxy)
-{
-    removeVertexIndicesFromProxy(proxy, vertexIndices);
+    for (int f = 0; f < meshIndices.size(); f++)
+    {
+        uint32 index = meshIndices[f];
+        thisProxy->removeIndex(index);
+    }
 }
 
 void RBX::Render::IRenderable::editMeshPosition(CoordinateFrame newPosition)
 {
-    auto& keys = vertexIndices.getKeys();
     Render::Mesh* mesh = Render::Mesh::getGlobalMesh();
 
-    for (int i = 0; i < keys.size(); i++)
+    for (int f = 0; f < meshIndices.size(); f++)
     {
-        NormalId key = keys[i];
-        auto& face = vertexIndices[key];
+        uint32 index = meshIndices[f];
+        Color4 color;
+        Vector3 oldVertex, newVertex, normal;
+        Vector2 uv;
 
-        for (int f = 0; f < face.indices.size(); f++)
-        {
-            uint32 index = face.indices[f];
-            Color4 color;
-            Vector3 oldVertex, newVertex, normal;
-            Vector2 uv;
+        oldVertex = mesh->vertexArray[index];
+        newVertex = newPosition.pointToWorldSpace(oldVertex);
 
-            oldVertex = mesh->vertexArray[index];
-            newVertex = newPosition.pointToWorldSpace(oldVertex);
+        normal = mesh->normalArray[index];
+        uv = mesh->texCoordArray[index];
 
-            normal = mesh->normalArray[index];
-            uv = mesh->texCoordArray[index];
+        color = mesh->colorArray[index];
 
-            color = mesh->colorArray[index];
-
-            Render::Mesh::edit(index, newVertex, normal, uv);
-        }
+        Render::Mesh::edit(index, newVertex, normal, uv);
     }
 }
 
 void RBX::Render::IRenderable::removeFromRenderEnvironment()
 {
     Render::Mesh* mesh = Render::Mesh::getGlobalMesh();
-    Array<NormalId> keys = vertexIndices.getKeys();
-
     Render::RenderScene* scene = RBX::Render::RenderScene::get();
 
     if (currentProxy)
@@ -116,34 +58,13 @@ void RBX::Render::IRenderable::removeFromRenderEnvironment()
         removeFromProxy(currentProxy);
     }
 
-    if (vertexIndices.containsKey(Front))
+    for (int i = 0; i < meshIndices.size(); i++)
     {
-        vertexIndices.remove(Front);
+        uint32 index = meshIndices[i];
+        mesh->freeVertex(index);
     }
-    if (vertexIndices.containsKey(Back))
-    {
-        vertexIndices.remove(Back);
-    }
-    if (vertexIndices.containsKey(Right))
-    {
-        vertexIndices.remove(Right);
-    }
-    if (vertexIndices.containsKey(Left))
-    {
-        vertexIndices.remove(Left);
-    }
-    if (vertexIndices.containsKey(Top))
-    {
-        vertexIndices.remove(Top);
-    }
-    if (vertexIndices.containsKey(Bottom))
-    {
-        vertexIndices.remove(Bottom);
-    }
-    if (vertexIndices.containsKey(UNDEFINED))
-    {
-        vertexIndices.remove(UNDEFINED);
-    }
+
+    meshIndices.clear();
 
     if (specialShape) {
         specialShape->removeFromRenderEnvironment();
@@ -164,7 +85,7 @@ void RBX::Render::IRenderable::editGlobalProxyLocation()
 
     Render::Mesh* proxy;
 
-    if (vertexIndices.size() == 0)
+    if (meshIndices.size() == 0)
     {
         return;
     }
@@ -203,6 +124,6 @@ void  RBX::Render::IRenderable::editGlobalTexturedProxyLocation()
     Render::RenderSurface* textured = scene->texturedProxy;
     Render::Mesh* level = textured->fullMesh;
 
-    removeVertexIndicesFromProxy(level, vertexIndices);
-    addVertexIndicesToProxy(level, vertexIndices);
+    removeFromProxy(level);
+    addToProxy(level);
 }

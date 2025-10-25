@@ -14,6 +14,7 @@ scriptEditDoc::scriptEditDoc() noexcept
 
 scriptEditDoc::~scriptEditDoc()
 { 
+
 }
 
 void scriptEditDoc::update()
@@ -35,8 +36,6 @@ void scriptEditDoc::update()
 				view->doUpdate(source.source);
 			}
 		}
-
-		SetTitle(attachedScript->name.c_str());
 	}
 }
 

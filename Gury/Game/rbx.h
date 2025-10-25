@@ -47,7 +47,7 @@ namespace RBX
 	static std::string Format(std::string fmt, ...)
 	{
 		va_list argPtr;
-		std::string _fmt;
+		std::string _fmt = std::string();
 
 		va_start(argPtr, fmt);
 		_fmt = G3D::vformat(fmt.c_str(), argPtr);

@@ -22,6 +22,8 @@ namespace RBX
 			bool varDirty;
 
 			Array<uint32> vertexRefCounts;
+			Array<uint32> freeList;
+			int vertexRefCount;
 
 			Array<Vector3> originVertexArray; /* Origin of vertices */
 			Array<Vector3> vertexArray;
@@ -70,7 +72,7 @@ namespace RBX
 			static uint32 write(Vector3 vertex, Vector3 normal, Vector2 texCoord);
 			static void edit(uint32 index, Vector3 vertex, Vector3 normal, Vector2 texCoord);
 			static void editVertex(uint32 index, Vector3 vertex);
-			static void erase(uint32 index);
+			static void freeVertex(uint32 index);
 
 			static void applyTextureUnits(RenderDevice* renderDevice);
 

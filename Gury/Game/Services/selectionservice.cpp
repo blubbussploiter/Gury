@@ -49,7 +49,7 @@ void RBX::SelectionService::dragSelect()
 	Vector2 a2(max(worldSelectStart.x, worldSelectEnd.x), max(worldSelectStart.y, worldSelectEnd.y));
 
 	Instances instances;
-	instances = RBX::Scene::get()->getArrayOfObjects();
+	instances = RBX::WorldScene::get()->getArrayOfObjects();
 
 	for (unsigned int i = 0; i < instances.size(); i++)
 	{
@@ -159,9 +159,7 @@ RBX::Instance* RBX::SelectionService::getPossibleSelectedItem()
 						continue;
 					}
 				}
-
-				/* Comment this out if you want just by part selection */
-
+				
 				if (IsA<ModelInstance>(instance)) /* Check if model locked */
 				{
 					ModelInstance* modelInstance = toInstance<ModelInstance>(instance);

@@ -25,6 +25,8 @@ namespace RBX
 		NoBuild /* dont build joints AT ALL */
 	};
 
+	class ConnectorNode;
+
 	class Connector : public Instance
 	{
 		friend class JointsService;
@@ -34,7 +36,7 @@ namespace RBX
 		Array<Primitive*>* primitives;
 		Array<Body*>* bodys;
 
-		SnapConnector* master;
+		ConnectorNode* parentNode;
 
 		CoordinateFrame center; // for debug
 
@@ -45,13 +47,9 @@ namespace RBX
 		Primitive* prim0, * prim1;
 		NormalId connectedAt;
 
-		virtual void build() {};
+		virtual void build();
 		virtual void link() {};
 		virtual void unlink() {};
-
-		void onRemove() {
-			unlink();
-		}
 
 		bool diagPrimitivesAreTouching();
 
@@ -59,11 +57,38 @@ namespace RBX
 		void diagRenderPrimitiveOutlines(RenderDevice* rd);
 
 		CoordinateFrame getInterceptPosition(); // for debug 
+		static Connector* getConnectingConnector(RBX::Primitive* prim);
+		static ConnectorNode* getParentNode(RBX::Primitive* prim0, RBX::Primitive* prim1);
+		static void getConnectingConnectorsByPrim(RBX::Primitive* prim, Array<Connector*>& finalArray);
+		static void getConnectingConnectorsByConnector(RBX::Connector* connector, Array<Connector*>& finalArray);
 
 		bool connected();
 
 		Connector(Primitive* prim0, Primitive* prim1, NormalId connectedAt) : prim0(prim0), prim1(prim1), connectedAt(connectedAt)
 		{
+		}
+
+		~Connector()
+		{
+			unlink();
+		}
+	};
+
+	class ConnectorNode
+	{
+	private:
+		Array<Connector*> connectors;
+	public:
+		void addConnector(Connector* connector)
+		{
+			connectors.append(connector);
+		}
+		void removeConnector(Connector* connector)
+		{
+			if (connectors.contains(connector))
+			{
+				connectors.fastRemove(connectors.findIndex(connector));
+			}
 		}
 	};
 
@@ -73,6 +98,7 @@ namespace RBX
 	{
 	public:
 		Array<Body*> old_Bodies; /* bodies from old primitives before connector built */
+		Array<ConnectorNode*> connectorNodes; /* `nodes` of connectors for building them later on */
 	public:
 
 		dJointGroupID joints;

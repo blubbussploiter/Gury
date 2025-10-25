@@ -159,7 +159,7 @@ void RBX::JointsService::buildConnectors()
 			Body* body = old_Bodies[i];
 			if (body && body->body)
 			{
-				body->destroyBody();
+				//body->destroyBody();
 			}
 		}
 
@@ -178,7 +178,7 @@ void RBX::JointsService::buildGlobalJoints()
 
 void RBX::JointsService::doLink(Connector* connector)
 {
-	RBX::StandardOut::print(RBX::MESSAGE_INFO, "master connector = 0x%08X", connector->master);
+
 }
 
 RBX::JointsService* RBX::JointsService::get()

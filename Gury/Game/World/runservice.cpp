@@ -30,7 +30,7 @@ void RBX::RunService::run()
         RBX::Network::Player* localPlayer;
         localPlayer = RBX::Network::Players::get()->localPlayer;
 
-        Scene::get()->saveStartPVs();
+        WorldScene::get()->saveStartPVs();
         Gurnel::get()->spawnWorld();
 
         RBX::StandardOut::print(RBX::MESSAGE_INFO, "RunService::run() diagnostic splash: %d primitives and %d bodies in world", Gurnel::get()->getPrimitivesInWorld(), Gurnel::get()->getBodiesInWorld());
@@ -86,8 +86,9 @@ void RBX::RunService::reset()
     }
     else
     {
-        stop();
         shouldReset = 1;
+        update();
+        stop();
     }
 }
 
@@ -96,8 +97,8 @@ void RBX::RunService::update()
 
     if (isRunning)
     {
-        RBX::Scene::get()->updateSteppables();
-        RBX::Scene::get()->updateSteppablesKernelly();
+        RBX::WorldScene::get()->updateSteppables();
+        RBX::WorldScene::get()->updateSteppablesKernelly();
 
         for (int i = 0; i < 4; i++)
         {
@@ -113,6 +114,10 @@ void RBX::RunService::update()
     if (shouldReset)
     {
         resetPvs();
+
+        Gurnel::get()->markForReset(true);
+        Gurnel::get()->afterStep();
+
         onReset();
         shouldReset = 0;
     }
@@ -135,7 +140,7 @@ void RBX::RunService::updateSteppers()
 
 void RBX::RunService::resetPvs()
 {
-    Instances scene = Scene::get()->getArrayOfObjects();
+    Instances scene = WorldScene::get()->getArrayOfObjects();
     for (unsigned int i = 0; i < scene.size(); i++)
     {
         PVInstance* pv = toInstance<PVInstance>(scene.at(i));

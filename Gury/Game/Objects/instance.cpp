@@ -161,12 +161,15 @@ void RBX::Instance::remove()
 
 		for (RBX::Instance* i : *children)
 		{
-			i->remove();
+			if (i)
+			{
+				i->remove();
+			}
 		}
 
-		onRemove();
 		setParent(0);
 
+		delete []this;
 	}
 }
 

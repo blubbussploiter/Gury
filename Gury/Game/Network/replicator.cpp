@@ -51,10 +51,10 @@ PluginReceiveResult RBX::Network::Replicator::OnReceive(Packet* p)
 
             /* brick countage.. */
 
-            if (Scene::isRenderable(instance))
+            if (WorldScene::isRenderable(instance))
             {
                 Datamodel* root = Datamodel::get();
-                if (root && root->uiBrickcount)
+                if (root && root->uiShowBrickCount)
                 {
                     root->setMessage(Format("Bricks: %d", receivedBrickCount));
                     receivedBrickCount++;
@@ -96,7 +96,7 @@ void RBX::Network::Replicator::SendSceneInfo()
     int inScene;
     BitStream stream;
 
-    RBX::Scene* scene = RBX::Scene::get();
+    RBX::WorldScene* scene = RBX::WorldScene::get();
     inScene = scene->sceneObjects.size();
 
     stream << (unsigned char)ID_BRICK_COUNT;

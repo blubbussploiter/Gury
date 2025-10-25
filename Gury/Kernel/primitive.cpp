@@ -221,15 +221,27 @@ void RBX::Primitive::step()
 
 		CoordinateFrame position = getPosition();
 
-		if (!body->atRest())
+		if (!body->atRest() || body->wantsReset)
 		{
-			if (position != pv->position)
+			PVInstance* pi = (PVInstance*)ud;
+
+			if (pi)
 			{
-				PVInstance* pi = (PVInstance*)ud;
-				pv->position = getPosition();
-				if (pi)
+				if (pv)
 				{
-					pi->step();
+					if (body->wantsReset)
+					{
+						pi->step();
+						body->wantsReset = false;
+					}
+					else
+					{
+						if (position != pv->position)
+						{
+							pv->position = getPosition();
+							pi->step();
+						}
+					}
 				}
 			}
 		}

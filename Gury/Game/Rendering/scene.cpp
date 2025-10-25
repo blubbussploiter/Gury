@@ -5,16 +5,18 @@
 #include "../Gury/Game/Services/stdout.h"
 #include "../Gury/Game/Objects/mesh.h"
 
+#include "../Gury/Game/Rendering/worldManager.h"
+
 #include "../Gury/Application/appmanager.h"
 
 #include "scene.h"
 
-RBX::Scene* RBX::Scene::get()
+RBX::WorldScene* RBX::WorldScene::get()
 {
 	return RBX::Datamodel::get()->scene;
 }
 
-void RBX::Scene::close()
+void RBX::WorldScene::close()
 {
 	for (Instance* object : sceneObjects)
 	{
@@ -23,12 +25,12 @@ void RBX::Scene::close()
 	sceneObjects.clear();
 }
 
-RBX::Instances RBX::Scene::getArrayOfObjects()
+RBX::Instances RBX::WorldScene::getArrayOfObjects()
 {
 	return sceneObjects;
 }
 
-void RBX::Scene::updateSteppables()
+void RBX::WorldScene::updateSteppables()
 {
 	for (unsigned int i = 0; i < sceneObjects.size(); i++)
 	{
@@ -40,7 +42,7 @@ void RBX::Scene::updateSteppables()
 	}
 }
 
-void RBX::Scene::updateSteppablesKernelly()
+void RBX::WorldScene::updateSteppablesKernelly()
 {
 	for (unsigned int i = 0; i < sceneObjects.size(); i++)
 	{
@@ -52,7 +54,7 @@ void RBX::Scene::updateSteppablesKernelly()
 	}
 }
 
-void RBX::Scene::initializeKernel()
+void RBX::WorldScene::initializeKernel()
 {
 	for (unsigned int i = 0; i < sceneObjects.size(); i++)
 	{
@@ -64,7 +66,7 @@ void RBX::Scene::initializeKernel()
 	}
 }
 
-void RBX::Scene::saveStartPVs() /* before run: save each position of everything in the scene */
+void RBX::WorldScene::saveStartPVs() /* before run: save each position of everything in the scene */
 {
 	for (unsigned int i = 0; i < sceneObjects.size(); i++)
 	{
@@ -76,7 +78,7 @@ void RBX::Scene::saveStartPVs() /* before run: save each position of everything 
 	}
 }
 
-void RBX::Scene::onWorkspaceDescendentAdded(Render::IRenderable* instance)
+void RBX::WorldScene::onWorkspaceDescendentAdded(Render::IRenderable* instance)
 {
 	if (IsA<Render::IRenderable>(instance) || IsA<RBX::ISteppable>(instance))
 	{
@@ -94,7 +96,8 @@ void RBX::Scene::onWorkspaceDescendentAdded(Render::IRenderable* instance)
 		}
 		else
 		{
-			instance->write();
+			//instance->write();
+			Render::WorldManager::get()->makeDirty();
 		}
 
 		if (pvInstance)
@@ -111,7 +114,7 @@ void RBX::Scene::onWorkspaceDescendentAdded(Render::IRenderable* instance)
 	}
 }
 
-void RBX::Scene::onWorkspaceDescendentRemoved(RBX::Render::IRenderable* instance)
+void RBX::WorldScene::onWorkspaceDescendentRemoved(RBX::Render::IRenderable* instance)
 {
 	if (std::find(sceneObjects.begin(), sceneObjects.end(), instance) != sceneObjects.end())
 	{
@@ -123,10 +126,11 @@ void RBX::Scene::onWorkspaceDescendentRemoved(RBX::Render::IRenderable* instance
 		PVInstance* pv = toInstance<PVInstance>(instance);
 		if (pv)
 		{
-			//pv->removeSurfaces(); /* Clear out surfaces */
+			/* Clear out surfaces + physical presence */
+			pv->RemovePhysicalPresence();
+			pv->removeSurfaces(pv->color);
 		}
 
-		instance->onRemove();
 		instance->removeFromRenderEnvironment();
 	}
 }

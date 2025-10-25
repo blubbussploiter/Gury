@@ -46,10 +46,12 @@ RBX::Datamodel* RBX::Datamodel::get()
 
 void RBX::Datamodel::loadContent(std::string contentId)
 {
+    loaded = false;
     RBX::StandardOut::print(MESSAGE_INFO, "DataModel loading %s", contentId.c_str());
     RBX::Serializer::load(contentId);
 
     JointsService::get()->buildGlobalJoints();
+    loaded = true;
 
     RBX::StandardOut::print(MESSAGE_INFO, "DataModel::loadContent diagnostic splash: %d scripts, %d bricks, %d joints, %d primitives, %d bodies, %d textures", scriptContext->getNumScripts(), workspace->getNumBricks(), jointService->getNumConnectors(), Gurnel::get()->getPrimitivesInWorld(), Gurnel::get()->getBodiesInWorld(), Render::TextureReserve::get()->getNumTextures());
 }
@@ -64,9 +66,9 @@ void RBX::Datamodel::close()
 {
     RBX::StandardOut::print(MESSAGE_INFO, "DataModel::close()");
     RBX::ScriptContext::get()->closeState();
-    RBX::Scene::get()->close();
-    Gurnel::get()->cleanup();
-    RBX::Log::cleanup();
+    RBX::WorldScene::get()->close();
+    RBX::Log::close();
+    Gurnel::get()->close();
     emptyExplorerWindow();
 }
 
@@ -113,6 +115,7 @@ void RBX::Datamodel::render(RenderDevice* renderDevice)
         gameHint->render(renderDevice);
     }
 
+    /* Single message system didn't work out to well.. just render from workspace */
     //if (!gameMessage->text.empty()) {
     //    gameMessage->render(renderDevice);
     //}
@@ -128,7 +131,7 @@ void RBX::Datamodel::open()
     runService = new RunService();
     renderScene = new Render::RenderScene();
     lighting = new Lighting();
-    scene = new Scene();
+    scene = new WorldScene();
     controllerService = new ControllerService();
     thumbnailGenerator = new ThumbnailGenerator();
     scriptContext = new ScriptContext();
@@ -139,6 +142,8 @@ void RBX::Datamodel::open()
     yieldingThreads = new Lua::YieldingThreads(scriptContext);
     physicsKernel = new Gurnel();
     globalMesh = new Render::Mesh();
+
+    loaded = true;
 
     onOpened();
 

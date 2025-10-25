@@ -1,3 +1,4 @@
+
 #include <thread>
 
 #include "../Gury/Game/World/camera.h"
@@ -40,7 +41,7 @@ BOOL CALLBACK documentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 			default: break;
 		}
 
-		if (app->wndProc)
+		if (app->wndProc)/* so its crashing here.. not good */
 		{/* put gury in the view instead of the frame, so much bullshit happening cos of it in the frame window */
 			return CallWindowProcA(app->wndProc, hwnd, uMsg, wParam, lParam);
 		}
@@ -117,7 +118,7 @@ RBX::Experimental::Application::Application(HWND wnd)
 	sky = Sky::create(renderDevice, _settings.dataDir + "sky/");
 
 	fps = 30.0f;
-	isThinking = false;
+	applicationThinking = false;
 
 }
 

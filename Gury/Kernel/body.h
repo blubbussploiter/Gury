@@ -49,7 +49,7 @@ namespace RBX
 		boost::signal<void(Body*)> onStepped;
 
 		void* ud;
-		bool disabled; /* anchored */
+		bool disabled, wantsReset; /* anchored */
 
 	public:
 

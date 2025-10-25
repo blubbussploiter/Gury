@@ -5,7 +5,7 @@
 
 void RBX::JointsService::Experiment::getKernelWorldContacts()
 {
-    Instances instances = Scene::get()->getArrayOfObjects();
+    Instances instances = WorldScene::get()->getArrayOfObjects();
 	buildInstancesJoints(instances);
 }
 

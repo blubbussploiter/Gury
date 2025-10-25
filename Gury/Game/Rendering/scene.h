@@ -8,7 +8,7 @@
 namespace RBX
 {
 
-	class Scene : public RBX::Instance
+	class WorldScene : public RBX::Instance
 	{
 	public:
 
@@ -26,12 +26,13 @@ namespace RBX
 
 		static bool isRenderable(RBX::Instance* instance) { return dynamic_cast<RBX::Render::IRenderable*>(instance) != 0; }
 
-		static Scene* get();
+		static WorldScene* get();
 		void close();
 
-		Scene()
+		WorldScene()
 		{
-
+			sceneObjects = Instances();
+			sceneModels = Instances();
 		}
 
 		Instances getArrayOfObjects();

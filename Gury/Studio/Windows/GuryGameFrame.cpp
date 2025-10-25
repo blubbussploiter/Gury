@@ -256,7 +256,7 @@ void GuryGameFrame::OnClose()
 			closeEventCalled = true;
 
 			manager->closeCurrentApplication();
-			this->application->isThinking = false;
+			this->application->applicationThinking = false;
 			this->application = nullptr;
 		}
 

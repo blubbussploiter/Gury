@@ -139,9 +139,9 @@ namespace RBX
 			void loadCharacter();
 			void disposeActiveBin();
 
-			void onRemove();
-
 			void setAsController();
+
+			void PlayerRemoveFromGui();
 
 			static void onPlayerMessageAdded(Instance* _this, Instance* playerMsg);
 			static void onPlayerMessageRemoved(Instance* _this, Instance* playerMsg);
@@ -169,10 +169,7 @@ namespace RBX
 
 				userId = 0;
 			}
-			~Player()
-			{
-				Players::get()->destroyPlayer(this);
-			}
+			~Player();
 			RTTR_ENABLE(RBX::Instance)
 		};
 

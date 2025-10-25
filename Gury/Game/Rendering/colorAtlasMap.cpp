@@ -33,7 +33,7 @@ void RBX::BrickColor::BrickAtlasMap::orderInAtlas(Color4 brickColor, SurfaceType
 
 			GImage::pasteSubImage(surfaceCanvas, surfaceTexture, 5, 5, 0, 0, surfaceTexture.width, surfaceTexture.height);
 
-			ImageMasher::mash(surfaceCanvas, orderedTexture, orderedTexture, 0.75f);
+			ImageMasher::mash(surfaceCanvas, orderedTexture, orderedTexture, 0.65f);
 		}
 
 		int position = Render::TextureReserve::get()->bindTexture(orderedTexture);

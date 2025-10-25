@@ -31,7 +31,7 @@ std::string dayOfWeek(WORD d)
 	return "";
 }
 
-void RBX::Log::cleanup()
+void RBX::Log::close()
 {
 	if (log_outStream)
 	{

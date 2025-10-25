@@ -173,26 +173,20 @@ void RBX::Render::SpecialMesh::writeHead()
 	if (part)
 	{
 		CoordinateFrame position = part->getCoordinateFrame();
-		
-		if (!vertexIndices.containsKey(UNDEFINED))
+
+		HeadMesh::getFaceVertices(getParentSize(), UNDEFINED, vertices, normals, uvs);
+
+		for (int i = 0; i < vertices.size(); i++)
 		{
-			Face newFace;
+			Vector3 vertex = vertices[i];
+			Vector3 normal = normals[i];
+			Vector3 uv = uvs[i];
 
-			HeadMesh::getFaceVertices(getParentSize(), UNDEFINED, vertices, normals, uvs);
+			Vector3 newVertex = position.pointToWorldSpace(vertex);
 
-			for (int i = 0; i < vertices.size(); i++)
-			{
-				Vector3 vertex = vertices[i];
-				Vector3 normal = normals[i];
-				Vector3 uv = uvs[i];
-
-				Vector3 newVertex = position.pointToWorldSpace(vertex);
-
-				newFace.indices.push_back(RBX::Render::Mesh::write(newVertex, normal, Vector2(uv.x, uv.y)));
-			}
-
-			vertexIndices.set(UNDEFINED, newFace);
+			meshIndices.push_back(RBX::Render::Mesh::write(newVertex, normal, Vector2(uv.x, uv.y)));
 		}
+
 	}
 }
 
@@ -205,28 +199,21 @@ void RBX::Render::SpecialMesh::editHead()
 		Vector3 size = part->getSize();
 		CoordinateFrame position = part->getCoordinateFrame();
 
-		if (vertexIndices.containsKey(UNDEFINED))
+		if (meshIndices.size() == vertices.size())
 		{
-			Face storedFace = vertexIndices.get(UNDEFINED);
-
-			if (storedFace.indices.size() == vertices.size())
+			for (int i = 0; i < meshIndices.size(); i++)
 			{
-				for (int i = 0; i < storedFace.indices.size(); i++)
-				{
-					uint32 index = storedFace.indices[i];
+				uint32 index = meshIndices[i];
 
-					Vector3 vertex = vertices[i];
-					Vector3 normal = normals[i];
-					Vector3 uv = uvs[i];
+				Vector3 vertex = vertices[i];
+				Vector3 normal = normals[i]; 
+				Vector3 uv = uvs[i];
 
-					Vector3 newVertex = position.pointToWorldSpace(vertex);
+				Vector3 newVertex = position.pointToWorldSpace(vertex);
 
-					RBX::Render::Mesh::edit(index, newVertex, normal, Vector2(uv.x, uv.y));
-
-				}
+				RBX::Render::Mesh::edit(index, newVertex, normal, Vector2(uv.x, uv.y));
 
 			}
-
 		}
 	}
 }

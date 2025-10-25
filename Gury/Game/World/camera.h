@@ -29,8 +29,12 @@ namespace RBX
 	{
 		RTTR_ENABLE(RBX::Controller)
 	private:
+
 		CoordinateFrame startFrame;
 		Vector3 startFocus;
+
+		POINT oldMouse;
+		POINT mouse;
 	public:
 
 		bool panning;
@@ -135,6 +139,8 @@ namespace RBX
 		{
 			cameraType = CameraType::Fixed;
 			cameraSubject = 0;
+			ZeroMemory(&oldMouse, sizeof(POINT));
+			ZeroMemory(&mouse, sizeof(POINT));
 			setSpeed(2.5f);
 			setClassName("Camera");
 			setName("Camera");

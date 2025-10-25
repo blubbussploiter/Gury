@@ -6,8 +6,6 @@
 
 void RBX::Render::SpecialMesh::writeSpecialMesh()
 {
-	Face face;
-
 	CoordinateFrame newPosition;
 	color = BrickColor::BrickMap::get()->fromName("Medium stone grey");
 
@@ -25,20 +23,17 @@ void RBX::Render::SpecialMesh::writeSpecialMesh()
 		worldVertex = newPosition.pointToWorldSpace(vertex);
 		Vector3 normal = normalize(worldVertex - newPosition.translation);
 
-		face.indices.push_back(RBX::Render::Mesh::write(vertex, normal, Vector2(uv.x, uv.y)));
+		meshIndices.push_back(RBX::Render::Mesh::write(vertex, normal, Vector2(uv.x, uv.y)));
 	}
 
-	vertexIndices.set(UNDEFINED, face);
 }
 
 void RBX::Render::SpecialMesh::editSpecialMesh()
 {
 	RBX::Render::Mesh* mesh = RBX::Render::Mesh::getGlobalMesh();
 
-	if (vertexIndices.containsKey(UNDEFINED))
+	if (meshIndices.size() > 0)
 	{
-		Face face = vertexIndices[UNDEFINED];
-
 		CoordinateFrame newPosition;
 		if (IsA<PartInstance>(parent))
 		{
@@ -47,7 +42,7 @@ void RBX::Render::SpecialMesh::editSpecialMesh()
 
 			for (int i = 0; i < num_faces; i++)
 			{
-				int index = face.indices[i];
+				int index = meshIndices[i];
 				Vector3 vertex = vertices[i], worldVertex;
 				Vector3 uv = uvs[i];
 

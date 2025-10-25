@@ -155,7 +155,7 @@ void dDebug (int num, const char *msg, ...)
     s[sizeof(s)-1] = 0;
     MessageBox(0, RBX::Format("Physics error %s", s).c_str(), "Gurnel Crash", 0);
   }
-  abort();
+  exit(num);
 }
 
 

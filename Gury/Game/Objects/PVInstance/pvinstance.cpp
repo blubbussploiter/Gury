@@ -17,7 +17,7 @@
 
 RTTR_REGISTRATION
 {
-    rttr::registration::class_ <RBX::PVInstance>("PVInstance")
+    rttr::registration::class_ <RBX::PVInstance>("PVInstance") 
          .constructor<>()
          .property("Anchored", &RBX::PVInstance::getAnchored, &RBX::PVInstance::setAnchored)(rttr::metadata("Type", RBX::Behavior))
          .property("CanCollide", &RBX::PVInstance::getCanCollide, &RBX::PVInstance::setCanCollide)(rttr::metadata("Type", RBX::Behavior))
@@ -49,39 +49,45 @@ RTTR_REGISTRATION
 
 void RBX::PVInstance::write()
 {
+    doWrite(true);
+}
+
+void RBX::PVInstance::doWrite(bool orderNewSurfaces)
+{
     if (specialShape)
     {
         specialShape->write();
     }
     else
     {
-        orderSurfaces();
-
+        if (orderNewSurfaces)
+        {
+            orderSurfaces(color);
+        }
         switch (shape)
         {
-        case Cylinder:
-        case Block:
-        {
-            /* in order 0 - 5*/
+            case Cylinder:
+            case Block:
+            {
+                /* in order 0 - 5*/
 
-            writeBrickFace(Right, -1);
-            writeBrickFace(Top, -1);
-            writeBrickFace(Back, -1);
-            writeBrickFace(Left, -1);
-            writeBrickFace(Bottom, -1);
-            writeBrickFace(Front, -1);
+                writeBrickFace(Right);
+                writeBrickFace(Top);
+                writeBrickFace(Back);
+                writeBrickFace(Left);
+                writeBrickFace(Bottom);
+                writeBrickFace(Front);
 
-            break;
+                break;
+            }
+            case Ball:
+            {
+                RBX::StandardOut::print(RBX::MESSAGE_INFO, "Ball ");
+                sphereRadius = size.y;
+                writeBall();
+                break;
+            }
         }
-        case Ball:
-        { 
-            sphereRadius = size.y;
-            writeBall();
-            break;
-        }
-        }
-
-        editGlobalProxyLocation();
     }
 }
 
@@ -93,21 +99,7 @@ void RBX::PVInstance::edit()
     }
     else
     {
-        switch (shape)
-        {
-        case Cylinder:
-        case Block:
-        {
-            editBrickFaces();
-            break;
-        }
-        case Ball:
-        {
-            sphereRadius = size.y;
-            editBrickFaces();
-            break;
-        }
-        }
+        editMeshPositition();
         editGlobalProxyLocation();
     }
 }
@@ -190,15 +182,18 @@ void RBX::PVInstance::setFace(NormalId f, SurfaceType s)
         }
     }
 
-    if (s != oldSurfaceType)
+    if (oldSurfaceType != s)
     {
-        BrickColor::getColorMap()->tryRemove(color, oldSurfaceType);
-        BrickColor::getColorMap()->orderInAtlas(color, s);
         Render::WorldManager::get()->makeDirty();
     }
-
-    edit();
 }
+
+void RBX::PVInstance::setColor4(Color4 newColor)
+{
+    color = newColor;
+    Render::WorldManager::get()->makeDirty();
+}
+
 
 float RBX::getAffectedFormFactor(RBX::PVInstance* pv)
 {
@@ -273,12 +268,7 @@ void RBX::PVInstance::initializeForKernel()
     setCanCollide(getCanCollide());
 }
 
-RBX::PVInstance::~PVInstance()
-{
-
-}
-
-void RBX::PVInstance::onRemove()
+void RBX::PVInstance::RemovePhysicalPresence()
 {
     if (primitive)
     {
@@ -294,10 +284,12 @@ void RBX::PVInstance::onRemove()
             connecting->remove();
         }
     }
-
-    removeSurfaces();
 }
 
+RBX::PVInstance::~PVInstance()
+{
+    removeSurfaces(color);
+}
 
 RBX::PVInstance::PVInstance()
 {
@@ -316,6 +308,8 @@ RBX::PVInstance::PVInstance()
 
     alpha = 1;
     shape = Block;
+
+    surfaceAlpha = 0;
 
     primitive = new Primitive(new Body());
 

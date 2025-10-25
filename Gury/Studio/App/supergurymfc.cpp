@@ -88,13 +88,9 @@ BOOL CsupergurymfcApp::InitInstance()
 {
 	RBX::CrashReporter::get()->start();
 
-	// InitCommonControlsEx() is required on Windows XP if an application
-	// manifest specifies use of ComCtl32.dll version 6 or later to enable
-	// visual styles.  Otherwise, any window creation will fail.
 	INITCOMMONCONTROLSEX InitCtrls;
 	InitCtrls.dwSize = sizeof(InitCtrls);
-	// Set this to include all the common control classes you want to use
-	// in your application.
+
 	InitCtrls.dwICC = ICC_COOL_CLASSES;
 	InitCommonControlsEx(&InitCtrls);
 
@@ -103,21 +99,8 @@ BOOL CsupergurymfcApp::InitInstance()
 	RBX::RBXManager* manager = RBX::RBXManager::get();
 
 	EnableTaskbarInteraction();
-
-	// AfxInitRichEdit2() is required to use RichEdit control
-	// AfxInitRichEdit2();
-
-	// Standard initialization
-	// If you are not using these features and wish to reduce the size
-	// of your final executable, you should remove from the following
-	// the specific initialization routines you do not need
-	// Change the registry key under which our settings are stored
-	// TODO: You should modify this string to be something appropriate
-	// such as the name of your company or organization
 	SetRegistryKey(_T("Local AppWizard-Generated Applications"));
-	LoadStdProfileSettings(4);  // Load standard INI file options (including MRU)
-
-	//InitContextMenuManager();
+	LoadStdProfileSettings(4);
 
 	InitKeyboardManager();
 
@@ -127,9 +110,6 @@ BOOL CsupergurymfcApp::InitInstance()
 	theApp.GetTooltipManager()->SetTooltipParams(AFX_TOOLTIP_TYPE_ALL,
 		RUNTIME_CLASS(CMFCToolTipCtrl), &ttParams);
 
-	// Register the application's document templates.  Document templates
-	//  serve as the connection between documents, frame windows and views
-	
 	pGameDocTemplate = new CMultiDocTemplate(
 		IDR_MAINFRAME,
 		RUNTIME_CLASS(GuryDoc),
@@ -170,7 +150,7 @@ BOOL CsupergurymfcApp::InitInstance()
 
 	if (!pMainFrame || !pMainFrame->LoadFrame(IDR_MAINFRAME))
 	{
-		MessageBox(0, "failed to load :(", 0, 0);
+		MessageBox(0, "Failed to load main gury frame! :(", 0, 0);
 		delete pMainFrame;
 		return FALSE;
 	}
@@ -181,7 +161,7 @@ BOOL CsupergurymfcApp::InitInstance()
 	CCommandLineInfo cmdInfo;
 	ParseCommandLine(cmdInfo);
 
-	if (!cmdInfo.m_nShellCommand)   // actually none
+	if (!cmdInfo.m_nShellCommand)  // actually none
 		cmdInfo.m_nShellCommand = CCommandLineInfo::FileNothing;
 
 	if (!cmdInfo.m_strFileName.IsEmpty())
@@ -193,9 +173,14 @@ BOOL CsupergurymfcApp::InitInstance()
 	// app was launched with /RegServer, /Register, /Unregserver or /Unregister.
 	if (!ProcessShellCommand(cmdInfo))
 		return FALSE;
+
+	startPage->OpenDocumentFile(0);
+
 	// The main window has been initialized, so show and update it
+
 	pMainFrame->ShowWindow(m_nCmdShow);
 	pMainFrame->UpdateWindow();
+
 
 	return TRUE;
 }
