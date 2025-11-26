@@ -1,0 +1,624 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\include\lua\lapi.c" />
+    <ClCompile Include="..\include\lua\lauxlib.c" />
+    <ClCompile Include="..\include\lua\lbaselib.c" />
+    <ClCompile Include="..\include\lua\lcode.c" />
+    <ClCompile Include="..\include\lua\ldblib.c" />
+    <ClCompile Include="..\include\lua\ldebug.c" />
+    <ClCompile Include="..\include\lua\ldo.c" />
+    <ClCompile Include="..\include\lua\ldump.c" />
+    <ClCompile Include="..\include\lua\lfunc.c" />
+    <ClCompile Include="..\include\lua\lgc.c" />
+    <ClCompile Include="..\include\lua\linit.c" />
+    <ClCompile Include="..\include\lua\liolib.c" />
+    <ClCompile Include="..\include\lua\llex.c" />
+    <ClCompile Include="..\include\lua\lmathlib.c" />
+    <ClCompile Include="..\include\lua\lmem.c" />
+    <ClCompile Include="..\include\lua\loadlib.c" />
+    <ClCompile Include="..\include\lua\lobject.c" />
+    <ClCompile Include="..\include\lua\lopcodes.c" />
+    <ClCompile Include="..\include\lua\loslib.c" />
+    <ClCompile Include="..\include\lua\lparser.c" />
+    <ClCompile Include="..\include\lua\lstate.c" />
+    <ClCompile Include="..\include\lua\lstring.c" />
+    <ClCompile Include="..\include\lua\lstrlib.c" />
+    <ClCompile Include="..\include\lua\ltable.c" />
+    <ClCompile Include="..\include\lua\ltablib.c" />
+    <ClCompile Include="..\include\lua\ltm.c" />
+    <ClCompile Include="..\include\lua\lundump.c" />
+    <ClCompile Include="..\include\lua\lvm.c" />
+    <ClCompile Include="..\include\lua\lzio.c" />
+    <ClCompile Include="..\include\ode\OPCODE\Ice\IceAABB.cpp" />
+    <ClCompile Include="..\include\ode\OPCODE\Ice\IceContainer.cpp" />
+    <ClCompile Include="..\include\ode\OPCODE\Ice\IceHPoint.cpp" />
+    <ClCompile Include="..\include\ode\OPCODE\Ice\IceIndexedTriangle.cpp" />
+    <ClCompile Include="..\include\ode\OPCODE\Ice\IceMatrix3x3.cpp" />
+    <ClCompile Include="..\include\ode\OPCODE\Ice\IceMatrix4x4.cpp" />
+    <ClCompile Include="..\include\ode\OPCODE\Ice\IceOBB.cpp" />
+    <ClCompile Include="..\include\ode\OPCODE\Ice\IcePlane.cpp" />
+    <ClCompile Include="..\include\ode\OPCODE\Ice\IcePoint.cpp" />
+    <ClCompile Include="..\include\ode\OPCODE\Ice\IceRandom.cpp" />
+    <ClCompile Include="..\include\ode\OPCODE\Ice\IceRay.cpp" />
+    <ClCompile Include="..\include\ode\OPCODE\Ice\IceRevisitedRadix.cpp" />
+    <ClCompile Include="..\include\ode\OPCODE\Ice\IceSegment.cpp" />
+    <ClCompile Include="..\include\ode\OPCODE\Ice\IceTriangle.cpp" />
+    <ClCompile Include="..\include\ode\OPCODE\Ice\IceUtils.cpp" />
+    <ClCompile Include="..\include\ode\OPCODE\Opcode.cpp" />
+    <ClCompile Include="..\include\ode\OPCODE\OPC_AABBCollider.cpp" />
+    <ClCompile Include="..\include\ode\OPCODE\OPC_AABBTree.cpp" />
+    <ClCompile Include="..\include\ode\OPCODE\OPC_BaseModel.cpp" />
+    <ClCompile Include="..\include\ode\OPCODE\OPC_BoxPruning.cpp" />
+    <ClCompile Include="..\include\ode\OPCODE\OPC_Collider.cpp" />
+    <ClCompile Include="..\include\ode\OPCODE\OPC_Common.cpp" />
+    <ClCompile Include="..\include\ode\OPCODE\OPC_HybridModel.cpp" />
+    <ClCompile Include="..\include\ode\OPCODE\OPC_LSSCollider.cpp" />
+    <ClCompile Include="..\include\ode\OPCODE\OPC_MeshInterface.cpp" />
+    <ClCompile Include="..\include\ode\OPCODE\OPC_Model.cpp" />
+    <ClCompile Include="..\include\ode\OPCODE\OPC_OBBCollider.cpp" />
+    <ClCompile Include="..\include\ode\OPCODE\OPC_OptimizedTree.cpp" />
+    <ClCompile Include="..\include\ode\OPCODE\OPC_Picking.cpp" />
+    <ClCompile Include="..\include\ode\OPCODE\OPC_PlanesCollider.cpp" />
+    <ClCompile Include="..\include\ode\OPCODE\OPC_RayCollider.cpp" />
+    <ClCompile Include="..\include\ode\OPCODE\OPC_SphereCollider.cpp" />
+    <ClCompile Include="..\include\ode\OPCODE\OPC_SweepAndPrune.cpp" />
+    <ClCompile Include="..\include\ode\OPCODE\OPC_TreeBuilders.cpp" />
+    <ClCompile Include="..\include\ode\OPCODE\OPC_TreeCollider.cpp" />
+    <ClCompile Include="..\include\ode\OPCODE\OPC_VolumeCollider.cpp" />
+    <ClCompile Include="..\include\ode\OPCODE\StdAfx.cpp" />
+    <ClCompile Include="..\include\ode\src\array.cpp" />
+    <ClCompile Include="..\include\ode\src\box.cpp" />
+    <ClCompile Include="..\include\ode\src\capsule.cpp" />
+    <ClCompile Include="..\include\ode\src\collision_cylinder_box.cpp" />
+    <ClCompile Include="..\include\ode\src\collision_cylinder_plane.cpp" />
+    <ClCompile Include="..\include\ode\src\collision_cylinder_sphere.cpp" />
+    <ClCompile Include="..\include\ode\src\collision_kernel.cpp" />
+    <ClCompile Include="..\include\ode\src\collision_quadtreespace.cpp" />
+    <ClCompile Include="..\include\ode\src\collision_space.cpp" />
+    <ClCompile Include="..\include\ode\src\collision_transform.cpp" />
+    <ClCompile Include="..\include\ode\src\collision_util.cpp" />
+    <ClCompile Include="..\include\ode\src\convex.cpp" />
+    <ClCompile Include="..\include\ode\src\cylinder.cpp" />
+    <ClCompile Include="..\include\ode\src\error.cpp" />
+    <ClCompile Include="..\include\ode\src\export-dif.cpp" />
+    <ClCompile Include="..\include\ode\src\fastdot.c" />
+    <ClCompile Include="..\include\ode\src\fastldlt.c" />
+    <ClCompile Include="..\include\ode\src\fastlsolve.c" />
+    <ClCompile Include="..\include\ode\src\fastltsolve.c" />
+    <ClCompile Include="..\include\ode\src\joint.cpp" />
+    <ClCompile Include="..\include\ode\src\lcp.cpp" />
+    <ClCompile Include="..\include\ode\src\mass.cpp" />
+    <ClCompile Include="..\include\ode\src\mat.cpp" />
+    <ClCompile Include="..\include\ode\src\matrix.cpp" />
+    <ClCompile Include="..\include\ode\src\memory.cpp" />
+    <ClCompile Include="..\include\ode\src\misc.cpp" />
+    <ClCompile Include="..\include\ode\src\obstack.cpp" />
+    <ClCompile Include="..\include\ode\src\ode.cpp" />
+    <ClCompile Include="..\include\ode\src\odemath.cpp" />
+    <ClCompile Include="..\include\ode\src\plane.cpp" />
+    <ClCompile Include="..\include\ode\src\quickstep.cpp" />
+    <ClCompile Include="..\include\ode\src\ray.cpp" />
+    <ClCompile Include="..\include\ode\src\rotation.cpp" />
+    <ClCompile Include="..\include\ode\src\sphere.cpp" />
+    <ClCompile Include="..\include\ode\src\step.cpp" />
+    <ClCompile Include="..\include\ode\src\stepfast.cpp" />
+    <ClCompile Include="..\include\ode\src\testing.cpp" />
+    <ClCompile Include="..\include\ode\src\timer.cpp" />
+    <ClCompile Include="..\include\ode\src\util.cpp" />
+    <ClCompile Include="Application\application.cpp" />
+    <ClCompile Include="Application\rbxmanager.cpp" />
+    <ClCompile Include="Application\guryApplication.cpp" />
+    <ClCompile Include="Application\gurycursor.cpp" />
+    <ClCompile Include="Application\iobfix.cpp" />
+    <ClCompile Include="Application\md5.cpp" />
+    <ClCompile Include="Application\inputPolling.cpp" />
+    <ClCompile Include="Game\classes.cpp" />
+    <ClCompile Include="Game\Controllers\playerController.cpp" />
+    <ClCompile Include="Game\Controllers\rightkeyboard.cpp" />
+    <ClCompile Include="Game\globalSounds.cpp" />
+    <ClCompile Include="Game\Gui\CameraControlMenu.cpp" />
+    <ClCompile Include="Game\Gui\GuiBox.cpp" />
+    <ClCompile Include="Game\Gui\GuiButton.cpp" />
+    <ClCompile Include="Game\Gui\GuiHint.cpp" />
+    <ClCompile Include="Game\Gui\GuiImage.cpp" />
+    <ClCompile Include="Game\Gui\GuiImageButton.cpp" />
+    <ClCompile Include="Game\Gui\GuiLabel.cpp" />
+    <ClCompile Include="Game\Gui\GuiList.cpp" />
+    <ClCompile Include="Game\Gui\GuiMessage.cpp" />
+    <ClCompile Include="Game\Gui\GuiRoot.cpp" />
+    <ClCompile Include="Game\Gui\TopMenuBar.cpp" />
+    <ClCompile Include="Game\log.cpp" />
+    <ClCompile Include="Game\Lua\cframemt.cpp" />
+    <ClCompile Include="Game\Lua\instanceBridge.cpp" />
+    <ClCompile Include="Game\Lua\luaAllocator.cpp" />
+    <ClCompile Include="Game\Lua\luargs.cpp" />
+    <ClCompile Include="Game\Lua\signalBridge.cpp" />
+    <ClCompile Include="Game\Lua\signaldescriptor.cpp" />
+    <ClCompile Include="Game\Lua\signalInstance.cpp" />
+    <ClCompile Include="Game\Lua\variantBridge.cpp" />
+    <ClCompile Include="Game\Lua\vector3mt.cpp" />
+    <ClCompile Include="Game\Network\guid.cpp" />
+    <ClCompile Include="Game\Network\idserializer.cpp" />
+    <ClCompile Include="Game\Network\networkclient.cpp" />
+    <ClCompile Include="Game\Network\oscontext.cpp" />
+    <ClCompile Include="Game\Network\Player\Mouse.cpp" />
+    <ClCompile Include="Game\Network\Player\player.cpp" />
+    <ClCompile Include="Game\Network\Player\players.cpp" />
+    <ClCompile Include="Game\Network\replicator.cpp" />
+    <ClCompile Include="Game\Network\thumbnailGenerator.cpp" />
+    <ClCompile Include="Game\Objects\basescript.cpp" />
+    <ClCompile Include="Game\Objects\Bins\clonebin.cpp" />
+    <ClCompile Include="Game\Objects\Bins\gametool.cpp" />
+    <ClCompile Include="Game\Objects\Bins\hopperbin.cpp" />
+    <ClCompile Include="Game\Objects\Bins\rocket.cpp" />
+    <ClCompile Include="Game\Objects\controller.cpp" />
+    <ClCompile Include="Game\Objects\decal.cpp" />
+    <ClCompile Include="Game\Objects\fileMesh.cpp" />
+    <ClCompile Include="Game\Objects\headmesh.cpp" />
+    <ClCompile Include="Game\Objects\Humanoid\humanoid.cpp" />
+    <ClCompile Include="Game\Objects\Humanoid\humanoidPhysicsStuff.cpp" />
+    <ClCompile Include="Game\Objects\instance.cpp" />
+    <ClCompile Include="Game\Objects\IRenderable.cpp" />
+    <ClCompile Include="Game\Objects\keyboard.cpp" />
+    <ClCompile Include="Game\Objects\model.cpp" />
+    <ClCompile Include="Game\Objects\part.cpp" />
+    <ClCompile Include="Game\Objects\PVInstance\Meshes\ballMesh.cpp" />
+    <ClCompile Include="Game\Objects\PVInstance\pvinstance.cpp" />
+    <ClCompile Include="Game\Objects\PVInstance\pvinstanceAppearance.cpp" />
+    <ClCompile Include="Game\Objects\PVInstance\pvinstanceAppearanceEdit.cpp" />
+    <ClCompile Include="Game\Objects\PVInstance\pvinstanceAppearanceWrite.cpp" />
+    <ClCompile Include="Game\Objects\PVInstance\faceTiling.cpp" />
+    <ClCompile Include="Game\Objects\specialMesh.cpp" />
+    <ClCompile Include="Game\Objects\wedgemesh.cpp" />
+    <ClCompile Include="Game\Objects\World\hint.cpp" />
+    <ClCompile Include="Game\Objects\World\message.cpp" />
+    <ClCompile Include="Game\Rendering\brickmap.cpp" />
+    <ClCompile Include="Game\Rendering\colorAtlasMap.cpp" />
+    <ClCompile Include="Game\Rendering\diagnosticsWorldDrawer.cpp" />
+    <ClCompile Include="Game\Rendering\drawPrimitives.cpp" />
+    <ClCompile Include="Game\Rendering\effectsetting.cpp" />
+    <ClCompile Include="Game\Rendering\imageMasher.cpp" />
+    <ClCompile Include="Game\Rendering\material.cpp" />
+    <ClCompile Include="Game\Rendering\materialFactory.cpp" />
+    <ClCompile Include="Game\Rendering\renderMesh.cpp" />
+    <ClCompile Include="Game\Rendering\renderScene.cpp" />
+    <ClCompile Include="Game\Rendering\scene.cpp" />
+    <ClCompile Include="Game\Rendering\shadows.cpp" />
+    <ClCompile Include="Game\Rendering\surfaceFactory.cpp" />
+    <ClCompile Include="Game\Rendering\surfaces.cpp" />
+    <ClCompile Include="Game\Rendering\texture.cpp" />
+    <ClCompile Include="Game\Rendering\textureReserve.cpp" />
+    <ClCompile Include="Game\Rendering\ToneMap.cpp" />
+    <ClCompile Include="Game\Rendering\worldManager.cpp" />
+    <ClCompile Include="Game\Serializer\deserializer.cpp" />
+    <ClCompile Include="Game\Serializer\serializer.cpp" />
+    <ClCompile Include="Game\Services\backpack.cpp" />
+    <ClCompile Include="Game\Services\backpackItem.cpp" />
+    <ClCompile Include="Game\Services\content.cpp" />
+    <ClCompile Include="Game\Services\contentprovider.cpp" />
+    <ClCompile Include="Game\Services\crashreporter.cpp" />
+    <ClCompile Include="Game\Services\Hopper.cpp" />
+    <ClCompile Include="Game\Services\scriptcontext.cpp" />
+    <ClCompile Include="Game\Services\selectionservice.cpp" />
+    <ClCompile Include="Game\Services\soundservice.cpp" />
+    <ClCompile Include="Game\Services\stdout.cpp" />
+    <ClCompile Include="Game\World\camera.cpp" />
+    <ClCompile Include="Game\World\cameraUtilities.cpp" />
+    <ClCompile Include="Game\World\datamodel.cpp" />
+    <ClCompile Include="Game\World\lighting.cpp" />
+    <ClCompile Include="Game\World\normalId.cpp" />
+    <ClCompile Include="Game\World\runservice.cpp" />
+    <ClCompile Include="Game\World\sound.cpp" />
+    <ClCompile Include="Game\World\workspace.cpp" />
+    <ClCompile Include="Kernel\body.cpp" />
+    <ClCompile Include="Kernel\Connectors\connector.cpp" />
+    <ClCompile Include="Kernel\Connectors\hinge.cpp" />
+    <ClCompile Include="Kernel\Connectors\motor.cpp" />
+    <ClCompile Include="Kernel\Connectors\snap.cpp" />
+    <ClCompile Include="Kernel\jointKernel.cpp" />
+    <ClCompile Include="Kernel\jointsservice.cpp" />
+    <ClCompile Include="Kernel\physicsKernel.cpp" />
+    <ClCompile Include="Kernel\primitive.cpp" />
+    <ClCompile Include="Main\main.cpp" />
+    <ClCompile Include="Studio\App\GuryChildFrame.cpp" />
+    <ClCompile Include="Studio\Documents\htmlDocument.cpp" />
+    <ClCompile Include="Studio\Documents\htmlView.cpp" />
+    <ClCompile Include="STUDIO\DOCUMENTS\scriptEditDoc.cpp" />
+    <ClCompile Include="Studio\Documents\scriptEditorView.cpp" />
+    <ClCompile Include="Studio\Windows\GuryGameFrame.cpp" />
+    <ClCompile Include="Studio\Gury Interaction\Studio Tools\DragTool.cpp" />
+    <ClCompile Include="Studio\Windows\CRBXHtmlView.cpp" />
+    <ClCompile Include="Studio\Windows\ExplorerView.cpp" />
+    <ClCompile Include="Studio\Windows\ExplorerViewTree.cpp" />
+    <ClCompile Include="Studio\Windows\Dialogs\InsertDialog.cpp" />
+    <ClCompile Include="Studio\Windows\MainFrm.cpp" />
+    <ClCompile Include="Studio\Gury Interaction\Studio Tools\MoveTool.cpp" />
+    <ClCompile Include="Studio\Windows\OutputWnd.cpp" />
+    <ClCompile Include="Studio\pch.cpp" />
+    <ClCompile Include="Studio\Windows\PropertiesWnd.cpp" />
+    <ClCompile Include="Studio\Gury Interaction\robloxClipboard.cpp" />
+    <ClCompile Include="Studio\Gury Interaction\robloxProperty.cpp" />
+    <ClCompile Include="Studio\Gury Interaction\StudioNavigator.cpp" />
+    <ClCompile Include="Studio\Gury Interaction\Studio Tools\StudioTool.cpp" />
+    <ClCompile Include="Studio\App\supergurymfc.cpp" />
+    <ClCompile Include="Studio\App\GuryDoc.cpp" />
+    <ClCompile Include="Studio\App\GuryView.cpp" />
+    <ClCompile Include="Studio\Gury Interaction\toolbarTools.cpp" />
+    <ClCompile Include="Studio\Windows\StartPage.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Application\application.h" />
+    <ClInclude Include="Application\appmanager.h" />
+    <ClInclude Include="Application\gurycursor.h" />
+    <ClInclude Include="Application\md5.h" />
+    <ClInclude Include="Game\globalSounds.h" />
+    <ClInclude Include="Game\Lua\luaAllocator.h" />
+    <ClInclude Include="Game\Lua\signaldescriptor.h" />
+    <ClInclude Include="Game\Lua\signalInstance.h" />
+    <ClInclude Include="Game\Objects\PVInstance\Meshes\icosphere.hpp" />
+    <ClInclude Include="Game\Objects\World\hint.h" />
+    <ClInclude Include="Game\Objects\World\message.h" />
+    <ClInclude Include="Game\Reflection\scriptSlot.h" />
+    <ClInclude Include="Game\Rendering\imageMasher.h" />
+    <ClInclude Include="Game\Rendering\worldManager.h" />
+    <ClInclude Include="Game\Services\Hopper.h" />
+    <ClInclude Include="Main\framework.h" />
+    <ClInclude Include="Game\classes.h" />
+    <ClInclude Include="Game\Controllers\rightkeyboard.h" />
+    <ClInclude Include="Game\Gui\GuiRoot.h" />
+    <ClInclude Include="Game\log.h" />
+    <ClInclude Include="Game\Lua\cframebridge.h" />
+    <ClInclude Include="Game\Lua\instancebridge.h" />
+    <ClInclude Include="Game\Lua\luabridge.h" />
+    <ClInclude Include="Game\Lua\singletonType.h" />
+    <ClInclude Include="Game\Lua\vector3bridge.h" />
+    <ClInclude Include="Game\Lua\yieldingthreads.h" />
+    <ClInclude Include="Game\Network\bitstreamHelp.h" />
+    <ClInclude Include="Game\Network\guid.h" />
+    <ClInclude Include="Game\Network\idserializer.h" />
+    <ClInclude Include="Game\Network\networkclient.h" />
+    <ClInclude Include="Game\Network\oscontext.h" />
+    <ClInclude Include="Game\Network\Player\Mouse.h" />
+    <ClInclude Include="Game\Network\Player\players.h" />
+    <ClInclude Include="Game\Network\replicator.h" />
+    <ClInclude Include="Game\Network\thumbnailGenerator.h" />
+    <ClInclude Include="Game\Objects\basescript.h" />
+    <ClInclude Include="Game\Objects\Bins\clonebin.h" />
+    <ClInclude Include="Game\Objects\Bins\gametool.h" />
+    <ClInclude Include="Game\Objects\Bins\hopperbin.h" />
+    <ClInclude Include="Game\Objects\Bins\rocket.h" />
+    <ClInclude Include="Game\Objects\Bins\rocketbin.h" />
+    <ClInclude Include="Game\Objects\controller.h" />
+    <ClInclude Include="Game\Objects\decal.h" />
+    <ClInclude Include="Game\Objects\geometry.h" />
+    <ClInclude Include="Game\Objects\Humanoid\humanoid.h" />
+    <ClInclude Include="Game\Objects\instance.h" />
+    <ClInclude Include="Game\Objects\IRenderable.h" />
+    <ClInclude Include="Game\Objects\ISelectable.h" />
+    <ClInclude Include="Game\Objects\keyboard.h" />
+    <ClInclude Include="Game\Objects\mesh.h" />
+    <ClInclude Include="Game\Objects\model.h" />
+    <ClInclude Include="Game\Objects\part.h" />
+    <ClInclude Include="Game\Objects\PVInstance\pvenums.h" />
+    <ClInclude Include="Game\Objects\PVInstance\pvinstance.h" />
+    <ClInclude Include="Game\rbx.h" />
+    <ClInclude Include="Game\rbxmath.h" />
+    <ClInclude Include="Game\rbxwindow.h" />
+    <ClInclude Include="Game\rbx_identifiers.h" />
+    <ClInclude Include="Game\Reflection\enum.h" />
+    <ClInclude Include="Game\Reflection\property.h" />
+    <ClInclude Include="Game\Reflection\signal.h" />
+    <ClInclude Include="Game\Rendering\brickcolor.h" />
+    <ClInclude Include="Game\Rendering\debugDrawer.h" />
+    <ClInclude Include="Game\Rendering\diagnosticsWorldDrawer.h" />
+    <ClInclude Include="Game\Rendering\effectsetting.h" />
+    <ClInclude Include="Game\Rendering\material.h" />
+    <ClInclude Include="Game\Rendering\materialFactory.h" />
+    <ClInclude Include="Game\Rendering\renderMesh.h" />
+    <ClInclude Include="Game\Rendering\renderScene.h" />
+    <ClInclude Include="Game\Rendering\renderSurface.h" />
+    <ClInclude Include="Game\Rendering\scene.h" />
+    <ClInclude Include="Game\Rendering\shadows.h" />
+    <ClInclude Include="Game\Rendering\surfaceFactory.h" />
+    <ClInclude Include="Game\Rendering\texture.h" />
+    <ClInclude Include="Game\Rendering\textureReserve.h" />
+    <ClInclude Include="Game\Serializer\decode.h" />
+    <ClInclude Include="Game\Serializer\encode.h" />
+    <ClInclude Include="Game\Serializer\serializer.h" />
+    <ClInclude Include="Game\Services\backpack.h" />
+    <ClInclude Include="Game\Services\content.h" />
+    <ClInclude Include="Game\Services\crashreporter.h" />
+    <ClInclude Include="Game\Services\scriptcontext.h" />
+    <ClInclude Include="Game\Services\selection.h" />
+    <ClInclude Include="Game\Services\service.h" />
+    <ClInclude Include="Game\Services\soundservice.h" />
+    <ClInclude Include="Game\Services\stdout.h" />
+    <ClInclude Include="Game\strings.h" />
+    <ClInclude Include="Game\World\camera.h" />
+    <ClInclude Include="Game\World\datamodel.h" />
+    <ClInclude Include="Game\World\extents.h" />
+    <ClInclude Include="Game\World\ICameraOwner.h" />
+    <ClInclude Include="Game\World\lighting.h" />
+    <ClInclude Include="Game\World\ray.h" />
+    <ClInclude Include="Game\World\runservice.h" />
+    <ClInclude Include="Game\World\sounds.h" />
+    <ClInclude Include="Game\World\workspace.h" />
+    <ClInclude Include="Kernel\body.h" />
+    <ClInclude Include="Kernel\collisionTest.h" />
+    <ClInclude Include="Kernel\Connectors\hinge.h" />
+    <ClInclude Include="Kernel\Connectors\motor.h" />
+    <ClInclude Include="Kernel\Connectors\snap.h" />
+    <ClInclude Include="Kernel\Connectors\weld.h" />
+    <ClInclude Include="Kernel\ISteppable.h" />
+    <ClInclude Include="Kernel\jointsservice.h" />
+    <ClInclude Include="Kernel\kernel.h" />
+    <ClInclude Include="Kernel\primitive.h" />
+    <ClInclude Include="Main\resource.h" />
+    <ClInclude Include="Studio\App\GuryChildFrame.h" />
+    <ClInclude Include="Studio\ChildFrm.h" />
+    <ClInclude Include="Studio\CInsertObjectDlg.h" />
+    <ClInclude Include="Studio\ClassView.h" />
+    <ClInclude Include="Studio\Documents\htmlDocument.h" />
+    <ClInclude Include="Studio\Documents\htmlView.h" />
+    <ClInclude Include="Studio\Documents\scriptEditorDocument.h" />
+    <ClInclude Include="Studio\Documents\scriptEditorView.h" />
+    <ClInclude Include="Studio\DragTool.h" />
+    <ClInclude Include="Studio\FileView.h" />
+    <ClInclude Include="Studio\MainFrm.h" />
+    <ClInclude Include="Studio\MoveTool.h" />
+    <ClInclude Include="Studio\OutputWnd.h" />
+    <ClInclude Include="Studio\pch.h" />
+    <ClInclude Include="Studio\PropertiesWnd.h" />
+    <ClInclude Include="Studio\robloxClipboard.h" />
+    <ClInclude Include="Studio\StudioTool.h" />
+    <ClInclude Include="Studio\supergurymfc.h" />
+    <ClInclude Include="Studio\supergurymfcDoc.h" />
+    <ClInclude Include="Studio\supergurymfcView.h" />
+    <ClInclude Include="Studio\ViewTree.h" />
+    <ClInclude Include="Main\targetver.h" />
+    <ClInclude Include="Studio\Windows\rbxhtml.h" />
+    <ClInclude Include="Studio\Windows\startPage.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Main\supergurymfc.aps" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Main\supergurymfc.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Main\res\camera.bmp" />
+    <Image Include="Main\res\classview.bmp" />
+    <Image Include="Main\res\classview_hc.bmp" />
+    <Image Include="Main\res\class_view.ico" />
+    <Image Include="Main\res\class_view_hc.ico" />
+    <Image Include="Main\res\explorer.bmp" />
+    <Image Include="Main\res\explorer_hc.bmp" />
+    <Image Include="Main\res\fileview.bmp" />
+    <Image Include="Main\res\fileview_hc.bmp" />
+    <Image Include="Main\res\file_view.ico" />
+    <Image Include="Main\res\file_view_hc.ico" />
+    <Image Include="Main\res\menuimages.bmp" />
+    <Image Include="Main\res\menuimages_hc.bmp" />
+    <Image Include="Main\res\output_wnd.ico" />
+    <Image Include="Main\res\output_wnd_hc.ico" />
+    <Image Include="Main\res\properties.bmp" />
+    <Image Include="Main\res\properties_hc.bmp" />
+    <Image Include="Main\res\properties_wnd.ico" />
+    <Image Include="Main\res\properties_wnd_hc.ico" />
+    <Image Include="Main\res\runservice.bmp" />
+    <Image Include="Main\res\services.bmp" />
+    <Image Include="Main\res\sort.bmp" />
+    <Image Include="Main\res\sort_hc.bmp" />
+    <Image Include="Main\res\supergurymfc.ico" />
+    <Image Include="Main\res\supergurymfcDoc.ico" />
+    <Image Include="Main\res\Toolbar.bmp" />
+    <Image Include="Main\res\Toolbar256.bmp" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>17.0</VCProjectVersion>
+    <ProjectGuid>{CF8EA185-0F2A-474A-A66B-8E3825E2F907}</ProjectGuid>
+    <Keyword>MFCProj</Keyword>
+    <RootNamespace>supergurymfc</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <UseOfMfc>Dynamic</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+    <UseOfMfc>Dynamic</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <UseOfMfc>Dynamic</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <UseOfMfc>Dynamic</UseOfMfc>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>built\$(Configuration)\</OutDir>
+    <IntDir>bin\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+    <Midl>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+      <ValidateAllParameters>true</ValidateAllParameters>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </Midl>
+    <ResourceCompile>
+      <Culture>0x0409</Culture>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;NOMINMAX;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>..\include;..\include\studio;..\include\include;..\include\fmod\inc;..\include\fmod\studio;..\include\bullet;..\include\bullet\vectormathlibrary\include\vectormath\scalar\cpp\;..\include\lua</AdditionalIncludeDirectories>
+      <SupportJustMyCode>false</SupportJustMyCode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <AdditionalLibraryDirectories>..\lib;</AdditionalLibraryDirectories>
+    </Link>
+    <Midl>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+      <ValidateAllParameters>true</ValidateAllParameters>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </Midl>
+    <ResourceCompile>
+      <Culture>0x0409</Culture>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_WINDOW;_CRT_SECURE_NO_WARNINGS;NOMINMAX%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>..\include;..\include\include;..\include\fmod\inc;..\include\fmod\studio;..\include\ode;..\include\png;..\include\rttr;..\include\lua;..\include\ode;..\include\ode\OPCODE;</AdditionalIncludeDirectories>
+      <CallingConvention>Cdecl</CallingConvention>
+      <ShowIncludes>false</ShowIncludes>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
+      <LanguageStandard>stdcpp14</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>..\lib;</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Advapi32.lib;</AdditionalDependencies>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <StackReserveSize>8388608</StackReserveSize>
+      <StackCommitSize>
+      </StackCommitSize>
+      <HeapReserveSize>
+      </HeapReserveSize>
+      <HeapCommitSize>
+      </HeapCommitSize>
+    </Link>
+    <Midl>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+      <ValidateAllParameters>true</ValidateAllParameters>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </Midl>
+    <ResourceCompile>
+      <Culture>0x0409</Culture>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <Midl>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+      <ValidateAllParameters>true</ValidateAllParameters>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </Midl>
+    <ResourceCompile>
+      <Culture>0x0409</Culture>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -17,7 +17,7 @@ void RBX::Studio::DragTool::onDrag()
 	
 	if (isDragging)
 	{ 
-		PVInstance* target = mouse->getTargetWithIgnoreList<Instance>(selection);
+		PartInstance* target = mouse->getTargetWithIgnoreList<Instance>(selection);
 		selectionService->selectionAllowed = false;
 
 		if (target)

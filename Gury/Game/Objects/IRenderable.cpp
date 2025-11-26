@@ -41,11 +41,15 @@ void RBX::Render::IRenderable::editMeshPosition(CoordinateFrame newPosition)
 
         normal = mesh->normalArray[index];
         uv = mesh->texCoordArray[index];
-
         color = mesh->colorArray[index];
 
         Render::Mesh::edit(index, newVertex, normal, uv);
     }
+}
+
+bool RBX::Render::IRenderable::inRenderEnvironment() const
+{
+    return currentProxy != 0 || (specialShape && specialShape->currentProxy != 0);
 }
 
 void RBX::Render::IRenderable::removeFromRenderEnvironment()

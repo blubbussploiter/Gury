@@ -71,12 +71,12 @@ void RBX::Network::Players::onPlayerNameChanged(Instance* plr, rttr::property pr
 	if (name == "Name") {
 
 		Player* player = toInstance<Player>(plr);
-		Gui::GuiLabel* lbl = player->getGuiName();
+		Gui::GuiLabel* label = player->getGuiName();
 
-		if (lbl && lbl->title != player->getName())
+		if (label)
 		{
-			lbl->title = player->getName();
-			lbl->textColor = Players::get()->getPlayerColor(player);
+			label->title = player->getName();
+			label->textColor = Players::get()->getPlayerColor(player);
 		}
 
 	}

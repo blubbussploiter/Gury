@@ -72,7 +72,7 @@ bool RBX::ModelInstance::isLocked()
 	Workspace::getPVInstances(children, pvInstances);
 
 	for (size_t i = 0; i < pvInstances->size(); i++) {
-		PVInstance* child = toInstance<PVInstance>(pvInstances->at(i));
+		PartInstance* child = toInstance<PartInstance>(pvInstances->at(i));
 		if (child && child->locked)
 		{
 			locked++;
@@ -84,13 +84,15 @@ bool RBX::ModelInstance::isLocked()
 
 void RBX::ModelInstance::drawControllerFlag(RenderDevice* rd, Color3 color)
 {
-	RBX::PVInstance* primaryPart = getPrimaryPart();
-	if (!primaryPart) return;
+	RBX::PartInstance* primaryPart = getPrimaryPart();
+	if (primaryPart)
+	{
+		rd->setObjectToWorldMatrix(primaryPart->getCFrame());
+		/* draw the flag stand */
 
-	rd->setObjectToWorldMatrix(primaryPart->getCFrame());
-	/* draw the flag stand */
+		Draw::line(Line::fromTwoPoints(Vector3::zero(), Vector3(0, 4, 0)), rd, color);
+	}
 
-	Draw::line(Line::fromTwoPoints(Vector3::zero(), Vector3(0, 4, 0)), rd, color);
 }
 
 void RBX::ModelInstance::render(RenderDevice* rd)
@@ -229,7 +231,7 @@ RBX::Extents RBX::ModelInstance::getInstancesExtents(Instances instances)
 
 	for (unsigned int i = 0; i < pvs->size(); i++)
 	{
-		PVInstance* pvInstance = toInstance<PVInstance>(pvs->at(i));
+		PartInstance* pvInstance = toInstance<PartInstance>(pvs->at(i));
 		if (pvInstance)
 		{
 			Extents extents;
@@ -266,9 +268,9 @@ RBX::Extents RBX::ModelInstance::getInstancesExtents(Instances instances)
 	}
 }
 
-RBX::PVInstance* RBX::ModelInstance::getRootPart(Instances i)
+RBX::PartInstance* RBX::ModelInstance::getRootPart(Instances i)
 {
-	PVInstance* result = 0;
+	PartInstance* result = 0;
 	Instances* children = new Instances();
 
 	float lastArea = -1;
@@ -276,7 +278,7 @@ RBX::PVInstance* RBX::ModelInstance::getRootPart(Instances i)
 
 	for (unsigned int i = 0; i < children->size(); i++)
 	{
-		PVInstance* pv = (PVInstance*)(children->at(i));
+		PartInstance* pv = (PartInstance*)(children->at(i));
 		Extents extents = pv->getWorldExtents();
 		float area = extents.area();
 		if (area > lastArea)
@@ -293,7 +295,7 @@ RBX::PVInstance* RBX::ModelInstance::getRootPart(Instances i)
 RBX::PartInstance* RBX::ModelInstance::getPrimaryPartInternal()
 {
 	PVInstance* rootPart = getRootPart(*getChildren());
-	if (!rootPart)
+	if (rootPart == nullptr)
 	{
 		for (size_t i = 0; i < children->size(); i++)
 		{
@@ -316,7 +318,7 @@ void RBX::ModelInstance::translate(CoordinateFrame cframe)
 
 void RBX::ModelInstance::buildJoints()
 {
-	JointsService::Experiment::buildInstancesJoints(*children);
+	JointsService::Builder::buildInstancesJoints(children);
 }
 
 void RBX::ModelInstance::breakJoints()

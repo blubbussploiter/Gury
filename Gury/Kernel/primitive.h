@@ -7,21 +7,25 @@
 #include "../Gury/Game/Reflection/signal.h"
 
 #include "../Gury/Game/Objects/geometry.h"
+#include "../Gury/Game/World/extents.h"
 
 #include "body.h"
 
 namespace RBX
 {
+	class Connector;
+
 	class Primitive
 	{
 	public:
-
+		PVInstance* physicalInstance; /* Our PVInstance, differentiated from UD now, since we also tend to store our connectors in UD. */
+		Array<Connector*> links;
 		RBX::Shape shape;
 
 		dGeomID geom[1];
 
 		Body* body;
-		PV* pv;
+		CoordinateFrame worldPosition; /* current Primitive location, DO NOT USE PV ANYMORE */
 
 		Vector3 size;
 
@@ -30,6 +34,8 @@ namespace RBX
 		void* ud;
 
 		bool collisionsEnabled();
+
+		bool isValid() const;
 
 		Render::Geometry* asGeometry();
 
@@ -46,7 +52,18 @@ namespace RBX
 		void modifyUserdata(void* data);
 		void modifyGeomData(void* data);
 
+		void attachLink(Connector* connector);
+		void detachLink(Connector* connector);
+
 		void modifyOffsetWorldCoordinateFrame(CoordinateFrame offset);
+
+		Extents getLocalExtents() const { return Extents(-size, size); }
+
+		Extents getWorldExtents()
+		{
+			Extents localExtents = getLocalExtents();
+			return localExtents.toWorldSpace(getPosition());
+		}
 
 		void* getUserdata();
 

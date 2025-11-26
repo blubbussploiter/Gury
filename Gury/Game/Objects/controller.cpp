@@ -5,16 +5,21 @@
 
 void RBX::Controller::handleInput(G3D::UserInput* ui)
 {
-	if (isDisabled) return;
-
-	horizontal = ui->getX();
-	vertical = ui->getY();
-
-	isMoving = (fabs(horizontal) == 1 || fabs(vertical) == 1);
-
-	if (ui->keyPressed(SDLK_SPACE))
+	if (ui)
 	{
-		jumping = true;
+		if (!isDisabled)
+		{
+
+			horizontal = ui->getX();
+			vertical = ui->getY();
+
+			isMoving = (fabs(horizontal) == 1 || fabs(vertical) == 1);
+
+			if (ui->keyPressed(SDLK_SPACE))
+			{
+				jumping = true;
+			}
+		}
 	}
 }
 

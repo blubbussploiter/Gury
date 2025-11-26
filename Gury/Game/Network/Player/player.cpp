@@ -10,11 +10,11 @@
 #include "../Gury/Game/Network/replicator.h"
 
 #include "../Gury/Game/World/workspace.h"
+#include "../Gury/Kernel/jointsservice.h"
 
 #include "players.h"
 
 using namespace RBX::Network;
-
 
 RTTR_REGISTRATION
 {
@@ -31,7 +31,7 @@ RTTR_REGISTRATION
 void Player::loadCharacter()
 {
 	RBX::Instances* load;
-	RBX::Humanoid* h = 0;
+	RBX::Humanoid* characterHumanoid = 0;
 
 	if (character)
 	{
@@ -40,53 +40,24 @@ void Player::loadCharacter()
 
 	load = RBX::Serializer::loadInstances(GetFileInPath("/content/font/character.rbxm"));
 
-	if (load && load->size() > 0)
+	if (load->size() > 0)
 	{
-		RBX::ModelInstance* possibleCharacter = toInstance<ModelInstance>(load->at(0));
-		if (possibleCharacter)
+		Camera* camera = Camera::get();
+		ModelInstance* model = RBXCast<ModelInstance>(load->at(0));
+
+		if (model)
 		{
-			h = RBX::Humanoid::modelIsCharacter(possibleCharacter);
-			if (h)
-			{
-				character = (RBX::ModelInstance*)possibleCharacter;
-			}
+			CoordinateFrame spawnPosition = camera->getCoordinateFrame();
+			spawnPosition.rotation = Matrix3::identity();
+
+			character = model;
+			character->translate(spawnPosition + Vector3(0, 60, 0));
+
+			character->setParent(Workspace::get());
+
+			camera->cameraSubject = character->findFirstChild<PartInstance>("Head");
+			camera->cameraType = Follow;
 		}
-	}
-
-	if (!character) return;
-
-	RBX::PartInstance* head, * humanoidRootPart;
-
-	head = (RBX::PartInstance*)character->findFirstChild("Head");
-	humanoidRootPart = (RBX::PartInstance*)character->findFirstChild("Torso");
-
-	if (!head || !humanoidRootPart) return;
-
-	if (!IsA<RBX::PartInstance>(head) || !IsA<RBX::PartInstance>(humanoidRootPart)) return;
-
-	Extents levelExtents;
-	Vector3 levelExtentsCentre;
-
-	Workspace* workspace;
-
-	workspace = Workspace::get();
-	levelExtents = workspace->getModelWorldExtents();
-
-	levelExtentsCentre = Camera::get()->camera->getCoordinateFrame().translation;
-	character->translate(levelExtentsCentre);
-
-	controller = new PlayerController();
-	controller->init(this);
-
-	Camera::get()->cameraSubject = head;
-	Camera::get()->cameraType = Follow;
-
-	character->setName(getName());
-	character->setParent(workspace);
-
-	if (RBX::RunService::get()->isRunning)
-	{
-		setAsController();
 	}
 
 }

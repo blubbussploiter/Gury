@@ -1,6 +1,6 @@
 #pragma once
 
-/* Gurnel (Gury kernel) written by Whirlpool
+/* Gurnel (Gury kernel) written by Billy Brickhoffen
 			(2023 - now)
 */
 
@@ -15,24 +15,31 @@ namespace RBX
 
 	class Gurnel 
 	{
-	public:
+	private:
 
-		Array<Primitive*> objects;
-		Array<Primitive*> objectQueue;
+		Array<Primitive*> primitives;
+		Array<Primitive*> garbagePrimitiveQueue;
+		Array<Body*> garbageBodyQueue;
+
+	public:
+		friend class Body;
 		
 		dWorldID world;
 		dSpaceID space;
 		dJointGroupID contacts;
+
+		float worldLimitsY;
 
 		void close();
 
 		void diag_renderObjects(RenderDevice* rd);
 
 		void addPrimitive(Primitive* primitive);
-
 		void removePrimitive(Primitive* primitive);
 
-		void addQueuedPrimitive(Primitive* primitive);
+
+		void collectGarbage();
+		void haltKernel();
 
 		void step(float stepInS=0.02f, int iterations=64);
 
@@ -53,20 +60,6 @@ namespace RBX
 
 		static Gurnel* get();
 
-		Gurnel()
-		{
-			world = dWorldCreate();
-
-			space = dSimpleSpaceCreate(0);
-			contacts = dJointGroupCreate(0);
-
-			dWorldSetGravity(world, 0, -9.81F, 0);
-			dWorldSetAutoDisableFlag(world, 1);
-			dWorldSetAutoDisableLinearThreshold(world, 0.02f);
-			dWorldSetAutoDisableAngularThreshold(world, 0.02f);
-			dWorldSetContactSurfaceLayer(world, 0.01f);
-			dWorldSetERP(world, 0.8f);
-			dWorldSetCFM(world, 1.0f);
-		}
+		Gurnel();
 	};
 }

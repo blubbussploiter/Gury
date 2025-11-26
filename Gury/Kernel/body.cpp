@@ -19,15 +19,21 @@ dMass RBX::Body::getMass()
 	return mass;
 }
 
-float RBX::Body::getFMass()
+float RBX::Body::getFloatMass()
 {
 	return getMass().mass;
 }
 
-bool RBX::Body::created()
+bool RBX::Body::created() const
 {
-	return (body != nullptr); 
+	return isValid();
 }
+
+bool RBX::Body::isValid() const
+{
+	return body != 0;
+}
+
 
 void* RBX::Body::getUserdata()
 {
@@ -75,17 +81,19 @@ void RBX::Body::modifyRotation(Matrix3 rotation)
 
 void RBX::Body::modifyPosition(CoordinateFrame position)
 {
-	Vector3 translation = position.translation;
-	Matrix3 rotation = position.rotation;
-
 	if (body)
 	{
+		Vector3 translation = position.translation;
+		Matrix3 rotation = position.rotation;
 
 		float dRotation[12] = toDMatrix3(rotation);
 
 		dBodySetRotation(body, dRotation);
 		dBodySetPosition(body, translation.x, translation.y, translation.z);
-
+	}
+	else
+	{
+		pv->position = position;
 	}
 }
 
@@ -103,6 +111,13 @@ void RBX::Body::modifyMass(dMass mass)
 
 	dBodySetMass(body, &mass);
 
+}
+
+void RBX::Body::modifyfMass(float mass)
+{
+	dMass dMass = getMass();
+	dMass.mass = mass;
+	modifyMass(dMass);
 }
 
 void RBX::Body::applyTorque(Vector3 torque)
@@ -145,9 +160,15 @@ Vector3 RBX::Body::getForce()
 
 Vector3 RBX::Body::getPosition()
 {
-	if (!body) return Vector3::zero();
-	const dReal* real = dBodyGetPosition(body);
-	return Vector3(real[0], real[1], real[2]);
+	if (body)
+	{
+		const dReal* real = dBodyGetPosition(body);
+		return Vector3(real[0], real[1], real[2]);
+	}
+	else
+	{
+		return pv->position.translation;
+	}
 }
 
 Matrix3 RBX::Body::getMoment()
@@ -166,28 +187,26 @@ void RBX::Body::modifySize(Vector3 size)
 {
 	if (body)
 	{
-		destroyBody();
-		createBody(size);
+		this->size = size;
+
+		dMass mass;
+
+		mass.setBox(0.01f, sqrt(size.x * 2), sqrt(size.y * 2), sqrt(size.z * 2));
+		dBodySetMass(body, &mass);
 	}
 }
 
 void RBX::Body::step()
 {
-	Velocity velocity;
+	if (body)
+	{
+		const dReal* linear = dBodyGetLinearVel(body);
+		const dReal* rotational = dBodyGetAngularVel(body);
 
-	const dReal* linear;
-	const dReal* rotational;
+		pv->velocity.linear = Vector3(linear[0], linear[1], linear[2]);
+		pv->velocity.rotational = Vector3(rotational[0], rotational[1], rotational[2]);
+	}
 
-	linear = dBodyGetLinearVel(body);
-	velocity.linear = Vector3(linear[0], linear[1], linear[2]);
-
-	rotational = dBodyGetAngularVel(body);
-	velocity.rotational = Vector3(rotational[0], rotational[1], rotational[2]);
-
-	pv->velocity = velocity;
-
-	onStepped(this);
-	
 }
 
 void RBX::Body::setDisabled(bool disabled)
@@ -208,34 +227,47 @@ void RBX::Body::setDisabled(bool disabled)
 
 void RBX::Body::createBody(Vector3 size)
 {
-	Vector3 position = pv->position.translation;
-	Matrix3 rotation = pv->position.rotation;
-	
-	if (body) return;
+	if (!body)
+	{
+		Vector3 position = pv->position.translation;
+		Matrix3 rotation = pv->position.rotation;
 
-	this->size = size;
+		this->size = size;
 
-	dMass mass;
-	mass.setBox(0.01f, sqrt(size.x * 2), sqrt(size.y * 2), sqrt(size.z * 2));
+		dMass mass;
+		mass.setBox(0.01f, sqrt(size.x * 2), sqrt(size.y * 2), sqrt(size.z * 2));
+		mass.translate(position.x, position.y, position.z);
 
-	body = dBodyCreate(Gurnel::get()->world);
-	dBodySetMass(body, &mass);
+		body = dBodyCreate(Gurnel::get()->world);
 
-	float dRotation[12] = { rotation[0][0], rotation[0][1], rotation[0][2], 0, rotation[1][0], rotation[1][1], rotation[1][2], 0, rotation[2][0], rotation[2][1], rotation[2][2], 0 };
+		float dRotation[12] = { rotation[0][0], rotation[0][1], rotation[0][2], 0, rotation[1][0], rotation[1][1], rotation[1][2], 0, rotation[2][0], rotation[2][1], rotation[2][2], 0 };
 
-	dBodySetRotation(body, dRotation);
-	dBodySetPosition(body, position.x, position.y, position.z);
+		dBodySetRotation(body, dRotation);
+		dBodySetPosition(body, position.x, position.y, position.z);
 
-	dBodySetData(body, 0);
+		dBodySetMass(body, &mass);
+
+		dBodySetData(body, 0);
+	}
 
 }
 
 void RBX::Body::destroyBody()
 {
+	Gurnel* gurnel = Gurnel::get();
+	if (gurnel)
+	{
+		if (!gurnel->garbageBodyQueue.contains(this))
+		{
+			gurnel->garbageBodyQueue.append(this);
+		}
+	}
+}
+
+void RBX::Body::doDestroy()
+{
 	if (body)
 	{
-		dBodyEnable(body);
-
 		for (int i = 0; i < dBodyGetNumJoints(body); i++) {
 			dBodyID b1 = dJointGetBody(dBodyGetJoint(body, i), 0);
 			dBodyID b2 = dJointGetBody(dBodyGetJoint(body, i), 1);
@@ -258,9 +290,12 @@ void RBX::Body::attachPrimitive(Primitive* primitive)
 {
 	if (primitive->geom[0])
 	{
+		if (!body)
+		{
+			createBody(size); /* Create after anchored or something .. */
+		}
 		dGeomSetBody(primitive->geom[0], body);
 		attachedPrimitives.push_back(primitive);
-		primitive->body = this;
 	}
 }
 
@@ -273,6 +308,5 @@ void RBX::Body::detachPrimitive(Primitive* primitive)
 			attachedPrimitives.fastRemove(attachedPrimitives.findIndex(primitive));
 		}
 		dGeomSetBody(primitive->geom[0], 0);
-		primitive->body = NULL;
 	}
 }

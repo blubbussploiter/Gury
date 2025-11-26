@@ -161,6 +161,8 @@ namespace RBX
 			}
 		}
 
+		void clearAllChildren();
+
 		void setName(std::string newName) 
 		{ 
 			name = newName;
@@ -239,9 +241,15 @@ namespace RBX
 	}
 
 	template <class Type>
-	static Type* toInstance(Instance* i)
+	static Type* RBXCast(Instance* i)
 	{
 		return dynamic_cast<Type*>(i);
 	}
 
+	/* for compatibility issues */
+	template <class Type>
+	static Type* toInstance(Instance* i)
+	{
+		return RBXCast<Type>(i);
+	}
 }

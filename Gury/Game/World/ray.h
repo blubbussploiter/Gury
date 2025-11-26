@@ -35,17 +35,17 @@ namespace RBX
 		template <typename IgnoredItem>
 		inline RBX::ISelectable* getPartFromG3DRay(G3D::Ray ray, Vector3& hitWorld, bool ignoreNonCollidableObjects=false, std::vector<IgnoredItem*>& ignore = empty_ignoreList)
 		{
-			Instances instances;
+			Instances* instances;
 			RBX::ISelectable* part = 0;
 
 			float nearest = inf();
 
 			instances = RBX::WorldScene::get()->getArrayOfObjects();
 
-			for (unsigned int i = 0; i < instances.size(); i++)
+			for (unsigned int i = 0; i < instances->size(); i++)
 			{
-				RBX::Instance* instance = instances.at(i);
-				RBX::PVInstance* child = toInstance<PVInstance>(instance);
+				RBX::Instance* instance = instances->at(i);
+				RBX::PartInstance* child = toInstance<PartInstance>(instance);
 
 				if (child)
 				{
@@ -78,16 +78,16 @@ namespace RBX
 		template <typename IgnoredItem>
 		inline RBX::ISelectable* getModelFromG3DRay(G3D::Ray ray, Vector3& hitWorld, bool ignoreNonCollidableObjects = false, std::vector<IgnoredItem*>& ignore = empty_ignoreList)
 		{
-			Instances instances;
+			Instances* instances;
 			RBX::ISelectable* part = 0;
 
 			float nearest = inf();
 
 			instances = RBX::WorldScene::get()->sceneModels;
 
-			for (unsigned int i = 0; i < instances.size(); i++)
+			for (unsigned int i = 0; i < instances->size(); i++)
 			{
-				RBX::Instance* instance = instances.at(i);
+				RBX::Instance* instance = instances->at(i);
 				RBX::ModelInstance* child = toInstance<ModelInstance>(instance);
 
 				if (child)

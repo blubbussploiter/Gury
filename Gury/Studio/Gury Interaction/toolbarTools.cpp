@@ -175,7 +175,7 @@ void CsupergurymfcApp::OnMoveUp()
 	for (unsigned int i = 0; i < selection.size(); i++)
 	{
 		RBX::Instance* instance = selection.at(i);
-		RBX::PVInstance* pv = RBX::toInstance<RBX::PVInstance>(instance);
+		RBX::PartInstance* pv = RBX::toInstance<RBX::PartInstance>(instance);
 		if (pv)
 		{
 			CoordinateFrame c = pv->getCoordinateFrame();
@@ -186,7 +186,7 @@ void CsupergurymfcApp::OnMoveUp()
 			}
 			else /* check if smaller than hitter, if it is, selected may get on top */
 			{
-				RBX::PVInstance* firstBrickUp = 0;
+				RBX::PartInstance* firstBrickUp = 0;
 				float top = RBX::getDirectionalBrickInfo(c.translation, c.upVector(), pv, firstBrickUp);
 
 				if (firstBrickUp)
@@ -223,7 +223,7 @@ void CsupergurymfcApp::OnMoveDown()
 	for (unsigned int i = 0; i < selection.size(); i++)
 	{
 		RBX::Instance* instance = selection.at(i);
-		RBX::PVInstance* pv = RBX::toInstance<RBX::PVInstance>(instance);
+		RBX::PartInstance* pv = RBX::toInstance<RBX::PartInstance>(instance);
 		if (pv)
 		{
 			CoordinateFrame c = pv->getCoordinateFrame();

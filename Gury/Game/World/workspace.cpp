@@ -61,7 +61,7 @@ void RBX::Workspace::getPVInstances(RBX::Instances* instances, RBX::Instances* p
     {
         RBX::Instance* child = instances->at(i);
 
-        if (RBX::IsA<RBX::PVInstance>(child))
+        if (RBX::IsA<RBX::PartInstance>(child))
             pvs->push_back(child);
 
         getPVInstances(child->getChildren(), pvs);

@@ -1,56 +1,15 @@
 #include "../Gury/Kernel/jointsservice.h"
 #include "../Gury/Game/Objects/instance.h"
+#include "../Gury/Game/Rendering/renderPrimitives.h"
 
-bool RBX::Connector::diagPrimitivesAreTouching()
+void RBX::Connector::setParentNode(OffsetBodyNode* parentNode)
 {
-	dGeomID geom0 = prim0->geom[0], geom1 = prim1->geom[0];
-
-	return true;
-}
-
-void RBX::Connector::diagRender(RenderDevice* rd)
-{
-	Vector3 interceptPos;
-	Vector3 v_p0, v_p1;
-
-	rd->setObjectToWorldMatrix(CoordinateFrame());
-
-	interceptPos = getInterceptPosition().translation;
-	v_p0 = prim0->pv->position.translation;
-	v_p1 = prim1->pv->position.translation;
-
-	Sphere s_p0, s_p1;
-
-	s_p0.radius = 0.2f;
-	s_p0.center = v_p0;
-	s_p1.radius = 0.2f;
-	s_p1.center = v_p1;
-
-	Color3 color;
-	color = (prim0->body == 0 || prim1->body == 0) ? Color3::blue() : Color3::red();
-
-	Draw::lineSegment(LineSegment::fromTwoPoints(v_p0, v_p1), rd, color, 0.5f);
-
-	Draw::sphere(s_p0, rd, color, Color4::clear());
-	Draw::sphere(s_p1, rd, color, Color4::clear());
-
-	
-
-}
-
-void RBX::Connector::diagRenderPrimitiveOutlines(RenderDevice* rd)
-{
-	Color3 color;
-	color = (prim0->body == 0 || prim1->body == 0) ? Color3::blue() : Color3::red();
-	rd->setObjectToWorldMatrix(prim0->pv->position);
-	Primitives::drawOutline(rd, -prim0->size, prim0->size, color, 0.1f);
-	rd->setObjectToWorldMatrix(prim1->pv->position);
-	Primitives::drawOutline(rd, -prim1->size, prim1->size, color, 0.1f);
+	this->parentNode = parentNode;
 }
 
 CoordinateFrame RBX::Connector::getInterceptPosition()
 {
-	return (prim0->pv->position.translation + prim1->pv->position.translation) / 2;
+	return (prim0->worldPosition.translation + prim1->worldPosition.translation) / 2;
 }
 
 bool RBX::Connector::connected()
@@ -81,65 +40,55 @@ RBX::Connector* RBX::Connector::getConnectingConnector(RBX::Primitive* prim)
 	return 0;
 }
 
-RBX::ConnectorNode* RBX::Connector::getParentNode(RBX::Primitive* prim0, RBX::Primitive* prim1)
+template <typename T>
+void mergeArrays(const Array<T> array0, const Array<T> array1, Array<T>& array2)
 {
-	Array<Connector*> connectorArray;
-
-	/* get from array recursively (hopefully) */
-	getConnectingConnectorsByPrim(prim0, connectorArray);
-	getConnectingConnectorsByPrim(prim1, connectorArray);
-
-	for (int i = 0; i < connectorArray.size(); i++)
+	for (int i = 0; i < array0.size(); i++)
 	{
-		Connector* connector = connectorArray[i];
-		if (connector)
+		T at = array0[i];
+		array2.push_back(at);
+	}
+
+	for (int i = 0; i < array1.size(); i++)
+	{
+		T at = array1[i];
+		array2.push_back(at);
+	}
+}
+
+void RBX::Connector::getConnectorTree(Primitive* primitive0, Primitive* primitive1, Array<RBX::Connector*>& connectors)
+{
+	Instances* children = JointsService::get()->children;
+	for (size_t i = 0; i < children->size(); i++)
+	{
+		Instance* instance = children->at(i);
+		if (instance)
 		{
-			if (connector->parentNode)
+			Connector* connector = RBXCast<Connector>(instance);
+			if (connector)
 			{
-				return connector->parentNode;
+				if (connector->prim0 == primitive0 || connector->prim1 == primitive1 ||
+					connector->prim0 == primitive1 || connector->prim1 == primitive0)
+				{
+					if (connectors.contains(connector))
+					{
+						RBX::StandardOut::print(RBX::MESSAGE_INFO, "Already contains this");
+						return;
+					}
+					else
+					{
+						connectors.push_back(connector);
+						getConnectorTree(connector->prim0, connector->prim1, connectors);
+					}
+				}
 			}
 		}
 	}
+}
 
+RBX::OffsetBodyNode* RBX::Connector::constructParentNode(RBX::Primitive* prim0, RBX::Primitive* prim1)
+{
 	return 0;
-}
-
-void RBX::Connector::getConnectingConnectorsByPrim(RBX::Primitive* prim, Array<Connector*>& finalArray)
-{
-	Connector* connectingPrim = getConnectingConnector(prim);
-
-	if (connectingPrim)
-	{
-		getConnectingConnectorsByConnector(connectingPrim, finalArray);
-	}
-}
-
-void RBX::Connector::getConnectingConnectorsByConnector(RBX::Connector* connector, Array<Connector*>& finalArray)
-{
-	Primitive* prim0 = connector->prim0;
-	Primitive* prim1 = connector->prim1;
-
-	if (prim0 && prim1)
-	{
-		Connector* connectingPrim0 = getConnectingConnector(prim0);
-		Connector* connectingPrim1 = getConnectingConnector(prim1);
-
-		if (connectingPrim0)
-		{
-			if (!finalArray.contains(connectingPrim0))
-			{
-				finalArray.push_back(connectingPrim0);
-			}
-		}
-
-		if (connectingPrim1)
-		{
-			if (!finalArray.contains(connectingPrim1))
-			{
-				finalArray.push_back(connectingPrim1);
-			}
-		}
-	}
 }
 
 void RBX::Connector::build()
@@ -148,7 +97,8 @@ void RBX::Connector::build()
 	if (prim0 && prim1)
 	{
 
-		ConnectorNode* parentNode = getParentNode(prim0, prim1);
+		prim0->attachLink(this);
+		prim1->attachLink(this);
 
 	}
 

@@ -18,7 +18,7 @@ float szx = 125, szy = 125;
 RBX::Mouse* mouse;
 HCURSOR oldCursor;
 
-RBX::PVInstance* RBX::Mouse::getTarget() /* ignore part for dragger tool */
+RBX::PartInstance* RBX::Mouse::getTarget() /* ignore part for dragger tool */
 {
 	RBX::Camera* camera = RBX::Camera::get();
 	RBX::ISelectable* selected;
@@ -27,7 +27,7 @@ RBX::PVInstance* RBX::Mouse::getTarget() /* ignore part for dragger tool */
 	ray = camera->camera->worldRay(x, y, RBX::RBXManager::get()->getApplication()->getViewport());
 
 	selected = RBX::World::getPartFromG3DRay<Instance>(ray, hitWorld);
-	target = (RBX::PVInstance*)(selected);
+	target = (RBX::PartInstance*)(selected);
 
 	return target;
 }
@@ -124,6 +124,9 @@ HCURSOR RBX::Mouse::get_cursor()
 		memset(xorMask, 0x00, width * height / 8); 
 
 		cursor = CreateCursor(0, 0, 0, width, height, andMask, xorMask);
+
+		free(andMask);
+		free(xorMask);
 	}
 	return cursor;
 }

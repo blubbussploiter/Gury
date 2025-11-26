@@ -63,7 +63,7 @@ namespace RBX
 		static void translateInstances(Instances i, PVInstance* rootPart, CoordinateFrame cframe);
 		static CoordinateFrame getPVInstancesCentre(Instances pvInstances);
 		static Extents getInstancesExtents(Instances i);
-		static PVInstance* getRootPart(Instances i);
+		static PartInstance* getRootPart(Instances i);
 
 		Render::Geometry getBoundingBox()
 		{

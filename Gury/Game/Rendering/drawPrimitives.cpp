@@ -1,4 +1,5 @@
-#include "../Gury/Game/Objects/PVInstance/pvinstance.h"
+#include "renderPrimitives.h"
+#include "../Gury/Game/Objects/part.h"
 
 void RBX::Primitives::drawLine(Vector2 pos, RenderDevice* d, Color3 color, float width, float height)
 {
@@ -36,23 +37,28 @@ void RBX::Primitives::rawCylinderAlongX(Color4 color, float radius, float axis, 
     glPopMatrix();
 }
 
-void RBX::Primitives::drawBall(RenderDevice* d, RBX::PVInstance* base)
+void RBX::Primitives::drawBall(RenderDevice* d, RBX::PartInstance* base)
 {
     if (base)
     {
-        GLUquadric* v1; // esi
         float radius = base->getSize().y;
-
-        glPushMatrix();
-        v1 = gluNewQuadric();
-        gluQuadricDrawStyle(v1, 0x186ACu);
-        gluSphere(v1, radius, 15, 15);
-        gluDeleteQuadric(v1);
-        glPopMatrix();
+        drawBall(d, radius);
     }
 }
 
-void RBX::Primitives::drawCylinder(RenderDevice* d, RBX::PVInstance* base)
+void RBX::Primitives::drawBall(RenderDevice* d, float radius)
+{
+    GLUquadric* v1; // esi
+
+    glPushMatrix();
+    v1 = gluNewQuadric();
+    gluQuadricDrawStyle(v1, 0x186ACu);
+    gluSphere(v1, radius, 15, 15);
+    gluDeleteQuadric(v1);
+    glPopMatrix();
+}
+
+void RBX::Primitives::drawCylinder(RenderDevice* d, RBX::PartInstance* base)
 {
     if (base)
     {

@@ -149,7 +149,7 @@ void RBX::Camera::update(bool rightMouseDown)
             {
                 GetCursorPos(&mouse);
                 SetCursorPos(oldMouse.x, oldMouse.y);
-                pan(&cframe, (mouse.x - oldMouse.x) / 100.f, (mouse.y - oldMouse.y) / 100.f);
+                pan(&cframe, (mouse.x - oldMouse.x) / 50.f, (mouse.y - oldMouse.y) / 50.f);
             }
         }
 

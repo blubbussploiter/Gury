@@ -17,6 +17,7 @@
 #include "../Gury/Studio/StudioTool.h"
 
 #include "../Gury/Game/Objects/model.h"
+#include "../Gury/Game/Rendering/renderPrimitives.h"
 
 bool RBX::SelectionService::isSelected(Instance* i)
 {
@@ -48,12 +49,12 @@ void RBX::SelectionService::dragSelect()
 	Vector2 a1(min(worldSelectStart.x, worldSelectEnd.x), min(worldSelectStart.y, worldSelectEnd.y));
 	Vector2 a2(max(worldSelectStart.x, worldSelectEnd.x), max(worldSelectStart.y, worldSelectEnd.y));
 
-	Instances instances;
+	Instances* instances;
 	instances = RBX::WorldScene::get()->getArrayOfObjects();
 
-	for (unsigned int i = 0; i < instances.size(); i++)
+	for (unsigned int i = 0; i < instances->size(); i++)
 	{
-		RBX::Instance* instance = dynamic_cast<RBX::Instance*>(instances.at(i));
+		RBX::Instance* instance = instances->at(i);
 		RBX::PVInstance* child = toInstance<PVInstance>(instance);
 
 		if (child)
@@ -95,15 +96,21 @@ void RBX::SelectionService::renderDragBox(RenderDevice* rd)
 
 void RBX::SelectionService::renderSelected(RenderDevice* rd, ISelectable* selection)
 {
-	Render::Geometry box;
-	box = selection->getBoundingBox();
+	if (selection)
+	{
+		if (typeCompareAny<ISelectable, Render::IRenderable>(selection))
+		{
+			Render::Geometry box;
+			box = selection->getBoundingBox();
 
-	rd->pushState();
+			rd->pushState();
 
-	rd->setObjectToWorldMatrix(box.cframe);
-	Primitives::drawOutline(rd, -box.size, box.size, Color3::cyan(), 0.5f);
+			rd->setObjectToWorldMatrix(box.cframe);
+			Primitives::drawOutline(rd, -box.size, box.size, Color3::cyan(), 0.5f);
 
-	rd->popState();
+			rd->popState();
+		}
+	}
 }
 
 void RBX::SelectionService::renderSelection(RenderDevice* rd)
@@ -111,10 +118,13 @@ void RBX::SelectionService::renderSelection(RenderDevice* rd)
 	Workspace* workspace = Workspace::get();
 	for (RBX::Instance* pv : selection)
 	{
-		RBX::ISelectable* s = toInstance<RBX::ISelectable>(pv);
-		if (workspace->isAncestorOf(pv) && s && s != workspace)
+		if (pv)
 		{
-			renderSelected(rd, s);
+			RBX::ISelectable* s = toInstance<RBX::ISelectable>(pv);
+			if (workspace->isAncestorOf(pv) && s != workspace)
+			{
+				renderSelected(rd, s);
+			}
 		}
 	}
 }
@@ -152,9 +162,9 @@ RBX::Instance* RBX::SelectionService::getPossibleSelectedItem()
 			if (instance)
 			{
 
-				if (IsA<PVInstance>(instance)) /* Check if locked */
+				if (IsA<PartInstance>(instance)) /* Check if locked */
 				{
-					PVInstance* pvInstance = toInstance<PVInstance>(instance);
+					PartInstance* pvInstance = toInstance<PartInstance>(instance);
 					if (pvInstance->getLocked()) {
 						continue;
 					}
@@ -249,7 +259,7 @@ bool RBX::SelectionService::doSelect(Instance* target, bool multiSelect)
 {
 	if (target)
 	{
-		PVInstance* pv = toInstance<PVInstance>(target);
+		PartInstance* pv = toInstance<PartInstance>(target);
 		if (pv && pv->locked) { 
 			return 0;
 		}

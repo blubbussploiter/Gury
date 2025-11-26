@@ -1,397 +1,294 @@
-
-#include "../Gury/Game/rbxmath.h"
-#include "../Gury/Game/World/camera.h"
-#include "../Gury/Game/Network/Player/players.h"
-#include "../Gury/Game/World/sounds.h"
-#include "../Gury/Game/World/ray.h"
-
-#include "../Gury/Kernel/jointsservice.h"
-#include "../Gury/Kernel/Connectors/snap.h"
-
-#include "../Gury/Game/Gui/GuiRoot.h"
-
 #include "humanoid.h"
 
+#include "../../../Kernel/jointsservice.h"
+#include "../../World/sounds.h"
+#include "../../Network/Player/players.h"
+#include "../../World/ray.h"
+
 RBX::Sound* uuhhh = RBX::Sound::fromFile("rbxasset://sounds\\uuhhh.wav");
- 
+
 RTTR_REGISTRATION
 {
-    rttr::registration::class_<RBX::Humanoid>("Humanoid")
-        .constructor<>()
-        .property("Health", &RBX::Humanoid::health)(rttr::metadata("Type", RBX::Game))
-        .property("health", &RBX::Humanoid::health)(rttr::metadata("Type", RBX::Game));
+	rttr::registration::class_<RBX::Humanoid>("Humanoid")
+		.constructor<>()
+		.property("Health", &RBX::Humanoid::health)(rttr::metadata("Type", RBX::Game))
+		.property("health", &RBX::Humanoid::health)(rttr::metadata("Type", RBX::Game));
 }
 
-RBX::Humanoid* RBX::Humanoid::modelIsCharacter(RBX::Instance* testModel)
+bool RBX::Humanoid::isValid()
 {
-    if (testModel)
-        return testModel->findFirstChildOfClass<RBX::Humanoid>("Humanoid");
-    else
-        return 0;
+	if (humanoidHead && humanoidRootPart)
+	{
+		JointsService* jointsService = JointsService::get();
+		return jointsService->areConnectedPrimitives(humanoidHead->getPrimitive(), humanoidRootPart->getPrimitive());
+	}
+	return false;
 }
 
-void RBX::Humanoid::setLocalTransparency(float transparency)
+void RBX::Humanoid::fetchLimbs()
 {
-    Instance* parent = getParent();
-
-    for (unsigned int i = 0; i < parent->children->size(); i++)
-    {
-        Instance* child = parent->children->at(i);
-        if (IsA<PVInstance>(child))
-        {
-            PVInstance* pv = toInstance<PVInstance>(child);
-            float f;
-
-            f = pv->fauxTransparency;
-            pv->setTransparency(transparency);
-            pv->fauxTransparency = f;
-        }
-    }
+	ModelInstance* character = getCharacter();
+	if (character)
+	{
+		if (!humanoidHead)
+		{
+			humanoidHead = character->findFirstChild<PartInstance>("Head");
+		}
+		if (!humanoidRootPart)
+		{
+			humanoidRootPart = character->findFirstChild<PartInstance>("Torso");
+		}
+	}
 }
 
-void RBX::Humanoid::setHumanoidAttributes()
+RBX::ModelInstance* RBX::Humanoid::getCharacter()
 {
-    if (!getParent())
-        return;
-
-    humanoidHead = getParent()->findFirstChild<PVInstance>("Head");
-    humanoidRootPart = getParent()->findFirstChild<PVInstance>("Torso");
-
+	return RBXCast<RBX::ModelInstance>(getParent());
 }
 
-bool RBX::Humanoid::humanCheck()
+void RBX::Humanoid::Snap(PartInstance* p0, PartInstance* p1)
 {
-    if (!humanoidHead || !humanoidRootPart)
-    {
-        setHumanoidAttributes();
-        return 0;
-    }
-    return 1;
+	JointsService* jointsService = JointsService::get();
+	if (p0 && p1)
+	{
+		jointsService->snap(p0, p1);
+	}
 }
 
-bool RBX::Humanoid::isFalling()
+void RBX::Humanoid::editMass()
 {
-    Body* body = humanoidRootPart->getBody();
+	Body* body = humanoidHead->getBody();
+	if (body && body->body)
+	{
+		CoordinateFrame cofm = humanoidRootPart->getCoordinateFrame();
+		dMass m;
 
-    if (body && body->body)
-    {
-        if (humanCheck())
-        {
-            return body->pv->velocity.linear.y >= -0.1f;
-        }
-    }
-    return 0;
+		float dRotation[12] = toDMatrix3(cofm.rotation);
+
+		m = body->getMass();
+
+		m.translate(cofm.translation.x, cofm.translation.y, cofm.translation.z);
+		m.rotate(dRotation);
+		m.adjust(0.1f);
+
+		body->modifyMass(m);
+	}
+}
+void RBX::Humanoid::applyHipHeight()
+{
+	Body* body = humanoidHead->getBody();
+
+	if (isJumping) {
+		return;
+	}
+
+	if (body && body->body)
+	{
+		float distance;
+		Vector3 hit, normal;
+		getHumanoidGroundData(distance, hit, normal);
+
+		Vector3 position = humanoidRootPart->getPosition();
+		Vector3 velocity = body->pv->velocity.linear;
+
+		Vector3 desired = Vector3(position.x, hit.y + hipHeight, position.z);
+
+		if (body->getFloatMass() > 1.5f)
+		{
+			editMass();
+		}
+
+		if (distance <= hipHeight)
+		{
+			body->applyForce(Vector3(0, -velocity.y, 0));
+			body->modifyPosition(desired);
+		}
+	}
 }
 
-bool RBX::Humanoid::isJoined()
+void RBX::Humanoid::onStep()
 {
-    if (!humanCheck()) return 0;
-    return JointsService::areConnectedPrimitives(humanoidRootPart->primitive, humanoidHead->primitive); /* change this probably.. fixi t!!!*/
-}
+	fetchLimbs();
 
-bool RBX::Humanoid::isTripped()
-{
-    if (humanCheck())
-    {
-        Vector3 up = humanoidRootPart->getCoordinateFrame().upVector();
-        Vector3 absNormUp = normalize(abs(up));
-        return (round(absNormUp.y) != 1);
-    }
-    return 0;
-}
-
-bool RBX::Humanoid::isGrounded()
-{
-    return (getHumanoidGroundData()->distanceFrom < hipHeight);
-}
-
-bool RBX::Humanoid::humanoidStanding()
-{
-    bool standing = true;
-    if (humanCheck())
-    {
-        CoordinateFrame cframe = humanoidRootPart->getCoordinateFrame();
-        Body* body = humanoidRootPart->getBody();
-
-        if (isGrounded())
-        {
-            standing = true;
-        }
-
-        if (isTripped())
-        {
-            standing = false;
-        }
-
-        if (isFalling())
-        {
-            standing = false;
-        }
-    }
-    return standing;
-}
-
-bool RBX::Humanoid::limbsCheck()
-{
-    return humanCheck();
-}
-
-void RBX::Humanoid::setWalkDirection(Vector3 value)
-{
-    double x, z;
-    double v4;
-
-    if (value != walkDirection)
-    {
-        if (value == G3D::Vector3::zero())
-        {
-            walkDirection = value;
-            walkMode = DIRECTION_STAY;
-        }
-        else
-        {
-            x = value.x;
-            z = value.z;
-
-            v4 = 1.0 / sqrt(z * z + x * x);
-            walkDirection.x = x * v4;
-            walkDirection.y = 0;
-            walkDirection.z = z * v4;
-            walkDirection *= walkSpeed; /* walk speed */
-            walkMode = DIRECTION_MOVE;
-        }
-    }
-}
-
-void RBX::Humanoid::snap(PVInstance* p0, PVInstance* p1)
-{
-    if (!p0 || !p1) return;
-    SnapConnector* snap = new SnapConnector(p0->primitive, p1->primitive, UNDEFINED);
-    snap->build();
-    snap->link();
-}
-
-void RBX::Humanoid::onDied()
-{
-    if (isDead)
-        return;
-
-    isDead = 1;
-    uuhhh->play();
-}
-
-void RBX::Humanoid::setJump(bool jump)
-{
-    if (canJump && jump == true)
-    {
-        jumping = true;
-        canJump = false;
-    }
-    else
-        jumping = false;
-}
-
-void RBX::Humanoid::jumpTimeStep()
-{
-    if (!canJump && jumpClock >= jumpTimer)
-    {
-        canJump = 1;
-        jumpClock = 0;
-    }
-    else
-    {
-        if (!canJump)
-            jumpClock += RunService::get()->deltaTime;
-    }
-}
-
-void RBX::Humanoid::resetJumpTimer()
-{
-    canJump = 0;
-}
-
-void RBX::Humanoid::buildJoints()
-{
-    if (!isJoined())
-    {
-        snap(humanoidRootPart, humanoidHead);
-        snap(humanoidRootPart, getRightArm());
-        snap(humanoidRootPart, getLeftArm());
-        snap(humanoidRootPart, getRightLeg());
-        snap(humanoidRootPart, getLeftLeg());
-
-        setLegCollisions(false);
-    }
+	if (isValid())
+	{
+		RBX::StandardOut::print(RBX::MESSAGE_INFO, "uh");
+		applyHipHeight();
+	}
+	else
+	{
+		ModelInstance* character = getCharacter();
+		if (character)
+		{
+			character->buildJoints();
+		}
+		/* snap head seperately */
+		Snap(humanoidHead, humanoidRootPart);
+	}
 }
 
 void RBX::Humanoid::onKernelStep()
 {
 
-    if (!humanCheck())
-        return;
-
-    onStrafe();
-}
-
-void RBX::Humanoid::onStep()
-{
-
-    /* first things first.. build the guy! */
-
-    if (!humanCheck())
-        return;
-
-    buildJoints();
-
-    if (!health)
-        onDied();
-
-    updateHumanoidState();
-    jumpTimeStep();
-
-}
-
-void RBX::Humanoid::updateHumanoidState()
-{
-    bool fallingOrJumping;
-    fallingOrJumping = (humanoidState == Falling || humanoidState == Jumping);
-
-    if (isGrounded() &&
-        !fallingOrJumping &&
-        walkDirection == Vector3::zero())
-    {
-        humanoidState = Running;
-    }
-
-    if (!isGrounded() && isFalling())
-    {
-            if (humanoidState != Jumping)
-            {
-                 humanoidState = Falling;
-            }
-    }
-
-    if (isGrounded() && fallingOrJumping)
-    {
-        humanoidState = Landed;
-    }
-
-    if (!isGrounded() && currentlyJumping)
-    {
-        humanoidState = Jumping;
-    }
-
 }
 
 void RBX::Humanoid::renderAdornee(RenderDevice* renderDevice)
 {
-    renderMultiplayer(renderDevice);
+	renderMultiplayer(renderDevice);
 }
 
 void RBX::Humanoid::renderMultiplayer(RenderDevice* renderDevice)
 {
-    GFontRef fnt;
-    RBX::Network::Player* localPlayer;
+	GFontRef fnt;
+	RBX::Network::Player* localPlayer;
 
-    fnt = Gui::get()->font;
-    localPlayer = RBX::Network::Players::get()->localPlayer;
+	fnt = Gui::get()->font;
+	localPlayer = RBX::Network::Players::get()->localPlayer;
 
-    if (humanCheck())
-    {
+	if (isValid())
+	{
 
-        if (localPlayer && localPlayer->character == getParent())
-        {
-            return;
-        }
+		if (localPlayer && localPlayer->character == getParent())
+		{
+			return;
+		}
 
-        if (!fnt.isNull())
-            /*
-            * thanks
-            https://github.com/Vulpovile/Blocks3D/blob/a75f7bf381c6714b8c55bb2e72acfb9077c29a08/src/source/DataModelV2/PartInstance.cpp#L114
-            */
-        {
-            Vector3 position = humanoidHead->getPosition();
-            Vector3 gamepoint = position + Vector3(0, 1.5, 0);
-            Vector3 camerapoint = renderDevice->getCameraToWorldMatrix().translation;
-            float distance = pow(pow((double)gamepoint.x - (double)camerapoint.x, 2) + pow((double)gamepoint.y - (double)camerapoint.y, 2) + pow((double)gamepoint.z - (double)camerapoint.z, 2), 0.5);
-            if (distance < 100 && distance > -100)
-            {
-                if (distance < 0)
-                    distance = distance * -1;
+		if (!fnt.isNull())
+			/*
+			* thanks
+			https://github.com/Vulpovile/Blocks3D/blob/a75f7bf381c6714b8c55bb2e72acfb9077c29a08/src/source/DataModelV2/PartInstance.cpp#L114
+			*/
+		{
+			Vector3 position = humanoidHead->getPosition();
+			Vector3 gamepoint = position + Vector3(0, 1.5, 0);
+			Vector3 camerapoint = renderDevice->getCameraToWorldMatrix().translation;
+			float distance = pow(pow((double)gamepoint.x - (double)camerapoint.x, 2) + pow((double)gamepoint.y - (double)camerapoint.y, 2) + pow((double)gamepoint.z - (double)camerapoint.z, 2), 0.5);
+			if (distance < 100 && distance > -100)
+			{
+				if (distance < 0)
+					distance = distance * -1;
 
-                renderDevice->pushState();
+				renderDevice->pushState();
 
-                    renderDevice->setDepthWrite(0);
-                    renderDevice->setDepthTest((RenderDevice::DepthTest)(RenderDevice::DEPTH_ALWAYS_PASS));
+				renderDevice->setDepthWrite(0);
+				renderDevice->setDepthTest((RenderDevice::DepthTest)(RenderDevice::DEPTH_ALWAYS_PASS));
 
-                    CoordinateFrame pos(renderDevice->getCameraToWorldMatrix().rotation, gamepoint);
+				CoordinateFrame pos(renderDevice->getCameraToWorldMatrix().rotation, gamepoint);
 
-                    fnt->draw3D(renderDevice, getParent()->name, pos, 0.03 * distance, Color3::white(), Color3::black(), G3D::GFont::XALIGN_CENTER, G3D::GFont::YALIGN_CENTER);
-                    drawHealthbar(renderDevice, pos, distance);
+				fnt->draw3D(renderDevice, getParent()->name, pos, 0.03 * distance, Color3::white(), Color3::black(), G3D::GFont::XALIGN_CENTER, G3D::GFont::YALIGN_CENTER);
+				drawHealthbar(renderDevice, pos, distance);
 
-                    renderDevice->setDepthWrite(1);
+				renderDevice->setDepthWrite(1);
 
-                renderDevice->popState();
+				renderDevice->popState();
 
-            }
-        }
-    }
+			}
+		}
+	}
 }
 
 void RBX::Humanoid::drawHealthbar(RenderDevice* rd, CoordinateFrame center, float distance)
 {
-    float f0 = (distance * 4);
+	float f0 = (distance * 4);
 
-    float width = f0 * (health / maxHealth) * 0.032f;
-    float height = distance * 0.015f;
+	float width = f0 * (health / maxHealth) * 0.032f;
+	float height = distance * 0.015f;
 
-    float x = (distance) * -0.065f;
-    float y = (distance) * -0.04f;
+	float x = (distance) * -0.065f;
+	float y = (distance) * -0.04f;
 
-    Rect2D green, red;
+	Rect2D green, red;
 
-    rd->setObjectToWorldMatrix(center);
+	rd->setObjectToWorldMatrix(center);
 
-    green = Rect2D::xywh(Vector2(x, y), Vector2(width, height));
-    red = Rect2D::xywh(Vector2(x, y), Vector2(f0 * 0.032f, height));
+	green = Rect2D::xywh(Vector2(x, y), Vector2(width, height));
+	red = Rect2D::xywh(Vector2(x, y), Vector2(f0 * 0.032f, height));
 
-    Draw::rect2D(red, rd, Color3::red());
-    Draw::rect2D(green, rd, Color3(0.50588238f, 0.77254903f, 0.086274512f));
-
+	Draw::rect2D(red, rd, Color3::red());
+	Draw::rect2D(green, rd, Color3(0.50588238f, 0.77254903f, 0.086274512f));
 }
 
-RBX::PVInstance* RBX::Humanoid::getRightArm()
+void RBX::Humanoid::setLocalTransparency(float transparency)
 {
-    if (!rightArm)
-    {
-        rightArm = getParent()->findFirstChild<PVInstance>("Right Arm");
-    }
-    return rightArm;
+	ModelInstance* character = getCharacter();
+
+	for (size_t i = 0; i < character->children->size(); i++)
+	{
+		PartInstance* pv = toInstance<PartInstance>(character->children->at(i));
+		if (pv)
+		{
+			float fauxTransparency = pv->fauxTransparency;
+			pv->setTransparency(transparency);
+			pv->fauxTransparency = fauxTransparency;
+		}
+	}
 }
 
-RBX::PVInstance* RBX::Humanoid::getLeftArm()
+void RBX::Humanoid::setWalkDirection(Vector3 walkDir)
 {
-    if (!leftArm)
-    {
-        leftArm = getParent()->findFirstChild<PVInstance>("Left Arm");
-    }
-    return leftArm;
+	double x, z;
+	double v4;
+
+	if (walkDir != walkDirection)
+	{
+		if (walkDir == G3D::Vector3::zero())
+		{
+			walkDirection = walkDir;
+			walkMode = DIRECTION_STAY;
+		}
+		else
+		{
+			x = walkDir.x;
+			z = walkDir.z;
+
+			v4 = 1.0 / sqrt(z * z + x * x);
+			walkDirection.x = x * v4;
+			walkDirection.y = 0;
+			walkDirection.z = z * v4;
+			walkDirection *= walkSpeed; /* walk speed */
+			walkMode = DIRECTION_MOVE;
+		}
+	}
 }
 
-RBX::PVInstance* RBX::Humanoid::getRightLeg()
+void RBX::Humanoid::getHumanoidGroundData(float& distanceFrom, Vector3& hit, Vector3& normal)
 {
-    if (!rightLeg)
-    {
-        rightLeg = getParent()->findFirstChild<PVInstance>("Right Leg");
-    }
-    return rightLeg;
+	CoordinateFrame cframe = humanoidRootPart->getCoordinateFrame();
+
+	Ray ray = Ray::fromOriginAndDirection(cframe.translation, -Vector3::unitY());
+
+	RBX::ISelectable* maybeGround = RBX::World::getPartFromG3DRay<Instance>(ray, hit, true, *getParent()->getChildren());
+
+	hit = hit;
+	normal = normalize(hit);
+	distanceFrom = (ray.origin - hit).magnitude();
 }
 
-RBX::PVInstance* RBX::Humanoid::getLeftLeg()
+RBX::Humanoid* RBX::Humanoid::modelIsCharacter(RBX::Instance* testModel)
 {
-    if (!leftLeg)
-    {
-        leftLeg = getParent()->findFirstChild<PVInstance>("Left Leg");
-    }
-    return leftLeg;
+	if (testModel)
+	{
+		return testModel->findFirstChildOfClass<RBX::Humanoid>("Humanoid");
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+RBX::Humanoid::Humanoid()
+{
+	health = 100.0f;
+	maxHealth = 100.0f;
+	hipHeight = 4.20f;
+	walkSpeed = 6;
+	setClassName("Humanoid");
+	setName("Humanoid");
+	humanoidRootPart = 0;
+	humanoidHead = 0;
+}
+
+RBX::Humanoid::~Humanoid()
+{
+
 }

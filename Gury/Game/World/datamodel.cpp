@@ -1,4 +1,6 @@
 
+#include "../instanceGarbageCollector.h"
+
 #include "../Gury/Studio/pch.h"
 #include "../Gury/Studio/MainFrm.h"
 
@@ -47,10 +49,13 @@ RBX::Datamodel* RBX::Datamodel::get()
 void RBX::Datamodel::loadContent(std::string contentId)
 {
     loaded = false;
+
     RBX::StandardOut::print(MESSAGE_INFO, "DataModel loading %s", contentId.c_str());
     RBX::Serializer::load(contentId);
 
+    Gurnel::get()->afterStep();
     JointsService::get()->buildGlobalJoints();
+
     loaded = true;
 
     RBX::StandardOut::print(MESSAGE_INFO, "DataModel::loadContent diagnostic splash: %d scripts, %d bricks, %d joints, %d primitives, %d bodies, %d textures", scriptContext->getNumScripts(), workspace->getNumBricks(), jointService->getNumConnectors(), Gurnel::get()->getPrimitivesInWorld(), Gurnel::get()->getBodiesInWorld(), Render::TextureReserve::get()->getNumTextures());
@@ -70,6 +75,8 @@ void RBX::Datamodel::close()
     RBX::Log::close();
     Gurnel::get()->close();
     emptyExplorerWindow();
+    workspace->clearAllChildren();
+    guiRoot->clearAllChildren();
 }
 
 void RBX::Datamodel::descendentAdded(Instance* _this, Instance* i)
@@ -152,6 +159,7 @@ void RBX::Datamodel::open()
 
 void RBX::Datamodel::step(double deltaTime)
 {
+    InstanceGarbageCollector::get()->step();
     runService->heartbeat(deltaTime);
-    yieldingThreads->resume(deltaTime);
+    //->resume(deltaTime);
 }

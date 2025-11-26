@@ -12,8 +12,8 @@ namespace RBX
 	{
 	public:
 
-		Instances sceneObjects;
-		Instances sceneModels;
+		Instances* sceneObjects;
+		Instances* sceneModels;
 
 		void onWorkspaceDescendentAdded(RBX::Render::IRenderable* descendent);
 		void onWorkspaceDescendentRemoved(RBX::Render::IRenderable* descendent);
@@ -21,8 +21,10 @@ namespace RBX
 		void updateSteppables();
 		void updateSteppablesKernelly();
 
-		void initializeKernel();
 		void saveStartPVs();
+
+		void removeRenderable(Render::IRenderable* iRenderable);
+		void addRenderable(Render::IRenderable* iRenderable);
 
 		static bool isRenderable(RBX::Instance* instance) { return dynamic_cast<RBX::Render::IRenderable*>(instance) != 0; }
 
@@ -31,10 +33,10 @@ namespace RBX
 
 		WorldScene()
 		{
-			sceneObjects = Instances();
-			sceneModels = Instances();
+			sceneObjects = new Instances();
+			sceneModels = new Instances();
 		}
 
-		Instances getArrayOfObjects();
+		Instances* getArrayOfObjects();
 	};
 }

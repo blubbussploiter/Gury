@@ -18,23 +18,27 @@ RBX::WorldScene* RBX::WorldScene::get()
 
 void RBX::WorldScene::close()
 {
-	for (Instance* object : sceneObjects)
+	for (unsigned int i = 0; i < sceneObjects->size(); i++)
 	{
-		object->remove();
+		Instance* object = sceneObjects->at(i);
+		if (object)
+		{
+			object->remove();
+		}
 	}
-	sceneObjects.clear();
+	sceneObjects->clear();
 }
 
-RBX::Instances RBX::WorldScene::getArrayOfObjects()
+RBX::Instances* RBX::WorldScene::getArrayOfObjects()
 {
 	return sceneObjects;
 }
 
 void RBX::WorldScene::updateSteppables()
 {
-	for (unsigned int i = 0; i < sceneObjects.size(); i++)
+	for (unsigned int i = 0; i < sceneObjects->size(); i++)
 	{
-		ISteppable* steppableObject = toInstance<ISteppable>(sceneObjects.at(i));
+		ISteppable* steppableObject = toInstance<ISteppable>(sceneObjects->at(i));
 		if (steppableObject)
 		{
 			steppableObject->onStep();
@@ -44,9 +48,9 @@ void RBX::WorldScene::updateSteppables()
 
 void RBX::WorldScene::updateSteppablesKernelly()
 {
-	for (unsigned int i = 0; i < sceneObjects.size(); i++)
+	for (unsigned int i = 0; i < sceneObjects->size(); i++)
 	{
-		ISteppable* steppableObject = toInstance<ISteppable>(sceneObjects.at(i));
+		ISteppable* steppableObject = toInstance<ISteppable>(sceneObjects->at(i));
 		if (steppableObject)
 		{
 			steppableObject->onKernelStep();
@@ -54,27 +58,40 @@ void RBX::WorldScene::updateSteppablesKernelly()
 	}
 }
 
-void RBX::WorldScene::initializeKernel()
-{
-	for (unsigned int i = 0; i < sceneObjects.size(); i++)
-	{
-		PVInstance* pvInstance = toInstance<PVInstance>(sceneObjects.at(i));
-		if (pvInstance)
-		{
-			pvInstance->initializeForKernel();
-		}
-	}
-}
-
 void RBX::WorldScene::saveStartPVs() /* before run: save each position of everything in the scene */
 {
-	for (unsigned int i = 0; i < sceneObjects.size(); i++)
+	for (unsigned int i = 0; i < sceneObjects->size(); i++)
 	{
-		PVInstance* pvInstance = toInstance<PVInstance>(sceneObjects.at(i));
+		PVInstance* pvInstance = toInstance<PVInstance>(sceneObjects->at(i));
 		if (pvInstance)
 		{
 			pvInstance->savePV();
 		}
+	}
+}
+
+void RBX::WorldScene::removeRenderable(Render::IRenderable* iRenderable)
+{
+	if (std::find(sceneObjects->begin(), sceneObjects->end(), iRenderable) != sceneObjects->end())
+	{
+		if (iRenderable->inRenderEnvironment())
+		{
+			iRenderable->removeFromRenderEnvironment();
+			Render::WorldManager::get()->makeDirty();
+		}
+		sceneObjects->erase(std::remove(
+			sceneObjects->begin(),
+			sceneObjects->end(),
+			iRenderable));
+	}
+}
+
+void RBX::WorldScene::addRenderable(Render::IRenderable* iRenderable)
+{
+	if (std::find(sceneObjects->begin(), sceneObjects->end(), iRenderable) == sceneObjects->end())
+	{
+		sceneObjects->push_back(iRenderable);
+		Render::WorldManager::get()->makeDirty();
 	}
 }
 
@@ -91,46 +108,27 @@ void RBX::WorldScene::onWorkspaceDescendentAdded(Render::IRenderable* instance)
 			if (parent)
 			{
 				Render::IRenderable* renderable = (Render::IRenderable*)(parent);
-				renderable->specialShape = instance;
+				if (renderable)
+				{
+					renderable->specialShape = instance;
+				}
 			}
 		}
-		else
-		{
-			//instance->write();
-			Render::WorldManager::get()->makeDirty();
-		}
 
-		if (pvInstance)
-		{
-			Gurnel::get()->addQueuedPrimitive(pvInstance->primitive);
-		}
-
-		sceneObjects.push_back(instance);
-	}
-	else if (IsA<ModelInstance>(instance))
-	{
-		ModelInstance* model = toInstance<ModelInstance>(instance);
-		model->buildJoints();
+		addRenderable(instance);
 	}
 }
 
 void RBX::WorldScene::onWorkspaceDescendentRemoved(RBX::Render::IRenderable* instance)
 {
-	if (std::find(sceneObjects.begin(), sceneObjects.end(), instance) != sceneObjects.end())
+	PartInstance* pv = toInstance<PartInstance>(instance);
+	if (pv)
 	{
-		sceneObjects.erase(std::remove(
-			sceneObjects.begin(),
-			sceneObjects.end(),
-			instance));
-
-		PVInstance* pv = toInstance<PVInstance>(instance);
-		if (pv)
-		{
-			/* Clear out surfaces + physical presence */
-			pv->RemovePhysicalPresence();
-			pv->removeSurfaces(pv->color);
-		}
-
-		instance->removeFromRenderEnvironment();
+		/* Clear out surfaces + physical presence */
+		pv->RemovePhysicalPresence();
+		pv->removeSurfaces(pv->color);
 	}
+
+	instance->removeFromRenderEnvironment();
+	removeRenderable(instance);
 }

@@ -1,5 +1,7 @@
 
 
+#include "../instanceGarbageCollector.h"
+
 #include "../Gury/Studio/pch.h"
 #include "../Gury/Main/framework.h"
 #include "../Gury/Studio/MainFrm.h"
@@ -125,13 +127,15 @@ void RBX::Instance::setParent(Instance* instance)
 
 		if (oldParent)
 		{
-			if (std::find(parent->getChildren()->begin(), parent->getChildren()->end(), this) != parent->getChildren()->end())
+			Instances* children = oldParent->getChildren();
+			if (std::find(children->begin(), children->end(), this) != children->end())
 			{
-				parent->signalOnDescendentRemoved(instance, this);
-				parent->getChildren()->erase(std::remove(parent->getChildren()->begin(), parent->getChildren()->end(), this));
+				oldParent->signalOnDescendentRemoved(instance, this);
+				children->erase(std::remove(children->begin(), children->end(), this));
 				oldParent->onChildRemoved(oldParent, this);
 			}
 		}
+
 		parent = instance;
 
 		if (parent)
@@ -148,16 +152,23 @@ void RBX::Instance::setParent(Instance* instance)
 	onChanged(this, getPropertyByName("Parent"));
 }
 
+void RBX::Instance::clearAllChildren()
+{
+	for (size_t i = 0; i < children->size(); i++)
+	{
+		Instance* child = children->at(i);
+		if (child)
+		{
+			child->remove();
+		}
+	}
+}
+
 void RBX::Instance::remove()
 {
 	if (!isParentLocked)
 	{
-
-		if (parent)
-		{
-			Instances parentChildren = *parent->children;
-			parentChildren.erase(std::remove(parentChildren.begin(), parentChildren.end(), this), parentChildren.end());
-		}
+		InstanceGarbageCollector::get()->addInstance(this);
 
 		for (RBX::Instance* i : *children)
 		{
@@ -168,8 +179,6 @@ void RBX::Instance::remove()
 		}
 
 		setParent(0);
-
-		delete []this;
 	}
 }
 
@@ -213,18 +222,24 @@ rttr::property RBX::Instance::getPropertyByName(std::string propertyName)
 void RBX::Instance::onInstanceUpdateStudioView(RBX::Instance* instance, rttr::property property)
 {
 	ExplorerTreeView* classView = &CMainFrame::mainFrame->m_wndClassView;
-
-	std::string name = property.get_name().to_string();
-
-	if (name == "Name")
+	if (classView && instance)
 	{
-		std::string newName = instance->getName();
-		HTREEITEM item = classView->GetInstance(instance);
-		classView->m_wndClassView.SetItemText(item, newName.c_str());
-	}
 
-	if (name == "Parent")
-	{
-		classView->MoveInstanceParent(instance);
+		std::string name = property.get_name().to_string();
+
+		if (name == "Name")
+		{
+			std::string newName = instance->getName();
+			HTREEITEM item = classView->GetInstance(instance);
+			if (item)
+			{
+				classView->m_wndClassView.SetItemText(item, newName.c_str());
+			}
+		}
+
+		if (name == "Parent")
+		{
+			classView->MoveInstanceParent(instance);
+		}
 	}
 }

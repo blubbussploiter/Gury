@@ -30,10 +30,8 @@ void RBX::RunService::run()
         RBX::Network::Player* localPlayer;
         localPlayer = RBX::Network::Players::get()->localPlayer;
 
-        WorldScene::get()->saveStartPVs();
         Gurnel::get()->spawnWorld();
-
-        RBX::StandardOut::print(RBX::MESSAGE_INFO, "RunService::run() diagnostic splash: %d primitives and %d bodies in world", Gurnel::get()->getPrimitivesInWorld(), Gurnel::get()->getBodiesInWorld());
+        WorldScene::get()->saveStartPVs();
 
         if (!hasStarted)
         {
@@ -60,7 +58,9 @@ void RBX::RunService::run()
 
         isRunning = true;
         isPaused = false;
-     
+
+        RBX::StandardOut::print(RBX::MESSAGE_INFO, "RunService::run() diagnostic splash: %d primitives and %d bodies in world", Gurnel::get()->getPrimitivesInWorld(), Gurnel::get()->getBodiesInWorld());
+
     }
 }
 
@@ -81,14 +81,17 @@ void RBX::RunService::reset()
 {
     if (!hasStarted) /* to do : make this dependent on the functions below! this doesnt check for new objects / objects added after run */
     {
-        JointsService::get()->buildGlobalJoints();
-        JointsService::get()->buildConnectors();
+       // JointsService::get()->buildGlobalJoints();
     }
     else
     {
+        MessageBox(0, "Hi", 0, 0);
+        return;
+
         shouldReset = 1;
         update();
         stop();
+        Gurnel::get()->haltKernel();
     }
 }
 
@@ -97,22 +100,24 @@ void RBX::RunService::update()
 
     if (isRunning)
     {
+        Gurnel::get()->afterStep();
+
+        for (int i = 0; i < 2; i++)
+        {
+            Gurnel::get()->step(0.03f, 16);
+        }
+
         RBX::WorldScene::get()->updateSteppables();
         RBX::WorldScene::get()->updateSteppablesKernelly();
 
-        for (int i = 0; i < 4; i++)
-        {
-            Gurnel::get()->step(0.02f, 2);
-        }
-
-        Gurnel::get()->afterStep();
-
+        JointsService::get()->buildConnectors();
     }
 
     /* reset pvs */
 
     if (shouldReset)
     {
+
         resetPvs();
 
         Gurnel::get()->markForReset(true);
@@ -140,10 +145,10 @@ void RBX::RunService::updateSteppers()
 
 void RBX::RunService::resetPvs()
 {
-    Instances scene = WorldScene::get()->getArrayOfObjects();
-    for (unsigned int i = 0; i < scene.size(); i++)
+    Instances* scene = WorldScene::get()->getArrayOfObjects();
+    for (unsigned int i = 0; i < scene->size(); i++)
     {
-        PVInstance* pv = toInstance<PVInstance>(scene.at(i));
+        PVInstance* pv = toInstance<PVInstance>(scene->at(i));
         if (pv)
         {
             if (pv->getBody())

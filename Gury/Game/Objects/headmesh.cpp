@@ -1,6 +1,7 @@
 
 #include "PVInstance/pvinstance.h"
 #include "../World/lighting.h"
+#include "../Objects/part.h"
 
 #include "mesh.h"
 
@@ -182,39 +183,9 @@ void RBX::Render::SpecialMesh::writeHead()
 			Vector3 normal = normals[i];
 			Vector3 uv = uvs[i];
 
-			Vector3 newVertex = position.pointToWorldSpace(vertex);
-
-			meshIndices.push_back(RBX::Render::Mesh::write(newVertex, normal, Vector2(uv.x, uv.y)));
+			meshIndices.push_back(RBX::Render::Mesh::write(vertex, normal, Vector2(uv.x, uv.y)));
 		}
 
-	}
-}
-
-void RBX::Render::SpecialMesh::editHead()
-{
-	PVInstance* part = toInstance<PVInstance>(getParent());
-	if (part)
-	{
-
-		Vector3 size = part->getSize();
-		CoordinateFrame position = part->getCoordinateFrame();
-
-		if (meshIndices.size() == vertices.size())
-		{
-			for (int i = 0; i < meshIndices.size(); i++)
-			{
-				uint32 index = meshIndices[i];
-
-				Vector3 vertex = vertices[i];
-				Vector3 normal = normals[i]; 
-				Vector3 uv = uvs[i];
-
-				Vector3 newVertex = position.pointToWorldSpace(vertex);
-
-				RBX::Render::Mesh::edit(index, newVertex, normal, Vector2(uv.x, uv.y));
-
-			}
-		}
 	}
 }
 

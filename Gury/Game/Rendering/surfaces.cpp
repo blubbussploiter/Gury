@@ -1,6 +1,6 @@
-#include "../Gury/Game/Objects/PVInstance/pvinstance.h"
 
 #include "surfaceFactory.h"
+#include "../Objects/part.h"
 
 GImage RBX::getSurfaceFromFile(RBX::SurfaceType s)
 {

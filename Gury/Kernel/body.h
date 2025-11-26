@@ -38,6 +38,10 @@ namespace RBX
 
 	class Body
 	{
+	private:
+		friend class Gurnel;
+		friend class SnapConnector;
+
 	public:
 
 		dBodyID body;
@@ -46,20 +50,22 @@ namespace RBX
 		Vector3 size;
 		G3D::Array<Primitive*> attachedPrimitives;
 
-		boost::signal<void(Body*)> onStepped;
-
 		void* ud;
 		bool disabled, wantsReset; /* anchored */
+
+		void doDestroy();
 
 	public:
 
 		dMass getMass();
 
-		float getFMass();
+		float getFloatMass();
 
-		bool created();
+		bool created() const;
 
 		void* getUserdata();
+
+		bool isValid() const;
 
 		void modifyUserdata(void* data);
 
@@ -78,6 +84,8 @@ namespace RBX
 		void modifySize(Vector3 size);
 
 		void modifyMass(dMass mass);
+
+		void modifyfMass(float mass);
 
 		void applyTorque(Vector3 torque);
 

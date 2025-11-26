@@ -146,21 +146,35 @@ void RBX::Render::RenderScene::renderScene(RenderDevice* renderDevice)
 
 void RBX::Render::RenderScene::renderNonGeometricInstances(RenderDevice* renderDevice)
 {
-	Instances sceneObjects = WorldScene::get()->sceneObjects;
-	for (unsigned int i = 0; i < sceneObjects.size(); i++)
+	Instances* sceneObjects = WorldScene::get()->sceneObjects;
+	for (unsigned int i = 0; i < sceneObjects->size(); i++)
 	{
-		IRenderable* iRenderable = toInstance<IRenderable>(sceneObjects.at(i));
-		iRenderable->renderAdornee(renderDevice);
+		Instance* at = sceneObjects->at(i);
+		if (at)
+		{
+			IRenderable* iRenderable = toInstance<IRenderable>(at);
+			if (iRenderable)
+			{
+				iRenderable->renderAdornee(renderDevice);
+			}
+		}
 	}
 }
 
 void RBX::Render::RenderScene::render2DInstances(RenderDevice* renderDevice)
 {
-	Instances sceneObjects = WorldScene::get()->sceneObjects;
-	for (unsigned int i = 0; i < sceneObjects.size(); i++)
+	Instances* sceneObjects = WorldScene::get()->sceneObjects;
+	for (unsigned int i = 0; i < sceneObjects->size(); i++)
 	{
-		IRenderable* iRenderable = toInstance<IRenderable>(sceneObjects.at(i));
-		iRenderable->render2D(renderDevice);
+		Instance* at = sceneObjects->at(i);
+		if (at)
+		{
+			IRenderable* iRenderable = toInstance<IRenderable>(at);
+			if (iRenderable)
+			{
+				iRenderable->render2D(renderDevice);
+			}
+		}
 	}
 }
 
@@ -173,8 +187,8 @@ void RBX::Render::RenderScene::oneFrame(RenderDevice* renderDevice, Camera* proj
 	{
 		/* Generate / regenerate world */
 
-		TextureReserve::get()->generateSuperTexture();
 		WorldManager::get()->step();
+		TextureReserve::get()->generateSuperTexture();
 
 		renderDevice->beginFrame();
 

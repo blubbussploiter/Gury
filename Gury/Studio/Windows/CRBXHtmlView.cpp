@@ -20,7 +20,6 @@ CRBXHtmlView::~CRBXHtmlView()
 
 void CRBXHtmlView::WriteText(std::string preText, std::string text, std::string color)
 {
-
 	IHTMLDocument2* pDoc = 0;
 	LPDISPATCH pDisp = GetHtmlDocument();
 
@@ -36,7 +35,9 @@ void CRBXHtmlView::WriteText(std::string preText, std::string text, std::string 
 			{
 				bold = "font-weight:bold;";
 			}
-			else { bold = "font-weight:normal;"; }
+			else { 
+				bold = "font-weight:normal;"; 
+			}
 
 			std::string html = RBX::Format("<span style='%s'>%s</span><span style='%s color:%s; %s; '>%s</span><br>", style, preText.c_str(), style, color.c_str(), bold.c_str(), text.c_str());
 
@@ -46,6 +47,7 @@ void CRBXHtmlView::WriteText(std::string preText, std::string text, std::string 
 		}
 
 		pDisp->Release();
+		pDoc->close();
 	}
 
 }
@@ -70,6 +72,7 @@ void CRBXHtmlView::WriteQuickText(std::string text)
 		}
 
 		pDisp->Release();
+		pDoc->close();
 	}
 
 }

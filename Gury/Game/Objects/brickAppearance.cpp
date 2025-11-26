@@ -1,9 +1,63 @@
 
-#include "pvinstance.h"
+#include "part.h"
 
 #include "../Gury/Game/Rendering/renderScene.h"
+#include "../Gury/Game/Objects/mesh.h"
 
-Vector3 RBX::PVInstance::getQuadFaceNormal(NormalId face, Vector3 v0, Vector3 v1, Vector3 v2, Vector3 v3, Vector3 v4, Vector3 v5)
+void RBX::PartInstance::editMeshPosition()
+{
+    CoordinateFrame current = getCoordinateFrame();
+
+    for (int i = 0; i < meshIndices.size(); i++)
+    {
+        Vector3 vertex;
+        uint32 idx = meshIndices[i];
+
+        vertex = Render::Mesh::getGlobalMesh()->originalVertex(idx);
+        vertex = current.pointToWorldSpace(vertex);
+
+        Render::Mesh::editVertex(idx, vertex);
+    }
+
+}
+void RBX::PartInstance::writeBrickFace(NormalId face)
+{
+    Array<Vector3> subdivided;
+    Array<Vector2> subdividedTexcoords;
+
+    generateSubdividedFace(subdivided, subdividedTexcoords, face);
+    writeBrickGeometry(face, subdivided, subdividedTexcoords);
+}
+
+void RBX::PartInstance::writeBrickGeometry(NormalId face, Array<Vector3> vertices, Array<Vector2> texCoords)
+{
+    for (int i = 0; i < vertices.size() - 5; i += 6)
+    {
+
+        Vector3 v0, v1, v2, v3, v4, v5;
+
+        v0 = vertices[i];
+        v1 = vertices[i + 1];
+        v2 = vertices[i + 2];
+        v3 = vertices[i + 3];
+        v4 = vertices[i + 4];
+        v5 = vertices[i + 5];
+
+        Vector3 normal = getQuadFaceNormal(face, v0, v1, v2, v3, v4, v5);
+
+        meshIndices.push_back(RBX::Render::Mesh::write(v0, normal, texCoords[i]));
+        meshIndices.push_back(RBX::Render::Mesh::write(v1, normal, texCoords[i + 1]));
+        meshIndices.push_back(RBX::Render::Mesh::write(v2, normal, texCoords[i + 2]));
+
+        meshIndices.push_back(RBX::Render::Mesh::write(v3, normal, texCoords[i + 3]));
+        meshIndices.push_back(RBX::Render::Mesh::write(v4, normal, texCoords[i + 4]));
+        meshIndices.push_back(RBX::Render::Mesh::write(v5, normal, texCoords[i + 5]));
+    }
+
+}
+
+
+Vector3 RBX::PartInstance::getQuadFaceNormal(NormalId face, Vector3 v0, Vector3 v1, Vector3 v2, Vector3 v3, Vector3 v4, Vector3 v5)
 {
     Vector3 v0v1 = v0 - v2;
     Vector3 v0v2 = v1 - v2;
@@ -21,7 +75,7 @@ Vector3 RBX::PVInstance::getQuadFaceNormal(NormalId face, Vector3 v0, Vector3 v1
    }
 }
 
-Array<Vector3> RBX::PVInstance::calculateBrickFaceVertices(NormalId face, Vector3 size)
+Array<Vector3> RBX::PartInstance::calculateBrickFaceVertices(NormalId face, Vector3 size)
 {
     Array<Vector3> vertices;
     switch (face)
@@ -96,7 +150,7 @@ Array<Vector3> RBX::PVInstance::calculateBrickFaceVertices(NormalId face, Vector
     return vertices;
 }
 
-Array<Vector3> RBX::PVInstance::getBrickFaceVertices(NormalId face, bool asWorldSpace)
+Array<Vector3> RBX::PartInstance::getBrickFaceVertices(NormalId face, bool asWorldSpace)
 {
     Array<Vector3> vertices = calculateBrickFaceVertices(face, size);
 
@@ -111,7 +165,7 @@ Array<Vector3> RBX::PVInstance::getBrickFaceVertices(NormalId face, bool asWorld
     return vertices;
 }
 
-Vector2 RBX::PVInstance::getSubdivisionNumbers(NormalId face, Vector3 size)
+Vector2 RBX::PartInstance::getSubdivisionNumbers(NormalId face, Vector3 size)
 {
     switch (face)
     {
@@ -135,7 +189,7 @@ Vector2 RBX::PVInstance::getSubdivisionNumbers(NormalId face, Vector3 size)
 }
 
 
-void RBX::PVInstance::generateSubdividedFace(Array<Vector3>& out, Array<Vector2>& texCoordsOut, NormalId face)
+void RBX::PartInstance::generateSubdividedFace(Array<Vector3>& out, Array<Vector2>& texCoordsOut, NormalId face)
 {
 
     Render::TextureReserve* textureReserve = Render::TextureReserve::get();
@@ -175,12 +229,12 @@ void RBX::PVInstance::generateSubdividedFace(Array<Vector3>& out, Array<Vector2>
             float height = subdivisions.x;
 
             float subDivisionWidth = width;
-            float subDivisionHeight = 4;
+            float subDivisionHeight = 2;
 
             int iWidth = floorf(subDivisionWidth);
             int iHeight = floorf(subDivisionHeight);
 
-            rbxSubdivide(Smooth, face, iWidth, iHeight, width, worldSize.y, height, u, v, getCenter(), out, texCoordsOut);
+            rbxSubdivide(surface, face, iWidth, iHeight, width, worldSize.y, height, u, v, getCenter(), out, texCoordsOut);
         }
     }
     else
@@ -191,7 +245,7 @@ void RBX::PVInstance::generateSubdividedFace(Array<Vector3>& out, Array<Vector2>
     }
 }
 
-void RBX::PVInstance::removeSurfaces(Color4 surfaceColor)
+void RBX::PartInstance::removeSurfaces(Color4 surfaceColor)
 {
     removeSurface(surfaceColor, front);
     removeSurface(surfaceColor, back);
@@ -201,7 +255,7 @@ void RBX::PVInstance::removeSurfaces(Color4 surfaceColor)
     removeSurface(surfaceColor, right);
 }
 
-void RBX::PVInstance::orderSurfaces(Color4 surfaceColor)
+void RBX::PartInstance::orderSurfaces(Color4 surfaceColor)
 {
     orderSurface(surfaceColor, front);
     orderSurface(surfaceColor, back);
@@ -211,44 +265,62 @@ void RBX::PVInstance::orderSurfaces(Color4 surfaceColor)
     orderSurface(surfaceColor, right);
 }
 
-void RBX::PVInstance::orderSurface(Color4 surfaceColor, SurfaceType surfaceType)
+void RBX::PartInstance::orderSurface(Color4 surfaceColor, SurfaceType surfaceType)
 {
     BrickColor::getColorMap()->orderInAtlas(surfaceColor, surfaceType);
 }
 
-void RBX::PVInstance::removeSurface(Color4 surfaceColor, SurfaceType surfaceType)
+void RBX::PartInstance::removeSurface(Color4 surfaceColor, SurfaceType surfaceType)
 {
     BrickColor::getColorMap()->tryRemove(surfaceColor, surfaceType);
 }
 
-void RBX::PVInstance::reorderSurfaces(Color4 oldColor)
+bool RBX::PartInstance::containSurface(SurfaceType surface)
+{
+    return (top == surface || bottom == surface || right == surface || left == surface || front == surface || back == surface);
+}
+
+void RBX::PartInstance::reorderSurfaces(Color4 oldColor)
 {
     /* Reorder surfaces */
     removeSurfaces(oldColor);
     orderSurfaces(color);
 }
 
-void RBX::PVInstance::regenerateRenderable()
+void RBX::PartInstance::regenerateRenderable()
 {
-    if(shape == Block)
+    Render::SpecialMesh * mesh = getSpecialMesh();
+    if (mesh)
     {
+        mesh->removeFromRenderEnvironment();
+    }
+    else
+    { 
         if (meshIndices.size() > 0)
         {
             removeFromRenderEnvironment();
         }
-        doWrite(true);
-        edit();
     }
+    doWrite(true);
+    edit();
 }
 
-void RBX::PVInstance::step()
+void RBX::PartInstance::regenerateFace(NormalId face)
 {
-    if (specialShape)
+    Array<Vector3> subdivided;
+    Array<Vector2> subdividedTexcoords;
+
+    generateSubdividedFace(subdivided, subdividedTexcoords, face);
+
+    for (int i = 0; i < meshIndices.size(); i++)
     {
-        specialShape->edit();
+        Vector3 vertex, normal;
+        uint32 idx = meshIndices[i];
+
+        vertex = Render::Mesh::getGlobalMesh()->vertexArray[idx];
+        normal = Render::Mesh::getGlobalMesh()->normalArray[idx];
+
+        Render::Mesh::edit(idx, vertex, normal, subdividedTexcoords[i]);
     }
-    else
-    {
-        editMeshPositition();
-    }
+
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Gury/Game/Objects/PVInstance/pvinstance.h"
+#include "../Gury/Game/Objects/part.h"
 #include "../Gury/Game/Objects/PVInstance/pvenums.h"
 #include "../Gury/Game/Services/content.h"
 #include "../Gury/Game/Services/stdout.h"
@@ -83,7 +83,7 @@ namespace RBX
 				}
 				
 				CoordinateFrame getParentCoordinateFrame() {
-					PVInstance* pvInstance = toInstance<PVInstance>(parent);
+					PartInstance* pvInstance = toInstance<PartInstance>(parent);
 					if (pvInstance) {
 						return pvInstance->getCoordinateFrame();
 					}
@@ -92,7 +92,7 @@ namespace RBX
 
 				Vector3 getParentSize()
 				{
-					PVInstance* pvInstance = toInstance<PVInstance>(parent);
+					PartInstance* pvInstance = toInstance<PartInstance>(parent);
 					if (pvInstance) {
 						return pvInstance->getSize();
 					}
@@ -129,7 +129,7 @@ namespace RBX
 				void editWedge();
 
 				void writeHead();
-				void editHead();
+				void editMeshPosition();
 
 				void removeFromRenderEnvironment();
 

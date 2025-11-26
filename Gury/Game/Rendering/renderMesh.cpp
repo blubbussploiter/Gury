@@ -67,6 +67,16 @@ void RBX::Render::Mesh::editVertex(uint32 index, Vector3 vertex)
 	}
 }
 
+Vector3 RBX::Render::Mesh::originalVertex(uint32 index)
+{
+	Mesh* global = getGlobalMesh();
+	if (global->originVertexArray.size() > index)
+	{
+		return global->originVertexArray[index];
+	}
+	return Vector3::zero();
+}
+
 void RBX::Render::Mesh::freeVertex(uint32 index)
 {
 	Mesh* global = getGlobalMesh();

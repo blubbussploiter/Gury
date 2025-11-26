@@ -11,74 +11,36 @@ bool isASnapConnector(RBX::Primitive* prim)
 	return (RBX::SnapConnector::getConnectingSnap(prim) != 0);
 }
 
-CoordinateFrame getCenterOfMass(Array<RBX::Primitive*>* primitives)
-{
-	CoordinateFrame center;
-	Vector3 min, max;
-	Matrix3 rot;
-
-	for (unsigned int i = 0; i < primitives->size(); i++) /* modded version of this: https://devforum.roblox.com/t/how-do-i-get-the-middle-of-multiple-parts/2007200/20 */
-	{
-		RBX::Primitive* primitive = (*primitives)[i];
-		Vector3 pos = primitive->getPosition().translation;
-
-		if (min == Vector3::zero())
-		{
-			min = pos;
-		}
-		else
-		{
-			if (pos.x < min.x) min.x = pos.x;
-			if (pos.y < min.y) min.y = pos.y;
-			if (pos.z < min.z) min.z = pos.z;
-		}
-
-		if (max == Vector3::zero())
-		{
-			max = pos;
-		}
-		else
-		{
-			if (pos.x > max.x) max.x = pos.x;
-			if (pos.y > max.y) max.y = pos.y;
-			if (pos.z > max.z) max.z = pos.z;
-			rot = primitive->getPosition().rotation;
-		}
-	}
-	center.translation = ((max - min) / 2) + min;
-	center.rotation = rot;
-	return center;
-}
-
 void RBX::SnapConnector::build()
 {
 	Connector::build();
 
-	if (prim0->geom[0] && prim1->geom[0])
+	return;
+
+	if (prim0->ud != this && prim1->ud != this)
 	{
-		SnapConnector* connector0, * connector1;
+		OffsetBodyNode* parentNode = constructParentNode(prim0, prim1);
 
-		connector0 = getConnectingSnap(prim0);
-		connector1 = getConnectingSnap(prim1);
-
-		if (!connector0)
+		if (!parentNode)
 		{
-			prim0->modifyUserdata(this);
-		}
-		if (!connector1)
-		{
-			prim1->modifyUserdata(this);
+			//RBX::StandardOut::print(RBX::MESSAGE_ERROR, "No Node");
+			//OffsetBodyNode* newNode = new OffsetBodyNode();
+			//newNode->nodeType = Snapped;
+			//parentNode = newNode;
 		}
 
-		anchored = (prim0->body != 0 && prim1->body != 0);
+		//parentNode->addPrimitive(prim0);
+		//parentNode->addPrimitive(prim1);
+
+		//setParentNode(parentNode);
+		//JointsService::get()->addConnectorNode(parentNode);
 	}
+
 
 }
 
 void RBX::SnapConnector::link()
 {
-	/* do like JointService::doLink(Connector* connector) */
-	JointsService::get()->doLink(this);
 }
 
 

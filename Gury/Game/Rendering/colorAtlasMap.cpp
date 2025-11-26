@@ -10,14 +10,7 @@ void RBX::BrickColor::BrickAtlasMap::orderInAtlas(Color4 brickColor, SurfaceType
 	{
 		GImage orderedTexture = GImage(0, 0, 4);
 
-		if (surface == Smooth)
-		{
-			orderedTexture.resize(32+ 10, 32+ 10, 4); /* plus 5, 5 */
-		}
-		else
-		{
-			orderedTexture.resize(64+ 10, 128+10, 4); /* plus 5, 5 */
-		}
+		orderedTexture.resize(64 + 10, 128 + 1, 4); /* plus 5, 5 */
 
 		Color4uint8 color;
 		color.r = brickColor.r * 255;
@@ -31,7 +24,7 @@ void RBX::BrickColor::BrickAtlasMap::orderInAtlas(Color4 brickColor, SurfaceType
 			GImage surfaceTexture = getSurfaceFromFile(surface);
 			GImage surfaceCanvas(orderedTexture.width, orderedTexture.height, 4);
 
-			GImage::pasteSubImage(surfaceCanvas, surfaceTexture, 5, 5, 0, 0, surfaceTexture.width, surfaceTexture.height);
+			GImage::pasteSubImage(surfaceCanvas, surfaceTexture, 4, 0, 0, 0, surfaceTexture.width, surfaceTexture.height);
 
 			ImageMasher::mash(surfaceCanvas, orderedTexture, orderedTexture, 0.65f);
 		}

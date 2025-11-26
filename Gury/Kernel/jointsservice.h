@@ -25,18 +25,19 @@ namespace RBX
 		NoBuild /* dont build joints AT ALL */
 	};
 
-	class ConnectorNode;
+	class OffsetBodyNode;
+	class PartInstance;
 
 	class Connector : public Instance
 	{
+	private:
 		friend class JointsService;
 		friend class SnapConnector;
-	private:
 
 		Array<Primitive*>* primitives;
 		Array<Body*>* bodys;
 
-		ConnectorNode* parentNode;
+		OffsetBodyNode* parentNode;
 
 		CoordinateFrame center; // for debug
 
@@ -48,24 +49,19 @@ namespace RBX
 		NormalId connectedAt;
 
 		virtual void build();
-		virtual void link() {};
 		virtual void unlink() {};
 
-		bool diagPrimitivesAreTouching();
-
-		void diagRender(RenderDevice* rd);
-		void diagRenderPrimitiveOutlines(RenderDevice* rd);
-
+		void setParentNode(OffsetBodyNode* parentNode);
 		CoordinateFrame getInterceptPosition(); // for debug 
 		static Connector* getConnectingConnector(RBX::Primitive* prim);
-		static ConnectorNode* getParentNode(RBX::Primitive* prim0, RBX::Primitive* prim1);
-		static void getConnectingConnectorsByPrim(RBX::Primitive* prim, Array<Connector*>& finalArray);
-		static void getConnectingConnectorsByConnector(RBX::Connector* connector, Array<Connector*>& finalArray);
+		static void getConnectorTree(Primitive* primitive0, Primitive* primitive1, Array<RBX::Connector*>& connectors); /* get any connectors possibly connected to this connector */
+		static OffsetBodyNode* constructParentNode(RBX::Primitive* prim0, RBX::Primitive* prim1);
 
 		bool connected();
 
 		Connector(Primitive* prim0, Primitive* prim1, NormalId connectedAt) : prim0(prim0), prim1(prim1), connectedAt(connectedAt)
 		{
+			parentNode = 0;
 		}
 
 		~Connector()
@@ -74,21 +70,38 @@ namespace RBX
 		}
 	};
 
-	class ConnectorNode
+	class OffsetBodyNode /* Used for welds, glue and snaps. anything that uses one body and primitive offsets instead of traditional joints */
 	{
 	private:
-		Array<Connector*> connectors;
+		friend class Connector;
+		friend class SnapConnector;
+		friend class JointsService; 
+		Linkage nodeType;
+		Array<Primitive*> primitives;
+		Body* thisBody;
+		CoordinateFrame cofm;
+		bool isStatic; /* anchored or not */
 	public:
-		void addConnector(Connector* connector)
+		void addPrimitive(Primitive* primitive);
+		void removePrimitive(Primitive* primitive);
+		bool containsPrimitive(Primitive* primitive)
 		{
-			connectors.append(connector);
+			return primitives.contains(primitive);
 		}
-		void removeConnector(Connector* connector)
+
+		void adjustCofm();
+
+		void createBody();
+
+		void doRender(RenderDevice* renderDevice);
+		Extents getExtents();
+
+		OffsetBodyNode()
 		{
-			if (connectors.contains(connector))
-			{
-				connectors.fastRemove(connectors.findIndex(connector));
-			}
+			nodeType = NotLinked;
+			primitives = Array<Primitive*>();
+			thisBody = 0;
+			isStatic = false;
 		}
 	};
 
@@ -97,8 +110,8 @@ namespace RBX
 		public Service<JointsService>
 	{
 	public:
-		Array<Body*> old_Bodies; /* bodies from old primitives before connector built */
-		Array<ConnectorNode*> connectorNodes; /* `nodes` of connectors for building them later on */
+		Array<Body*> oldBodies; /* bodies from old primitives before connector built */
+		Array<OffsetBodyNode*> offsetBodyNodes; /* `nodes` of connectors for building them later on */
 	public:
 
 		dJointGroupID joints;
@@ -106,14 +119,32 @@ namespace RBX
 
 		BuildTime buildTime;
 
-		class Experiment
+		class Builder
 		{
 		public:
-			static bool areIntersecting(PVInstance* pv1, PVInstance* pv2);
+			static void recursiveSiblingCheck(bool& endResult, Primitive* primitive, Connector* link, Connector* rootLink=0);
+			static bool connectedBySiblings(Connector* link0, Connector* link1, bool recursive);
+			static bool checkLinks(Primitive* primitive, Connector* link);
+			static bool checkTwoLinks(Primitive* primitive, Connector* link0, Connector* link1);
+
+			static OffsetBodyNode* grabCurrentNode(Primitive* primitive);
+
+			static void shouldBeStatic(OffsetBodyNode* thisNode);
+
+			static bool CollidesWith(Primitive* primitive, OffsetBodyNode* primitiveNode);
+
+			static bool Collides(Primitive* primitive0, Primitive* primitive1);
+			static bool Collides(OffsetBodyNode* node0, OffsetBodyNode* node1);
+
 			static void getKernelWorldContacts();
-			static void buildInstancesJoints(Instances instances);
+
+			static void buildInstancesJoints(Instances* instances);
 			static void buildGlobalJoints();
 		};
+
+		void snap(PartInstance* part1, PartInstance* part2);
+
+		bool inStaticNode(Primitive* primitive);
 
 		void setBuildTime(BuildTime b) {
 			buildTime = b;
@@ -125,18 +156,22 @@ namespace RBX
 
 		int getNumConnectors()
 		{
-			return getChildren()->size(); /* inaccurate lol */
+			return getChildren()->size(); /* inaccurate lol (2025: actually pretty accurate you nob) */
 		}
 
 		Connector* getConnecting(Primitive* primitive);
 
+		bool arePrimitivesConnected(Primitive* primitive0, Primitive* primitive1);
+
 		void addConnector(Connector* connector);
+		void addConnectorNode(OffsetBodyNode* newNode);
+		void removeConnectorNode(OffsetBodyNode* newNode);
+
+		void linkNodes();
+		void linkNode(OffsetBodyNode* connectorNode);
 
 		void buildConnectors();
-
 		void buildGlobalJoints();
-
-		void doLink(Connector* connector);
 
 		/* before build() version, looks through children */
 
@@ -163,7 +198,7 @@ namespace RBX
 			setName("JointsService");
 			setClassName("JointsService");
 			joints = dJointGroupCreate(0);
-			buildTime = Build;
+			//buildTime = NoBuild;
 		}
 
 		RTTR_ENABLE(RBX::Instance)

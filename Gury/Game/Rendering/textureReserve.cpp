@@ -11,11 +11,11 @@ using namespace RBX;
 
 void RBX::Render::TextureReserve::regenWorld()
 {
-    Instances instances = WorldScene::get()->sceneObjects;
+    Instances* instances = WorldScene::get()->sceneObjects;
 
-    for (size_t i = 0; i < instances.size(); i++)
+    for (size_t i = 0; i < instances->size(); i++)
     {
-        IRenderable* renderable = toInstance<IRenderable>(instances.at(i));
+        IRenderable* renderable = toInstance<IRenderable>(instances->at(i));
         renderable->regenerateRenderable();
     }
 }
@@ -31,14 +31,14 @@ RBX::Render::TextureReserve::TexturePositionalInformation RBX::Render::TextureRe
             TexturePositionalInformation position;
             position = superTexturePositions.get(brickColor_texture);
 
-            position.x += 5;
-            position.y += 5;
-
-            position.cx -= 10;
-            position.cy -= 10;
-
             if (surface != Smooth)
             {
+                position.x += 5;
+                position.y += 1;
+
+                position.cx -= 5;
+                position.cy -= 1;
+
                 float sx = sizeTile.x;
                 float sy = sizeTile.y;
 
@@ -53,6 +53,14 @@ RBX::Render::TextureReserve::TexturePositionalInformation RBX::Render::TextureRe
                     position.cx = 32;
                     position.cy = 64;
                 }
+            }
+            else
+            {
+                position.x += 5;
+                position.y += 5;
+
+                position.cx -= 10;
+                position.cy -= 10;
             }
 
             position.x = position.x / dimensions.x;
@@ -85,9 +93,13 @@ RBX::Render::TextureReserve* RBX::Render::TextureReserve::get()
 
 Vector2 Render::TextureReserve::calculateSuperTextureDimensions()
 {
-    float width = 0, height = 0;
+    int width = 0,
+        height = 0;
+    int highHeight = 0;
 
     Array<int> keys = bindedTextures.getKeys();
+    Array<int> heights = Array<int>();
+
     for (int i = 0; i < keys.size(); i++)
     {
         int key = keys[i];
@@ -104,18 +116,22 @@ Vector2 Render::TextureReserve::calculateSuperTextureDimensions()
 
             if (texture.channels > 0)
             {
-                int textureWidth = texture.width, textureHeight = texture.height;
-                width += textureWidth; /* everything's gonna be packed together so no check for width */
-
-                if (height < textureHeight) /* prevent stair casing? */
-                {
-                    height += textureHeight ;
-                }
+                width += texture.width; /* everything's gonna be packed together so no check for width */
+                heights.push_back(texture.height); /* We'll calculate the height at the end */
             }
         }
     }
 
-    return Vector2(width, height);
+    for (int i = 0; i < heights.size(); i++)
+    {
+        int height = heights[i];
+        if (height > highHeight)
+        {
+            highHeight = height;
+        }
+    }
+
+    return Vector2(width, highHeight);
 }
 
 void Render::TextureReserve::generateSuperTexture()
@@ -123,7 +139,7 @@ void Render::TextureReserve::generateSuperTexture()
 
     if (dirty) /* check if textures added / removed */
     {
-        StandardOut::print(RBX::MESSAGE_INFO, "Dirty, regenerating supertexture...");
+        StandardOut::print(RBX::MESSAGE_INFO, "Dirty, rebuilding supertexture...");
 
         dimensions = calculateSuperTextureDimensions();
 
@@ -155,12 +171,8 @@ void Render::TextureReserve::generateSuperTexture()
                     continue;
                 }
 
-                TexturePositionalInformation position{};
+                TexturePositionalInformation position;
 
-                if (currentX < 0 || currentY < 0)
-                {
-
-                }
                 position.x = currentX;
                 position.y = currentY;
                 position.cx = texture->width;
@@ -178,14 +190,12 @@ void Render::TextureReserve::generateSuperTexture()
         }
 
         Texture::Parameters params;
-        
-        params.wrapMode = Texture::WrapMode::TILE;
-        params.autoMipMap = true;
-        params.interpolateMode = Texture::TRILINEAR_MIPMAP;
+        params.maxMipMap = 2;
+        params.minMipMap = -2;
 
-        guryWorldTexture = Texture::fromGImage("guryWorldTexture", superTextureData, TextureFormat::AUTO, Texture::Dimension::DIM_2D_NPOT, params);
+        guryWorldTexture = Texture::fromGImage("guryWorldTexture", superTextureData, TextureFormat::AUTO, Texture::DIM_2D, params);
 
-        //superTextureData.save("D:\\gury test stuff\\gurySuperImage.png");
+        superTextureData.save("D:\\gurySuperImage.png");
 
         if (!WorldManager::get()->dirty)
         {

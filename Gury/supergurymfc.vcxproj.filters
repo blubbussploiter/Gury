@@ -39,12 +39,8 @@
     <ClCompile Include="Game\Objects\Bins\gametool.cpp" />
     <ClCompile Include="Game\Objects\Bins\hopperbin.cpp" />
     <ClCompile Include="Game\Objects\Bins\rocket.cpp" />
-    <ClCompile Include="Game\Objects\Humanoid\humanoid.cpp" />
-    <ClCompile Include="Game\Objects\Humanoid\humanoidPhysicsStuff.cpp" />
     <ClCompile Include="Game\Objects\PVInstance\pvinstance.cpp" />
-    <ClCompile Include="Game\Objects\PVInstance\pvinstanceAppearance.cpp" />
-    <ClCompile Include="Game\Objects\PVInstance\pvinstanceAppearanceEdit.cpp" />
-    <ClCompile Include="Game\Objects\PVInstance\pvinstanceAppearanceWrite.cpp" />
+    <ClCompile Include="Game\Objects\brickAppearance.cpp" />
     <ClCompile Include="Game\Objects\basescript.cpp" />
     <ClCompile Include="Game\Objects\controller.cpp" />
     <ClCompile Include="Game\Objects\decal.cpp" />
@@ -95,9 +91,9 @@
     <ClCompile Include="Kernel\Connectors\motor.cpp" />
     <ClCompile Include="Kernel\Connectors\snap.cpp" />
     <ClCompile Include="Kernel\body.cpp" />
-    <ClCompile Include="Kernel\jointKernel.cpp" />
-    <ClCompile Include="Kernel\jointsservice.cpp" />
-    <ClCompile Include="Kernel\physicsKernel.cpp" />
+    <ClCompile Include="Kernel\jointBuilderKernel.cpp" />
+    <ClCompile Include="Kernel\jointsService.cpp" />
+    <ClCompile Include="Kernel\kernel.cpp" />
     <ClCompile Include="Kernel\primitive.cpp" />
     <ClCompile Include="Studio\Windows\GuryGameFrame.cpp" />
     <ClCompile Include="Studio\Gury Interaction\Studio Tools\DragTool.cpp" />
@@ -244,8 +240,11 @@
     <ClCompile Include="Game\Lua\luaAllocator.cpp" />
     <ClCompile Include="Game\Rendering\imageMasher.cpp" />
     <ClCompile Include="Game\Rendering\colorAtlasMap.cpp" />
-    <ClCompile Include="Game\Objects\PVInstance\faceTiling.cpp" />
+    <ClCompile Include="Game\Objects\faceTiling.cpp" />
     <ClCompile Include="Game\Rendering\worldManager.cpp" />
+    <ClCompile Include="Game\instanceGarbageCollector.cpp" />
+    <ClCompile Include="Kernel\offsetBodyNode.cpp" />
+    <ClCompile Include="Game\Objects\Humanoid\humanoid.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\application.h" />
@@ -274,7 +273,6 @@
     <ClInclude Include="Game\Objects\Bins\hopperbin.h" />
     <ClInclude Include="Game\Objects\Bins\rocket.h" />
     <ClInclude Include="Game\Objects\Bins\rocketbin.h" />
-    <ClInclude Include="Game\Objects\Humanoid\humanoid.h" />
     <ClInclude Include="Game\Objects\PVInstance\pvenums.h" />
     <ClInclude Include="Game\Objects\PVInstance\pvinstance.h" />
     <ClInclude Include="Game\Objects\basescript.h" />
@@ -379,6 +377,9 @@
     <ClInclude Include="Game\Rendering\imageMasher.h" />
     <ClInclude Include="Game\Rendering\worldManager.h" />
     <ClInclude Include="Game\Objects\PVInstance\Meshes\icosphere.hpp" />
+    <ClInclude Include="Game\Rendering\renderPrimitives.h" />
+    <ClInclude Include="Game\instanceGarbageCollector.h" />
+    <ClInclude Include="Game\Objects\Humanoid\humanoid.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Main\supergurymfc.aps" />

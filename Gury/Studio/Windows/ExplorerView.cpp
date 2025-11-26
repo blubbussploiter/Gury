@@ -156,11 +156,12 @@ void ExplorerTreeView::AddInstance(RBX::Instance* instance, bool addDescending)
 
 void ExplorerTreeView::RemoveInstance(RBX::Instance* instance)
 {
-	if (items.containsKey(instance))
-	{
-		HTREEITEM item = GetInstance(instance);
+	HTREEITEM item = GetInstance(instance);
 
+	if (item)
+	{
 		m_wndClassView.DeleteItem(item);
+		m_wndClassView.RedrawWindow();
 
 		items.remove(instance);
 	}

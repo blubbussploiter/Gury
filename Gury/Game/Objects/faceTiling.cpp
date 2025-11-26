@@ -1,18 +1,16 @@
 
-/* probably the worst code i've written in my life */
-
-#include "pvenums.h"
-#include "pvinstance.h"
+#include "../Objects/PVInstance/pvenums.h"
+#include "part.h"
 
 using namespace RBX;
 
-void RBX::PVInstance::getSliceInformation(NormalId face, SurfaceType surface, Vector3 realSize, Vector2& sliceSize, Vector2& u, Vector2& v)
+void RBX::PartInstance::getSliceInformation(NormalId face, SurfaceType surface, Vector3 realSize, Vector2& sliceSize, Vector2& u, Vector2& v)
 {
-    sliceSize = PVInstance::getSubdivisionNumbers(face, realSize);
+    sliceSize = PartInstance::getSubdivisionNumbers(face, realSize);
     Render::TextureReserve::get()->getSurfaceXXYY(color, surface, face, sliceSize, u, v);
 }
 
-void PVInstance::appendTexCoordsXYWH(Array<Vector2>& texCoordsOut, Vector2 ru, Vector2 rv, Vector2 size, float width, float height)
+void PartInstance::appendTexCoordsXYWH(Array<Vector2>& texCoordsOut, Vector2 ru, Vector2 rv, Vector2 size, float width, float height)
 {
     bool writeHorizontal = false;
 
@@ -36,41 +34,24 @@ void PVInstance::appendTexCoordsXYWH(Array<Vector2>& texCoordsOut, Vector2 ru, V
     appendHelpedTexCoords(texCoordsOut, ru, rv, size, width, height, writeHorizontal);
 }
 
-Vector2 v2Floor(Vector2 v)
-{
-    return Vector2(floor(v.x), floor(v.y));
-}
-
-Vector2 v2Fmod(Vector2 v, float d)
-{
-    return Vector2(fmod(v.x, d), fmod(v.y, d));
-}
-
-Vector2 fract(Vector2 v)
-{
-    return v - v2Floor(v);
-}
-
-void RBX::PVInstance::appendHelpedTexCoords(Array<Vector2>& texCoordsOut, Vector2 ru, Vector2 rv, Vector2 size, float w, float h, bool drawHorizontal)
+void RBX::PartInstance::appendHelpedTexCoords(Array<Vector2>& texCoordsOut, Vector2 ru, Vector2 rv, Vector2 size, float w, float h, bool drawHorizontal)
 {
 
     if (w >= 30 || h >= 30)
     {
-        if (w < h)
+        Render::TextureReserve* reserve = Render::TextureReserve::get();
+        Vector2 imageDimensions = reserve->getSuperImageDimensions();
+
+        rv.y = (32 * w) / imageDimensions.y;
+        if (rv.y > 4)
         {
-            /* 10/25/25 Soo.. i dont know how to do this quite yet. */
-
-            Render::TextureReserve* reserve = Render::TextureReserve::get();
-            Vector2 imageDimensions = reserve->getSuperImageDimensions();
-            //rv.x = (64 / imageDimensions.x);
-            //rv.y = (128 / imageDimensions.y);
-
-            //Vector2 coord = ru + rv * Vector2(w, h) * fract(rv);
-            //rv = coord;
-
-           // RBX::StandardOut::print(RBX::MESSAGE_ERROR, "rvx = %f, rvy = %f", rv.x * imageDimensions.x, rv.y * imageDimensions.y);
-            drawHorizontal = false;
+            rv.y = floor(rv.y);
         }
+        ru.y = -rv.y;
+
+        rv.x = (32 * size.x) / imageDimensions.x;
+
+        drawHorizontal = false;
     }
 
     if (drawHorizontal)
@@ -97,7 +78,7 @@ void RBX::PVInstance::appendHelpedTexCoords(Array<Vector2>& texCoordsOut, Vector
     }
 }
 
-void RBX::PVInstance::rbxAppendProductSlice(NormalId face, SurfaceType surface, Vector2 sliceSize, Vector2 u, Vector2 v, float cx, float cy, float xw, float yh, float worldY, float width, float height, Array<Vector3>& out, Array<Vector2>& texCoordsOut)
+void RBX::PartInstance::rbxAppendProductSlice(NormalId face, SurfaceType surface, Vector2 sliceSize, Vector2 u, Vector2 v, float cx, float cy, float xw, float yh, float worldY, float width, float height, Array<Vector3>& out, Array<Vector2>& texCoordsOut)
 {
     switch (face)
     {
@@ -110,22 +91,22 @@ void RBX::PVInstance::rbxAppendProductSlice(NormalId face, SurfaceType surface, 
         out.append(Vector3(xw, worldY, yh));
         out.append(Vector3(cx, worldY, cy));
         out.append(Vector3(cx, worldY, yh));
-        
+
         appendTexCoordsXYWH(texCoordsOut, u, v, sliceSize, width, height);
 
         break;
     }
-    case Right:
+    case Left:
     {
-        out.append(Vector3(-size.x, -worldY, cy)); /* 3 */
-        out.append(Vector3(-size.x, -worldY, yh)); /* 2 */
-        out.append(Vector3(-size.x, worldY, yh)); /*  1 */
+        out.append(Vector3(size.x, xw, yh));
+        out.append(Vector3(size.x, cx, yh));
+        out.append(Vector3(size.x, cx, cy));
 
-        out.append(Vector3(-size.x, -worldY, cy)); /* 3 */
-        out.append(Vector3(-size.x, worldY, yh)); /*  1 */
-        out.append(Vector3(-size.x, worldY, cy)); /* 0 */
+        out.append(Vector3(size.x, xw, yh));
+        out.append(Vector3(size.x, cx, cy));
+        out.append(Vector3(size.x, xw, cy));
 
-        appendHelpedTexCoords(texCoordsOut, u, v, sliceSize, width, height, 0);
+        appendTexCoordsXYWH(texCoordsOut, u, v, sliceSize, width, height);
         break;
     }
     case Bottom:
@@ -146,7 +127,7 @@ void RBX::PVInstance::rbxAppendProductSlice(NormalId face, SurfaceType surface, 
     }
 }
 
-void RBX::PVInstance::rbxAppendRemainderSlice(NormalId face, SurfaceType surface, Vector2 sliceSize, float rn0, float rn1, float rn2, float x, float y, float cx, float cy, float xw, float yh, float worldX, float worldY, float sliceW, float sliceH, float width, float height, Array<Vector3>& out, Array<Vector2>& texCoordsOut)
+void RBX::PartInstance::rbxAppendRemainderSlice(NormalId face, SurfaceType surface, Vector2 sliceSize, float rn0, float rn1, float rn2, float x, float y, float cx, float cy, float xw, float yh, float worldX, float worldY, float sliceW, float sliceH, float width, float height, Array<Vector3>& out, Array<Vector2>& texCoordsOut)
 {
 
     switch (face)
@@ -240,6 +221,8 @@ void RBX::PVInstance::rbxAppendRemainderSlice(NormalId face, SurfaceType surface
     }
     case Right:
     {
+        return;
+
         if (!rn2)
         {
             /* add remainders */
@@ -269,7 +252,7 @@ void RBX::PVInstance::rbxAppendRemainderSlice(NormalId face, SurfaceType surface
     Vector2 u = Vector2(), v = Vector2();
 
     float realX = 4, realZ = 2;
-    
+
     if (rn0 > 0)
     {
         realX = rn0;
@@ -289,30 +272,15 @@ void RBX::PVInstance::rbxAppendRemainderSlice(NormalId face, SurfaceType surface
     }
 
     Vector3 rSize = Vector3(realX, worldY, realZ);
-    Vector2 sSize = PVInstance::getSubdivisionNumbers(face, rSize);
+    Vector2 sSize = PartInstance::getSubdivisionNumbers(face, rSize);
 
     Render::TextureReserve::get()->getSurfaceXXYY(color, surface, face, sSize, u, v);
 
     appendTexCoordsXYWH(texCoordsOut, u, v, sSize, sliceW, sliceH);
 }
 
-void PVInstance::rbxSubdivide(SurfaceType surface, NormalId face, int width, int height, float w, float y, float h, Vector2 u, Vector2 v, CoordinateFrame cframe, Array<Vector3>& out, Array<Vector2>& texCoordsOut)
+void PartInstance::rbxSubdivide(SurfaceType surface, NormalId face, int width, int height, float w, float y, float h, Vector2 u, Vector2 v, CoordinateFrame cframe, Array<Vector3>& out, Array<Vector2>& texCoordsOut)
 {
-
-    //int width = 2;
-    //int height = 4;
-
-    /* so this code caused more problems than fixed them. 
-    if (h < w)
-    {
-        if (h > width)
-        {
-            int owidth = width;
-            width = height;
-            height = owidth;
-        }
-    }
-    */
 
     if (h < height)
     {
@@ -373,7 +341,7 @@ void PVInstance::rbxSubdivide(SurfaceType surface, NormalId face, int width, int
 
                 if (y == sliceY - 1)
                 {
-                    if(rSize.z < height)
+                    if (rSize.z < height)
                     {
                         yh += remainderStripY;
                         rSize.z += remainderStripY;
@@ -395,7 +363,7 @@ void PVInstance::rbxSubdivide(SurfaceType surface, NormalId face, int width, int
                     {
                         if (remainderStripX > 0)
                         {
-                           rbxAppendRemainderSlice(face, surface, sSize, remainderStripX, 0, 0, cx, cy, xw, yh, remainder0XWidth, remainder0YHeight, 0, trueY, w, h, width, height, out, texCoordsOut);
+                            rbxAppendRemainderSlice(face, surface, sSize, remainderStripX, 0, 0, cx, cy, xw, yh, remainder0XWidth, remainder0YHeight, 0, trueY, w, h, width, height, out, texCoordsOut);
                         }
                     }
                     if (y == sliceY - 1)
@@ -429,12 +397,12 @@ void PVInstance::rbxSubdivide(SurfaceType surface, NormalId face, int width, int
                                         remainder0XWidth,
                                         remainder0YHeight + remainderStripY,
                                         0, trueY, w, h, width, height, out, texCoordsOut);
-                                    }
                                 }
                             }
                         }
-                     }
+                    }
                 }
+            }
 
         }
     }

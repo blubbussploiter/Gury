@@ -15,74 +15,46 @@ RBX::Diagnostics::Renderer* RBX::Diagnostics::get_Renderer()
 
 void RBX::Diagnostics::Renderer::render(RenderDevice* rd)
 {
-	if (!diagnostics_enabled) return;
-
-	/* render Joints */
-
-	if (joints_shouldRenderWebs)
+	if (diagnostics_enabled)
 	{
 
-		RBX::Instances* joints = JointsService::get()->getChildren();
-		for (size_t i = 0; i < joints->size(); i++)
+		/* render Nodes */
+
+		JointsService* joints = JointsService::get();
+
+		for (int i = 0; i < joints->offsetBodyNodes.size(); i++)
 		{
-			RBX::Connector* joint = toInstance<Connector>(joints->at(i));
-			if (joint)
+			OffsetBodyNode* node = joints->offsetBodyNodes[i];
+			if (node)
 			{
-				joint->diagRender(rd);
+				node->doRender(rd);
 			}
 		}
 
+		/* -- render roblox stuff probably.. -- */
 	}
-
-	/* -- render roblox stuff probably.. -- */
 
 
 }
 
 void RBX::Diagnostics::Renderer::preRender(RenderDevice* rd)
 {
-	if (!diagnostics_enabled) return;
-
-	/* render outlines for joint's primitives */
-
-	if (joints_shouldRenderOutlines)
+	if (diagnostics_enabled)
 	{
+		/* render outlines for joint's primitives */
 
-		RBX::Instances* joints = JointsService::get()->getChildren();
-		for (size_t i = 0; i < joints->size(); i++)
+		if (joints_shouldRenderOutlines)
 		{
-			RBX::Connector* joint = toInstance<Connector>(joints->at(i));
-			if (joint)
-			{
-				joint->diagRenderPrimitiveOutlines(rd);
-			}
-		}
 
+
+
+		}
 	}
+
 }
 
 void RBX::Diagnostics::Renderer::render2D(RenderDevice* rd)
 {
-	if (!diagnostics_enabled) return;
-
-	if (!addedButtons)
-	{
-		RBX::Gui::get()->add(&diag_button3);
-		RBX::Gui::get()->add(&diag_button4);
-		addedButtons = true;
-	}
-
-	diag_label1.title = RBX::Format("Joints in world: %d", JointsService::get()->getChildren()->size());
-	diag_label2.title = RBX::Format("Primitives in world: %d", Gurnel::get()->objects.size());
-	diag_label3.title = RBX::Format("Kernel: good");
-	diag_button3.title = RBX::Format("joints_renderWebs: %d", joints_shouldRenderWebs);
-	diag_button4.title = RBX::Format("joints_renderOutlines: %d", joints_shouldRenderOutlines);
-
-	diag_label0.render(rd);
-	diag_label1.render(rd);
-	diag_label2.render(rd);
-	diag_label3.render(rd);
-	diag_box0.render(rd);
 
 }
 

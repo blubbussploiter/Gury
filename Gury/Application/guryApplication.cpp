@@ -143,7 +143,7 @@ void RBX::Experimental::Application::onGraphics()
 void RBX::Experimental::Application::onInit()
 {
 	/* Change to true if you want to enable diagnostics */
-	Diagnostics::get_Renderer()->diagnostics_enabled = false;
+	//Diagnostics::get_Renderer()->diagnostics_enabled = true;
 
 	updateAppName();
 

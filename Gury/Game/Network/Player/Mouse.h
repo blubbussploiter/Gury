@@ -17,7 +17,7 @@ namespace RBX
 
 		int currentglId;
 
-		RBX::PVInstance* target;
+		RBX::PartInstance* target;
 		Vector3 hitWorld, dir;
 
 		HCURSOR cursor;
@@ -27,7 +27,7 @@ namespace RBX
 		bool hoveringUI;
 		float cx, cy, x, y;
 
-		RBX::PVInstance* getTarget();
+		RBX::PartInstance* getTarget();
 		RBX::ModelInstance* getModelTarget();
 
 		Vector3 getDir() { getTarget(); return dir; }
@@ -42,7 +42,7 @@ namespace RBX
 		static Mouse* get();
 
 		template<typename IgnoredItem>
-		RBX::PVInstance* getTargetWithIgnoreList(std::vector<IgnoredItem*>& ignore)
+		RBX::PartInstance* getTargetWithIgnoreList(std::vector<IgnoredItem*>& ignore)
 		{
 			Ray ray;
 			Rect2D viewport;
@@ -51,7 +51,7 @@ namespace RBX
 			Camera* camera = Camera::get();
 
 			ray = camera->camera->worldRay(x, y, viewport);
-			target = (PVInstance*)World::getPartFromG3DRay<IgnoredItem>(ray, hitWorld, 0, ignore);
+			target = (PartInstance*)World::getPartFromG3DRay<IgnoredItem>(ray, hitWorld, 0, ignore);
 
 			return target;
 		}

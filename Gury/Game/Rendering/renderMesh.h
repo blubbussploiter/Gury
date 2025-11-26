@@ -56,6 +56,7 @@ namespace RBX
 			};
 
 			/* unlike roblox, only 1 level per mesh (i lied) */
+
 			Level* triangle_level; 
 
 			Mesh::Level* getLevel()
@@ -72,6 +73,7 @@ namespace RBX
 			static uint32 write(Vector3 vertex, Vector3 normal, Vector2 texCoord);
 			static void edit(uint32 index, Vector3 vertex, Vector3 normal, Vector2 texCoord);
 			static void editVertex(uint32 index, Vector3 vertex);
+			static Vector3 originalVertex(uint32 index);
 			static void freeVertex(uint32 index);
 
 			static void applyTextureUnits(RenderDevice* renderDevice);

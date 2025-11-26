@@ -5,14 +5,14 @@
 
 namespace RBX
 {
-	static RBX::PVInstance* getColliding(PVInstance* pvi)
+	static RBX::PartInstance* getColliding(PartInstance* pvi)
 	{
 		Box box = Box(-pvi->getSize() * 1.1f, pvi->getSize() * 1.1f);
-		Instances instances = WorldScene::get()->getArrayOfObjects();
+		Instances* instances = WorldScene::get()->getArrayOfObjects();
 
-		for (RBX::Instance* instance : instances)
+		for (RBX::Instance* instance : *instances)
 		{
-			RBX::PVInstance* pvInstance = toInstance<PVInstance>(instance);
+			RBX::PartInstance* pvInstance = toInstance<PartInstance>(instance);
 
 			if (pvInstance == 0) continue;
 			if (pvInstance == pvi) continue;
@@ -31,13 +31,13 @@ namespace RBX
 		return 0;
 	}
 
-	static bool collidingIgnoringAxis(PVInstance* pvi, Box box, Vector3 normAxis)
+	static bool collidingIgnoringAxis(PartInstance* pvi, Box box, Vector3 normAxis)
 	{
-		Instances instances = WorldScene::get()->getArrayOfObjects();
+		Instances* instances = WorldScene::get()->getArrayOfObjects();
 
-		for (RBX::Instance* instance : instances)
+		for (RBX::Instance* instance : *instances)
 		{
-			RBX::PVInstance* pvInstance = toInstance<PVInstance>(instance);
+			RBX::PartInstance* pvInstance = toInstance<PartInstance>(instance);
 
 			if (pvInstance == 0) continue;
 			if (pvInstance == pvi) continue;
@@ -65,13 +65,13 @@ namespace RBX
 		return false;
 	}
 
-	static bool colliding(PVInstance* pvi, Box box)
+	static bool colliding(PartInstance* pvi, Box box)
 	{
-		Instances instances = WorldScene::get()->getArrayOfObjects();
+		Instances* instances = WorldScene::get()->getArrayOfObjects();
 
-		for (RBX::Instance* instance : instances)
+		for (RBX::Instance* instance : *instances)
 		{
-			RBX::PVInstance* pvInstance = toInstance<PVInstance>(instance);
+			RBX::PartInstance* pvInstance = toInstance<PartInstance>(instance);
 
 			if (pvInstance == 0) continue;
 			if (pvInstance == pvi) continue;
@@ -91,26 +91,26 @@ namespace RBX
 		return false;
 	}
 
-	static bool predict(PVInstance* pvi, CoordinateFrame futureCoord)
+	static bool predict(PartInstance* pvi, CoordinateFrame futureCoord)
 	{
 		Box box;
 		box = futureCoord.toWorldSpace(Box(-pvi->getSize(), pvi->getSize()));
 		return !colliding(pvi, box);
 	}
 	
-	static bool predictOnAxis(PVInstance* pvi, CoordinateFrame futureCoord, Vector3 axis)
+	static bool predictOnAxis(PartInstance* pvi, CoordinateFrame futureCoord, Vector3 axis)
 	{
 		Box box;
 		box = futureCoord.toWorldSpace(Box(-pvi->getSize(), pvi->getSize()));
 		return !collidingIgnoringAxis(pvi, box, axis);
 	}
 
-	static float getDirectionalBrickInfo(Vector3 origin, Vector3 direction, PVInstance* me, PVInstance*& firstBrickUp)
+	static float getDirectionalBrickInfo(Vector3 origin, Vector3 direction, PartInstance* me, PartInstance*& firstBrickUp)
 	{
 		float nearest = inf();
 		float top = 0.f;
 
-		PVInstance* colliding = getColliding(me);
+		PartInstance* colliding = getColliding(me);
 		if (colliding)
 		{
 			Array<Vector3> contactPoints, contactNormals;

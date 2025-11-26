@@ -347,7 +347,16 @@ RBX::Instances* RBX::Serializer::loadInstances(std::string fileName)
 	if (file.size() <= 0)
 		return i;
 
-	doc.parse<0>(file.data());
+	try
+	{
+		doc.parse<0>(file.data());
+	}
+	catch (std::exception e)
+	{
+		MessageBox(0, "Failed to open document", "Gury", MB_OK | MB_ICONWARNING);
+		RBX::StandardOut::print(RBX::MESSAGE_ERROR, e.what());
+		return 0;
+	}
 
 	if (!checkTag())
 		return i;

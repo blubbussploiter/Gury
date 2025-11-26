@@ -74,7 +74,7 @@ void RBX::Render::SpecialMesh::writeWedgeFace(NormalId face)
 		SurfaceType surface = part->getSurface(face);
 
 		Array<Vector3> vertices = WedgeMesh::getFaceVertices(part->getCoordinateFrame(), size, face);
-		Vector2 subdividedTileSize = PVInstance::getSubdivisionNumbers(face, size);
+		Vector2 subdividedTileSize = PartInstance::getSubdivisionNumbers(face, size);
 
 		Render::TextureReserve::TexturePositionalInformation faceUV = TextureReserve::get()->getSurfaceUV(Color3(color), surface, face, subdividedTileSize);
 
@@ -108,7 +108,7 @@ void RBX::Render::SpecialMesh::editWedgeFace(NormalId face)
 		SurfaceType surface = part->getSurface(face);
 
 		Array<Vector3> vertices = WedgeMesh::getFaceVertices(part->getCoordinateFrame(), size, face);
-		Vector2 subdividedTileSize = PVInstance::getSubdivisionNumbers(face, size);
+		Vector2 subdividedTileSize = PartInstance::getSubdivisionNumbers(face, size);
 
 		Render::TextureReserve::TexturePositionalInformation faceUV = TextureReserve::get()->getSurfaceUV(Color3(color), surface, face, subdividedTileSize);
 

@@ -102,9 +102,14 @@ void RBX::Render::SpecialMesh::fromMeshType(MeshType types)
 
 void RBX::Render::SpecialMesh::resizeMesh()
 {
-	for (int i = 0; i < vertices.size(); i++)
+	for (int i = 0; i < meshIndices.size(); i++)
 	{
-		vertices[i] = vertices[i] * mesh_scale;
+		Vector3 vertex;
+		uint32 idx = meshIndices[i];
+
+		vertex = Render::Mesh::getGlobalMesh()->vertexArray[idx];
+
+		Render::Mesh::editVertex(idx, vertex * mesh_scale);
 	}
 	edit(); /* reposition what not */
 }
@@ -195,34 +200,18 @@ void RBX::Render::SpecialMesh::write()
 
 void RBX::Render::SpecialMesh::edit()
 {
+	/* Set our renderable thingies */
+
 	PartInstance* part = toInstance<PartInstance>(getParent());
 	if (part)
 	{
-		/* Set our renderable thingies */
-
 		transparency = part->transparency;
 		reflectance = part->reflectance;
 		alpha = part->alpha;
-
-		switch (meshType)
-		{
-			case Head: {
-				editHead();
-				break;
-			}
-			case Wedge:
-			{
-				editWedge();
-				break;
-			}
-			default:
-			{
-				editSpecialMesh();
-				break;
-			}
-		}
-		editGlobalProxyLocation();
 	}
+	
+	editMeshPosition();
+	editGlobalProxyLocation();
 }
 
 void RBX::Render::SpecialMesh::onParentChanged(Instance* self, rttr::property property)
@@ -238,13 +227,39 @@ void RBX::Render::SpecialMesh::onParentChanged(Instance* self, rttr::property pr
 			PVInstance* pvInstance = toInstance<PVInstance>(parent);
 
 			if (pvInstance) {
-
 				IRenderable* renderableSelf = toInstance<IRenderable>(self);
-				parent->onChanged.connect(onParentSizeChanged);
-				pvInstance->removeFromRenderEnvironment();
-				pvInstance->specialShape = renderableSelf;
-				renderableSelf->write();
+				if (renderableSelf)
+				{
+					parent->onChanged.connect(onParentSizeChanged);
+
+					pvInstance->removeFromRenderEnvironment();
+					pvInstance->specialShape = renderableSelf;
+
+					renderableSelf->write();
+					renderableSelf->edit();
+
+					pvInstance->CreatePhysicalPresence();
+				}
 			}
+		}
+	}
+}
+
+void RBX::Render::SpecialMesh::editMeshPosition()
+{
+	PartInstance* part = toInstance<PartInstance>(getParent());
+	if (part)
+	{
+		CoordinateFrame position = part->getCoordinateFrame();
+		for (int i = 0; i < meshIndices.size(); i++)
+		{
+			Vector3 vertex;
+			uint32 idx = meshIndices[i];
+
+			vertex = Render::Mesh::getGlobalMesh()->originalVertex(idx);
+			vertex = position.pointToWorldSpace(vertex);
+
+			Render::Mesh::editVertex(idx, vertex);
 		}
 	}
 }
@@ -258,7 +273,6 @@ void RBX::Render::SpecialMesh::onParentSizeChanged(Instance* self, rttr::propert
 		PVInstance* pvInstance = toInstance<PVInstance>(self);
 		if (pvInstance->specialShape)
 		{
-			RBX::StandardOut::print(RBX::MESSAGE_INFO, "done with");
 			pvInstance->specialShape->removeFromRenderEnvironment();
 			pvInstance->specialShape->write();
 		}

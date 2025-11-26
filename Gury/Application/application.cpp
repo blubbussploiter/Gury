@@ -38,6 +38,13 @@ BOOL CALLBACK documentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 				app->key.lParam = lParam;
 				break;
 			}
+			case WM_CLOSE: /* Maybe this works? */
+			{
+				WNDPROC oldWndProc = app->wndProc;
+				app->wndProc = 0;
+				app->close(); /* Close datamodel */
+				return CallWindowProcA(oldWndProc, hwnd, uMsg, wParam, lParam);
+			}
 			default: break;
 		}
 
@@ -117,7 +124,7 @@ RBX::Experimental::Application::Application(HWND wnd)
 
 	sky = Sky::create(renderDevice, _settings.dataDir + "sky/");
 
-	fps = 30.0f;
+	fps = 32.0f;
 	applicationThinking = false;
 
 }

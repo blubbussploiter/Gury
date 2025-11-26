@@ -1,8 +1,8 @@
 
-#include "../pvinstance.h"
 #include "icosphere.hpp"
+#include "../../part.h"
 
-void RBX::PVInstance::writeBall()
+void RBX::PartInstance::writeBall()
 {
 	std::vector<Vector3> vertices_temp, vertices;
 	std::vector<uint32_t> indices;
@@ -18,8 +18,6 @@ void RBX::PVInstance::writeBall()
 	Vector2 ru, rv;
 
 	Render::TextureReserve::get()->getSurfaceXXYY(color, Smooth, UNDEFINED, Vector2(1, 1), ru, rv);
-
-	RBX::StandardOut::print(RBX::MESSAGE_INFO, "vertice Size = %d", vertices.size());
 
 	for (int i = 0; i < vertices.size(); i++)
 	{
