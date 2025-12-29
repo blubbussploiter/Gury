@@ -3,7 +3,7 @@
   <ItemGroup>
     <ClCompile Include="Application\application.cpp" />
     <ClCompile Include="Application\rbxmanager.cpp" />
-    <ClCompile Include="Application\guryApplication.cpp" />
+    <ClCompile Include="Application\applogic.cpp" />
     <ClCompile Include="Application\gurycursor.cpp" />
     <ClCompile Include="Application\iobfix.cpp" />
     <ClCompile Include="Application\md5.cpp" />
@@ -77,7 +77,7 @@
     <ClCompile Include="Game\Services\soundservice.cpp" />
     <ClCompile Include="Game\Services\stdout.cpp" />
     <ClCompile Include="Game\World\camera.cpp" />
-    <ClCompile Include="Game\World\cameraUtilities.cpp" />
+    <ClCompile Include="Game\World\b3dcam.cpp" />
     <ClCompile Include="Game\World\datamodel.cpp" />
     <ClCompile Include="Game\World\lighting.cpp" />
     <ClCompile Include="Game\World\normalId.cpp" />
@@ -240,7 +240,7 @@
     <ClCompile Include="Game\Lua\luaAllocator.cpp" />
     <ClCompile Include="Game\Rendering\imageMasher.cpp" />
     <ClCompile Include="Game\Rendering\colorAtlasMap.cpp" />
-    <ClCompile Include="Game\Objects\faceTiling.cpp" />
+    <ClCompile Include="Game\Objects\tileBuilder.cpp" />
     <ClCompile Include="Game\Rendering\worldManager.cpp" />
     <ClCompile Include="Game\instanceGarbageCollector.cpp" />
     <ClCompile Include="Kernel\offsetBodyNode.cpp" />
@@ -380,6 +380,7 @@
     <ClInclude Include="Game\Rendering\renderPrimitives.h" />
     <ClInclude Include="Game\instanceGarbageCollector.h" />
     <ClInclude Include="Game\Objects\Humanoid\humanoid.h" />
+    <ClInclude Include="Game\Objects\tileBuilder.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Main\supergurymfc.aps" />

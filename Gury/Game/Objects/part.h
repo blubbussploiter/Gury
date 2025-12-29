@@ -4,6 +4,7 @@
 #include "../Gury/Game/Objects/PVInstance/pvinstance.h"
 #include "../Gury/Game/Rendering/brickcolor.h"
 #include "../Gury/Game/Reflection/enum.h"
+#include "../../Game/Objects/tileBuilder.h"
 
 namespace RBX
 {
@@ -17,6 +18,7 @@ namespace RBX
 		public RBX::PVInstance
 	{
 	protected:
+		friend class RBX::TileBuilder;
 		friend class RBX::Render::SpecialMesh;
 
 		float sphereRadius; /* 2025 you know what this is for :) */
@@ -35,20 +37,10 @@ namespace RBX
 		void writeBrickFace(NormalId face);
 		void editMeshPosition();
 
-		void getSliceInformation(NormalId face, SurfaceType surface, Vector3 realSize, Vector2& sliceSize, Vector2& u, Vector2& v);
-
-		void appendTexCoordsXYWH(Array<Vector2>& texCoordsOut, Vector2 ru, Vector2 rv, Vector2 size, float width, float height);
-		void appendHelpedTexCoords(Array<Vector2>& texCoordsOut, Vector2 ru, Vector2 rv, Vector2 size, float w, float h, bool drawHorizontal);
+		void writeBall();
 
 		void regenerateRenderable();
 		void regenerateFace(NormalId face);
-
-		void rbxAppendProductSlice(NormalId face, SurfaceType surface, Vector2 sliceSize, Vector2 u, Vector2 v, float cx, float cy, float xw, float yh, float worldY, float width, float height, Array<Vector3>& out, Array<Vector2>& texCoordsOut);
-		void rbxAppendRemainderSlice(NormalId face, SurfaceType surface, Vector2 sliceSize, float rn0, float rn1, float rn2, float x, float y, float cx, float cy, float xw, float yh, float worldX, float worldY, float sliceW, float sliceH, float width, float height, Array<Vector3>& out, Array<Vector2>& texCoordsOut);
-
-		void rbxSubdivide(SurfaceType surface, NormalId face, int width, int height, float w, float y, float h, Vector2 u, Vector2 v, CoordinateFrame cframe, Array<Vector3>& out, Array<Vector2>& texCoordsOut);
-
-		void writeBall();
 
 		static Array<Vector3> calculateBrickFaceVertices(NormalId face, Vector3 size);
 		static Vector2 getSubdivisionNumbers(NormalId face, Vector3 size);

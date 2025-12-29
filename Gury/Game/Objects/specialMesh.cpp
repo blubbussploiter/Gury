@@ -100,7 +100,7 @@ void RBX::Render::SpecialMesh::fromMeshType(MeshType types)
 	setMeshType(types);
 }
 
-void RBX::Render::SpecialMesh::resizeMesh()
+void RBX::Render::SpecialMesh::resizeMesh(Vector3 scale)
 {
 	for (int i = 0; i < meshIndices.size(); i++)
 	{
@@ -109,8 +109,13 @@ void RBX::Render::SpecialMesh::resizeMesh()
 
 		vertex = Render::Mesh::getGlobalMesh()->vertexArray[idx];
 
-		Render::Mesh::editVertex(idx, vertex * mesh_scale);
+		Render::Mesh::editVertex(idx, vertex * scale);
 	}
+}
+
+void RBX::Render::SpecialMesh::resizeMesh()
+{
+	resizeMesh(mesh_scale);
 	edit(); /* reposition what not */
 }
 
@@ -224,19 +229,21 @@ void RBX::Render::SpecialMesh::onParentChanged(Instance* self, rttr::property pr
 
 		if (parent) {
 
-			PVInstance* pvInstance = toInstance<PVInstance>(parent);
+			PartInstance* pvInstance = toInstance<PartInstance>(parent);
 
 			if (pvInstance) {
-				IRenderable* renderableSelf = toInstance<IRenderable>(self);
-				if (renderableSelf)
+				SpecialMesh* mesh = toInstance<SpecialMesh>(self);
+				if (mesh)
 				{
 					parent->onChanged.connect(onParentSizeChanged);
 
 					pvInstance->removeFromRenderEnvironment();
-					pvInstance->specialShape = renderableSelf;
+					pvInstance->specialShape = mesh;
 
-					renderableSelf->write();
-					renderableSelf->edit();
+					mesh->write();
+					mesh->edit();
+
+					mesh->resizeMesh(pvInstance->size);
 
 					pvInstance->CreatePhysicalPresence();
 				}
@@ -270,11 +277,14 @@ void RBX::Render::SpecialMesh::onParentSizeChanged(Instance* self, rttr::propert
 
 	if (self && propertyName == "Size")
 	{
-		PVInstance* pvInstance = toInstance<PVInstance>(self);
-		if (pvInstance->specialShape)
+		PartInstance* pvInstance = toInstance<PartInstance>(self);
+		if (pvInstance)
 		{
-			pvInstance->specialShape->removeFromRenderEnvironment();
-			pvInstance->specialShape->write();
+			SpecialMesh* mesh = pvInstance->getSpecialMesh();
+			if (mesh)
+			{
+				mesh->resizeMesh(pvInstance->size);
+			}
 		}
 	}
 }

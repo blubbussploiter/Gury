@@ -99,6 +99,11 @@ void RBX::Experimental::Application::resizeWithParent(int cx, int cy)
 	resize(w, h);
 }
 
+RBX::Experimental::Application* RBX::Experimental::Application::getApp()
+{
+	return RBXManager::get()->getApplication();
+}
+
 RBX::Experimental::Application::Application(HWND wnd)
 {
 	viewHwnd = wnd;

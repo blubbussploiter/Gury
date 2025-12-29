@@ -1,4 +1,6 @@
 
+/* Semi modified Blocks3D code */
+
 #include "camera.h"
 #include "sounds.h"
 
@@ -83,10 +85,15 @@ void RBX::Camera::refreshZoom(const CoordinateFrame& frame)
 
 void RBX::Camera::pan(CoordinateFrame* frame, float spdX, float spdY, bool lookAt)
 {
-	Vector3 pos;
-
 	yaw += spdX;
 	pitch += spdY;
+
+	snapToGoal(frame, lookAt);
+}
+
+void RBX::Camera::snapToGoal(CoordinateFrame* frame, bool lookAtGoal)
+{
+	Vector3 pos;
 
 	if (pitch > 1.4f) pitch = 1.4f;
 	if (pitch < -1.4f) pitch = -1.4f;
@@ -94,7 +101,7 @@ void RBX::Camera::pan(CoordinateFrame* frame, float spdX, float spdY, bool lookA
 	pos = Vector3(sin(-yaw) * zoom * cos(pitch), sin(pitch) * zoom, cos(-yaw) * zoom * cos(pitch)) + goal;
 
 	frame->translation = pos;
-	if (lookAt)
+	if (lookAtGoal)
 	{
 		frame->lookAt(goal);
 	}

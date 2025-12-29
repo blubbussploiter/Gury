@@ -44,6 +44,7 @@ namespace RBX
 
 		float oldZoom;
 		float yaw, pitch, zoom;
+		float cameraLerpSmoothness;
 
 		RBX::PartInstance* cameraSubject;
 
@@ -97,6 +98,11 @@ namespace RBX
 
 		/* gury stuff */
 
+		void setCameraType(CameraType newCameraType);
+		void snapToGoal(CoordinateFrame* frame, bool lookAtGoal=true);
+
+		void stepCameraType();
+
 		void lookAtSelected();
 		void lookAtSelectableArray(ISelectableArray array);
 
@@ -106,12 +112,11 @@ namespace RBX
 		void tiltUp(double deg = 5);
 		void tiltDown(double deg = 5);
 
-		void cam_zoom(bool inout);
+		void doZoom(bool inout);
 
 		void reset();
 
-		void update(bool rightMouseDown);
-		void follow();
+		void update();
 
 		void updateView()
 		{ 
@@ -137,10 +142,10 @@ namespace RBX
 
 		Camera() : goal(Vector3(0, 0, 0)), yaw(0.f), pitch(0.f), zoom(14.f)
 		{
-			cameraType = CameraType::Fixed;
 			cameraSubject = 0;
 			ZeroMemory(&oldMouse, sizeof(POINT));
 			ZeroMemory(&mouse, sizeof(POINT));
+			setCameraType(Fixed);
 			setSpeed(2.5f);
 			setClassName("Camera");
 			setName("Camera");

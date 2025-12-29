@@ -130,7 +130,6 @@ void RBX::Datamodel::render(RenderDevice* renderDevice)
 
 void RBX::Datamodel::open()
 {
-    textureReserve = new Render::TextureReserve();
     guiRoot = new Gui::GuiRoot();
     players = new RBX::Network::Players();
     hopper = new Hopper();

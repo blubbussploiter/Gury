@@ -77,11 +77,11 @@ void RBX::Experimental::Application::onLogic()
 
 		if (userInput->keyPressed(SDLK_o))
 		{
-			RBX::Camera::get()->cam_zoom(0);
+			RBX::Camera::get()->doZoom(0);
 		}
 		if (userInput->keyPressed(SDLK_i))
 		{
-			RBX::Camera::get()->cam_zoom(1);
+			RBX::Camera::get()->doZoom(1);
 		}
 
 		if (RBX::Studio::current_Tool)
@@ -97,7 +97,7 @@ void RBX::Experimental::Application::onLogic()
 		Camera* cam = getCamera();
 		if (cam)
 		{
-			cam->update(inGuryWindow() && userInput->keyDown(SDL_RIGHT_MOUSE_KEY));
+			cam->update();
 		}
 
 		bool overGui = Gui::get()->doButtonLogic(userInput, renderDevice);
@@ -148,6 +148,7 @@ void RBX::Experimental::Application::onInit()
 	updateAppName();
 
 	RBX::RBXManager::get()->initOneTimeAppliances();
+	BrickColor::BrickMap::get()->orderAllColors();
 
 	setWindowLong();
 

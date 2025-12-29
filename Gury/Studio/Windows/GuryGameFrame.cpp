@@ -123,7 +123,7 @@ BOOL GuryGameFrame::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 
 	if (application)
 	{
-		application->getCamera()->cam_zoom(zDelta > 0);
+		application->getCamera()->doZoom(zDelta > 0);
 	}
 
 	return CMDIChildWndEx::OnMouseWheel(nFlags, zDelta, pt);

@@ -126,7 +126,7 @@
     <ClCompile Include="..\include\ode\src\util.cpp" />
     <ClCompile Include="Application\application.cpp" />
     <ClCompile Include="Application\rbxmanager.cpp" />
-    <ClCompile Include="Application\guryApplication.cpp" />
+    <ClCompile Include="Application\applogic.cpp" />
     <ClCompile Include="Application\gurycursor.cpp" />
     <ClCompile Include="Application\iobfix.cpp" />
     <ClCompile Include="Application\md5.cpp" />
@@ -184,7 +184,7 @@
     <ClCompile Include="Game\Objects\PVInstance\Meshes\ballMesh.cpp" />
     <ClCompile Include="Game\Objects\PVInstance\pvinstance.cpp" />
     <ClCompile Include="Game\Objects\brickAppearance.cpp" />
-    <ClCompile Include="Game\Objects\faceTiling.cpp" />
+    <ClCompile Include="Game\Objects\tileBuilder.cpp" />
     <ClCompile Include="Game\Objects\specialMesh.cpp" />
     <ClCompile Include="Game\Objects\wedgemesh.cpp" />
     <ClCompile Include="Game\Objects\World\hint.cpp" />
@@ -220,7 +220,7 @@
     <ClCompile Include="Game\Services\soundservice.cpp" />
     <ClCompile Include="Game\Services\stdout.cpp" />
     <ClCompile Include="Game\World\camera.cpp" />
-    <ClCompile Include="Game\World\cameraUtilities.cpp" />
+    <ClCompile Include="Game\World\b3dcam.cpp" />
     <ClCompile Include="Game\World\datamodel.cpp" />
     <ClCompile Include="Game\World\lighting.cpp" />
     <ClCompile Include="Game\World\normalId.cpp" />
@@ -276,6 +276,7 @@
     <ClInclude Include="Game\Lua\signalInstance.h" />
     <ClInclude Include="Game\Objects\Humanoid\humanoid.h" />
     <ClInclude Include="Game\Objects\PVInstance\Meshes\icosphere.hpp" />
+    <ClInclude Include="Game\Objects\tileBuilder.h" />
     <ClInclude Include="Game\Objects\World\hint.h" />
     <ClInclude Include="Game\Objects\World\message.h" />
     <ClInclude Include="Game\Reflection\scriptSlot.h" />

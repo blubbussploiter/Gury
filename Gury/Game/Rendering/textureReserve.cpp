@@ -9,6 +9,8 @@
 
 using namespace RBX;
 
+Render::TextureReserve* textureReserve = new Render::TextureReserve();
+
 void RBX::Render::TextureReserve::regenWorld()
 {
     Instances* instances = WorldScene::get()->sceneObjects;
@@ -88,7 +90,7 @@ void RBX::Render::TextureReserve::getSurfaceXXYY(Color4 brickColor, SurfaceType 
 
 RBX::Render::TextureReserve* RBX::Render::TextureReserve::get()
 {
-    return Datamodel::get()->textureReserve;
+    return textureReserve;
 }
 
 Vector2 Render::TextureReserve::calculateSuperTextureDimensions()

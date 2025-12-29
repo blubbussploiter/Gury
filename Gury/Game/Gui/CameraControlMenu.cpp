@@ -1,7 +1,8 @@
-#include "GuiRoot.h"
 
 #include "../Gury/Game/World/sounds.h"
 #include "../Gury/Application/appmanager.h"
+
+#include "GuiRoot.h"
 
 void RBX::Gui::CameraPanMenu::onArrowUpBtnClick(GuiButton* btn)
 {
@@ -17,12 +18,12 @@ void RBX::Gui::CameraPanMenu::onArrowDwnBtnClick(GuiButton* btn)
 
 void RBX::Gui::CameraPanMenu::onZoomOutBtnClick(GuiButton* btn)
 {
-	Camera::get()->cam_zoom(0);
+	Camera::get()->doZoom(0);
 	Camera::switch3->play();
 }
 
 void RBX::Gui::CameraPanMenu::onZoomInBtnClick(GuiButton* btn)
 {
-	Camera::get()->cam_zoom(1);
+	Camera::get()->doZoom(1);
 	Camera::switch3->play();
 }

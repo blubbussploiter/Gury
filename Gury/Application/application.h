@@ -89,6 +89,8 @@ namespace RBX
 			Datamodel* getDatamodel();
 			Camera* getCamera();
 
+			UserInput* getUserInput() { return userInput; }
+
 			void onFocus();
 			void onKillFocus();
 
@@ -105,6 +107,8 @@ namespace RBX
 			void resume() {
 				applicationThinking = true;
 			}
+
+			static Application* getApp();
 
 			bool initialized() { return isInitialized; }
 

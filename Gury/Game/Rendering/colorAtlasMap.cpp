@@ -110,6 +110,17 @@ void RBX::BrickColor::BrickAtlasMap::tryRemove(Color4 brickColor, SurfaceType su
 	}
 }
 
+void RBX::BrickColor::BrickMap::orderAllInSurface(std::string name,SurfaceType surface)
+{
+	BrickAtlasMap* map = BrickAtlasMap::get();
+	map->orderInAtlas(fromName(name), surface);
+}
+
+void RBX::BrickColor::BrickMap::orderAllColors()
+{
+	//orderAllInSurface("")
+}
+
 RBX::BrickColor::BrickAtlasMap* RBX::BrickColor::BrickAtlasMap::get()
 {
 	return Render::TextureReserve::get()->getColorAtlas();

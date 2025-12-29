@@ -56,7 +56,7 @@ void Player::loadCharacter()
 			character->setParent(Workspace::get());
 
 			camera->cameraSubject = character->findFirstChild<PartInstance>("Head");
-			camera->cameraType = Follow;
+			camera->setCameraType(Follow);
 		}
 	}
 

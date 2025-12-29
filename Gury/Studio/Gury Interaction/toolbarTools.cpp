@@ -274,14 +274,14 @@ void CsupergurymfcApp::OnZoomIn()
 {
 	RBX::Camera* camera = RBX::Camera::get();
 	if (!camera) return;
-	camera->cam_zoom(1);
+	camera->doZoom(1);
 }
 
 void CsupergurymfcApp::OnZoomOut()
 {
 	RBX::Camera* camera = RBX::Camera::get();
 	if (!camera) return;
-	camera->cam_zoom(0);
+	camera->doZoom(0);
 }
 
 void CsupergurymfcApp::OnLookat()

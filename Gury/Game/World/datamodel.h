@@ -40,7 +40,6 @@ namespace RBX
 		WorldScene* scene;
 		RBX::Render::Mesh* globalMesh;
 		RBX::Render::RenderScene* renderScene;
-		RBX::Render::TextureReserve* textureReserve;
 		RBX::Gurnel* physicsKernel;
 
 		Gui::GuiHint* gameHint;

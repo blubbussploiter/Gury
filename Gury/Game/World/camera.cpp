@@ -55,7 +55,7 @@ void RBX::Camera::characterFade()
 
     if (cameraSubject)
     {
-        if (player && player && player->character)
+        if (player && player->character)
         {
             RBX::ModelInstance* character = player->character;
             RBX::Humanoid* humanoid = Humanoid::modelIsCharacter(character);
@@ -92,7 +92,7 @@ void RBX::Camera::characterFade()
 }
 
 
-void RBX::Camera::cam_zoom(bool inout)
+void RBX::Camera::doZoom(bool inout)
 {
     if (inout)
     {
@@ -109,43 +109,19 @@ void RBX::Camera::reset()
     setFocus(startFocus);
 }
 
-void RBX::Camera::follow()
-{
-    if (cameraSubject)
-    {
-        goal = cameraSubject->getPosition();
-        pan(&cframe, 0, 0);
-    }
-}
-
-void RBX::Camera::update(bool rightMouseDown)
+void RBX::Camera::update()
 {
     if (camera)
     {
-        Vector3 pos;
-        float smoothness;
+        UserInput* userInput = Experimental::Application::getApp()->getUserInput();
 
-        panning = rightMouseDown;
+        bool mouseDown = userInput->keyDown(SDL_RIGHT_MOUSE_KEY);
 
-        switch (cameraType)
+        panning = mouseDown;
+        if (panning)
         {
-        case Follow:
-        {
-            smoothness = 0.9f;
-            characterFade();
-            follow();
-            break;
-        }
-        default:
-        {
-            smoothness = 0.45f;
-            break;
-        }
-        }
-
-        if (rightMouseDown)
-        {
-            if (oldMouse.x != 0 && oldMouse.y != 0)
+            if (oldMouse.x != 0 &&
+                oldMouse.y != 0)
             {
                 GetCursorPos(&mouse);
                 SetCursorPos(oldMouse.x, oldMouse.y);
@@ -154,11 +130,12 @@ void RBX::Camera::update(bool rightMouseDown)
         }
 
         GetCursorPos(&oldMouse);
+        stepCameraType();
 
         CoordinateFrame current = camera->getCoordinateFrame();
         if (cframe != current)
         {
-            camera->setCoordinateFrame(current.lerp(cframe, smoothness));
+            camera->setCoordinateFrame(current.lerp(cframe, cameraLerpSmoothness));
         }
     }
 
@@ -176,6 +153,43 @@ void RBX::Camera::doMove()
 
     camera->setCoordinateFrame(cframe);
     setFrame(cframe);
+}
+
+void RBX::Camera::setCameraType(CameraType newCameraType)
+{
+    cameraType = newCameraType;
+    switch (cameraType)
+    {
+        case Follow:
+        {
+            cameraLerpSmoothness = 0.9f;
+            break;
+        }
+        case Fixed:
+        {
+            cameraLerpSmoothness = 0.45f;
+            break;
+        }
+    }
+}
+
+void RBX::Camera::stepCameraType()
+{
+    switch (cameraType)
+    {
+        case Follow:
+        {
+            characterFade();
+
+            if (cameraSubject)
+            {
+                goal = cameraSubject->getPosition();
+                pan(&cframe, 0, 0, false);
+            }
+
+            break;
+        }
+    }
 }
 
 void RBX::Camera::lookAtSelected()
@@ -262,7 +276,7 @@ void RBX::Camera::setImageServerViewNoLerp(CoordinateFrame modelCoord)
     goal = modelCoord.translation;
 
     pan(&cframe, 0, 0);
-    update(0);
+    update();
 }
 
 RBX::ICameraOwner* RBX::Camera::getCameraOwner()

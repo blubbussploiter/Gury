@@ -220,7 +220,7 @@ void RBX::PartInstance::generateSubdividedFace(Array<Vector3>& out, Array<Vector
             float width = subdivisions.y;
             float height = subdivisions.x;
 
-            rbxSubdivide(surface, face, subDivisionWidth, subDivisionHeight, width, worldSize.y, height, u, v, getCenter(), out, texCoordsOut);
+            TileBuilder::tile(color, worldSize, surface, face, subDivisionWidth, subDivisionHeight, width, worldSize.y, height, u, v, getCenter(), out, texCoordsOut);
         }
         else /* Mega texture */
         {
@@ -234,14 +234,14 @@ void RBX::PartInstance::generateSubdividedFace(Array<Vector3>& out, Array<Vector
             int iWidth = floorf(subDivisionWidth);
             int iHeight = floorf(subDivisionHeight);
 
-            rbxSubdivide(surface, face, iWidth, iHeight, width, worldSize.y, height, u, v, getCenter(), out, texCoordsOut);
+            TileBuilder::tile(color, worldSize, surface, face, iWidth, iHeight, width, worldSize.y, height, u, v, getCenter(), out, texCoordsOut);
         }
     }
     else
     {
         /* Smooth brick */
         out = vertices;
-        appendTexCoordsXYWH(texCoordsOut, u, v, subdivisions, 4, 2);
+        TileBuilder::appendTexCoordsXYWH(texCoordsOut, u, v, subdivisions, 4, 2);
     }
 }
 

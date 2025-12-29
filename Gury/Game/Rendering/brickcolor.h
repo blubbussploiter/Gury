@@ -62,6 +62,8 @@ namespace RBX
 			Color3 fromName(std::string name);
 
 			void insert(std::string name, int number, Color3 color);
+			void orderAllInSurface(std::string name, SurfaceType surface);
+			void orderAllColors();
 
 			static BrickMap* get();
 
@@ -89,4 +91,6 @@ namespace RBX
 	{
 		return x.number < y.number;
 	}
+
+
 }

@@ -101,6 +101,7 @@ namespace RBX
 
 				Vector3 getMeshScale() { return mesh_scale; }
 
+				void resizeMesh(Vector3 scale);
 				void resizeMesh();
 
 				void fromFile(std::string path);

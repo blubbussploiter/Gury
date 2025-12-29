@@ -101,7 +101,7 @@ namespace RBX
 			setCFrame(c);
 		}
 
-		Vector3 getPosition() { return pv->position.translation; }
+		Vector3 getPosition() { return getCoordinateFrame().translation; }
 
 		void setPosition(Vector3 p)
 		{

@@ -1,16 +1,24 @@
 
 #include "../Objects/PVInstance/pvenums.h"
+
+#include "tileBuilder.h"
 #include "part.h"
+
+/*
+*   Written in 2025, reviewed near... 2026?
+*       jesus this is gross... haha
+*   What the fuck was i writing??
+*/
 
 using namespace RBX;
 
-void RBX::PartInstance::getSliceInformation(NormalId face, SurfaceType surface, Vector3 realSize, Vector2& sliceSize, Vector2& u, Vector2& v)
+void RBX::TileBuilder::getSliceInformation(const Color4& color, NormalId face, SurfaceType surface,  const Vector3& realSize, Vector2& sliceSize, Vector2& u, Vector2& v)
 {
     sliceSize = PartInstance::getSubdivisionNumbers(face, realSize);
     Render::TextureReserve::get()->getSurfaceXXYY(color, surface, face, sliceSize, u, v);
 }
 
-void PartInstance::appendTexCoordsXYWH(Array<Vector2>& texCoordsOut, Vector2 ru, Vector2 rv, Vector2 size, float width, float height)
+void TileBuilder::appendTexCoordsXYWH(Array<Vector2>& texCoordsOut, Vector2 ru, Vector2 rv, Vector2 size, float width, float height)
 {
     bool writeHorizontal = false;
 
@@ -34,7 +42,7 @@ void PartInstance::appendTexCoordsXYWH(Array<Vector2>& texCoordsOut, Vector2 ru,
     appendHelpedTexCoords(texCoordsOut, ru, rv, size, width, height, writeHorizontal);
 }
 
-void RBX::PartInstance::appendHelpedTexCoords(Array<Vector2>& texCoordsOut, Vector2 ru, Vector2 rv, Vector2 size, float w, float h, bool drawHorizontal)
+void RBX::TileBuilder::appendHelpedTexCoords(Array<Vector2>& texCoordsOut, Vector2 ru, Vector2 rv, Vector2 size, float w, float h, bool drawHorizontal)
 {
 
     if (w >= 30 || h >= 30)
@@ -78,7 +86,7 @@ void RBX::PartInstance::appendHelpedTexCoords(Array<Vector2>& texCoordsOut, Vect
     }
 }
 
-void RBX::PartInstance::rbxAppendProductSlice(NormalId face, SurfaceType surface, Vector2 sliceSize, Vector2 u, Vector2 v, float cx, float cy, float xw, float yh, float worldY, float width, float height, Array<Vector3>& out, Array<Vector2>& texCoordsOut)
+void RBX::TileBuilder::rbxAppendProductSlice(const Vector3& size, NormalId face, SurfaceType surface, Vector2 sliceSize, Vector2 u, Vector2 v, float cx, float cy, float xw, float yh, float worldY, float width, float height, Array<Vector3>& out, Array<Vector2>& texCoordsOut)
 {
     switch (face)
     {
@@ -127,7 +135,7 @@ void RBX::PartInstance::rbxAppendProductSlice(NormalId face, SurfaceType surface
     }
 }
 
-void RBX::PartInstance::rbxAppendRemainderSlice(NormalId face, SurfaceType surface, Vector2 sliceSize, float rn0, float rn1, float rn2, float x, float y, float cx, float cy, float xw, float yh, float worldX, float worldY, float sliceW, float sliceH, float width, float height, Array<Vector3>& out, Array<Vector2>& texCoordsOut)
+void RBX::TileBuilder::rbxAppendRemainderSlice(NormalId face, SurfaceType surface, const Vector3& size, const Vector2& sliceSize, float rn0, float rn1, float rn2, float x, float y, float cx, float cy, float xw, float yh, float worldX, float worldY, float sliceW, float sliceH, float width, float height, Array<Vector3>& out, Array<Vector2>& texCoordsOut)
 {
 
     switch (face)
@@ -247,6 +255,10 @@ void RBX::PartInstance::rbxAppendRemainderSlice(NormalId face, SurfaceType surfa
     }
 
 
+}
+
+void RBX::TileBuilder::generate_texture(const Color4& color, NormalId face, SurfaceType surface, const Vector2& sliceSize, float rn0, float rn1, float rn2, float x, float y, float cx, float cy, float xw, float yh, float worldX, float worldY, float sliceW, float sliceH, float width, float height, Array<Vector3>& out, Array<Vector2>& texCoordsOut)
+{
     /* if theres any texturing problems, it's definitely coming from here */
 
     Vector2 u = Vector2(), v = Vector2();
@@ -279,7 +291,7 @@ void RBX::PartInstance::rbxAppendRemainderSlice(NormalId face, SurfaceType surfa
     appendTexCoordsXYWH(texCoordsOut, u, v, sSize, sliceW, sliceH);
 }
 
-void PartInstance::rbxSubdivide(SurfaceType surface, NormalId face, int width, int height, float w, float y, float h, Vector2 u, Vector2 v, CoordinateFrame cframe, Array<Vector3>& out, Array<Vector2>& texCoordsOut)
+void TileBuilder::tile(const Color4& color, const Vector3& size, SurfaceType surface, NormalId face, int width, int height, float w, float y, float h, Vector2 u, Vector2 v, CoordinateFrame cframe, Array<Vector3>& out, Array<Vector2>& texCoordsOut)
 {
 
     if (h < height)
@@ -348,8 +360,10 @@ void PartInstance::rbxSubdivide(SurfaceType surface, NormalId face, int width, i
                     }
                 }
 
-                getSliceInformation(face, surface, rSize, sSize, u, v);
-                rbxAppendProductSlice(face, surface, sSize, u, v, cx, cy, xw, yh, trueY, w, h, out, texCoordsOut);
+                getSliceInformation(color, face, surface, rSize, sSize, u, v);
+                rbxAppendProductSlice(size, face, surface, sSize, u, v, cx, cy, xw, yh, trueY, w, h, out, texCoordsOut);
+
+                /* what was i writing??? */
 
                 if (x == sliceX - 1 || y == sliceY - 1)
                 {
@@ -363,14 +377,14 @@ void PartInstance::rbxSubdivide(SurfaceType surface, NormalId face, int width, i
                     {
                         if (remainderStripX > 0)
                         {
-                            rbxAppendRemainderSlice(face, surface, sSize, remainderStripX, 0, 0, cx, cy, xw, yh, remainder0XWidth, remainder0YHeight, 0, trueY, w, h, width, height, out, texCoordsOut);
+                            rbxAppendRemainderSlice(face, surface, size, sSize, remainderStripX, 0, 0, cx, cy, xw, yh, remainder0XWidth, remainder0YHeight, 0, trueY, w, h, width, height, out, texCoordsOut);
                         }
                     }
                     if (y == sliceY - 1)
                     {
                         if (remainderStripY > 0 && (rSize.z >= height))
                         {
-                            rbxAppendRemainderSlice(face, surface, sSize, 0, remainderStripY, 0, cx, cy, xw, yh, remainder1XWidth, remainder1YHeight, 0, trueY, w, h, width, height, out, texCoordsOut);
+                            rbxAppendRemainderSlice(face, surface, size, sSize, 0, remainderStripY, 0, cx, cy, xw, yh, remainder1XWidth, remainder1YHeight, 0, trueY, w, h, width, height, out, texCoordsOut);
                         }
                     }
                     if (x == sliceX - 1 && y == sliceY - 1)
@@ -386,7 +400,7 @@ void PartInstance::rbxSubdivide(SurfaceType surface, NormalId face, int width, i
                             {
                                 if (remainderStripX > 0)
                                 {
-                                    rbxAppendRemainderSlice(face, surface, sSize,
+                                    rbxAppendRemainderSlice(face, surface, size, sSize,
                                         remainderStripX,
                                         remainderStripY,
                                         1,
