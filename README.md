@@ -1,5 +1,6 @@
 # Gury3d
 Roblox 2006 recreation
+Built for windows, although with some tinkering (should) work for basically any OS with opengl support
 
 # The final project
 
